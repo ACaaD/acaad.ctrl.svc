@@ -32,10 +32,10 @@ public class DelegatingCommandExecutorTests
     }
 
     [Fact]
-    public void ShouldSuccessfullyExecute()
+    public async Task ShouldSuccessfullyExecute()
     {
         ICommand commandMock = Substitute.For<ICommand>();
-        var result = _instance.ExecuteAsync(commandMock);
+        var result = await _instance.ExecuteAsync(commandMock);
         
         result.IsRight.Should().BeTrue();
 

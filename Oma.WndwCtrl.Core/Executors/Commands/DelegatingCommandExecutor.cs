@@ -26,14 +26,13 @@ public class DelegatingCommandExecutor : ICommandExecutor
     {
         _logger = logger;
         _commandExecutors = commandExecutors;
-        
-        _callChain = FindCommandExecutor()
+
+        _callChain = SetStartTime()
+            .BindAsync(FindCommandExecutor)
             .BindAsync(RunExecutor);
     }
     
-    // public delegate Either<CommandError, (S, A)> State<S, A>(S state);
-    
-    public Either<CommandError, CommandOutcome> ExecuteAsync(ICommand command, CancellationToken cancelToken = default)
+    public async Task<Either<CommandError, CommandOutcome>> ExecuteAsync(ICommand command, CancellationToken cancelToken = default)
     {
         Stopwatch swExec = Stopwatch.StartNew();
         
@@ -42,7 +41,7 @@ public class DelegatingCommandExecutor : ICommandExecutor
 
         CommandState initialState = new(_logger, _commandExecutors, command);
         
-        var outcomeWithState = _callChain.RunAsync(initialState);
+        var outcomeWithState = await _callChain.RunAsync(initialState);
         
         _logger.LogDebug("Finished command in {elapsed} (Success={isSuccess})", swExec.Measure(), outcomeWithState);
         
@@ -51,10 +50,15 @@ public class DelegatingCommandExecutor : ICommandExecutor
             err => err
         );
     }
-    
-    private static MyState<CommandState, ICommandExecutor> FindCommandExecutor()
+
+    private static MyState<CommandState, Unit> SetStartTime()
     {
-        return state =>
+        return async state => (state with { StartDate = DateTime.UtcNow }, Unit.Default);
+    }
+    
+    private static MyState<CommandState, ICommandExecutor> FindCommandExecutor(Unit _)
+    {
+        return async state =>
         {
             ICommandExecutor? executor = state.CommandExecutors.FirstOrDefault(executor => executor.Handles(state.Command));
             
@@ -73,11 +77,11 @@ public class DelegatingCommandExecutor : ICommandExecutor
     
     private static Abstractions.MyState<CommandState, CommandOutcome> RunExecutor(ICommandExecutor commandExecutor)
     {
-        return state =>
+        return async state =>
         {
             state.Logger.LogDebug("Executing command {CommandName} with {ExecutedRetries} retries.", state.Command.GetType().Name, state.ExecutedRetries);
             
-            var either = commandExecutor.ExecuteAsync(state.Command);
+            var either = await commandExecutor.ExecuteAsync(state.Command);
             
             return either.BiMap(
                 oc => (state, oc),
