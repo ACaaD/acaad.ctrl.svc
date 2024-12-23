@@ -5,20 +5,18 @@
   <PropertyGroup Label="General Configuration">
     <AnalysisLevel>latest</AnalysisLevel>
   </PropertyGroup>
-  
   <ItemGroup Label="Host">
+    <PackageVersion Include="LanguageExt.Core" Version="4.4.9" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
   </ItemGroup>
-  
   <ItemGroup Label="API">
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
     <PackageVersion Include="Scalar.AspNetCore" Version="1.2.69" />
   </ItemGroup>
-  
   <ItemGroup Label="Code Analysis">
     <PackageVersion Include="JetBrains.Annotations" Version="2024.3.0" />
   </ItemGroup>
-  
   <ItemGroup Label="Test Framework">
     <PackageVersion Include="coverlet.collector" Version="6.0.2" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
