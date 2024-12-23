@@ -9,7 +9,7 @@ namespace Oma.WndwCtrl.Core.Executors.Commands;
 
 public class CliCommandExecutor : ICommandExecutor<CliCommand>
 {
-    public Task<Either<CommandError, CommandOutcome>> ExecuteAsync(CliCommand command, CancellationToken cancelToken = default)
+    public Task<MyState<CommandState, CommandOutcome>> ExecuteAsync(CliCommand command, CancellationToken cancelToken = default)
     {
         throw new NotImplementedException();
     }
