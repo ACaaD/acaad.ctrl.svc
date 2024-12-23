@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <PackageReference Include="LanguageExt.Core" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     </ItemGroup>
 
 </Project>

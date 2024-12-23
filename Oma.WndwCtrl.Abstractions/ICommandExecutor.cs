@@ -1,11 +1,12 @@
 using LanguageExt;
+using Microsoft.Extensions.Logging;
 using static LanguageExt.Prelude;
 using Oma.WndwCtrl.Abstractions.Errors;
 using Oma.WndwCtrl.Abstractions.Model;
 
 namespace Oma.WndwCtrl.Abstractions;
 
-public delegate Task<Either<CommandError, (S, A)>> MyState<S, A>(S state);
+public delegate Either<CommandError, (S, A)> MyState<S, A>(S state);
 
 public static class OmaExtensions
 {
@@ -14,7 +15,7 @@ public static class OmaExtensions
         {
             try
             {
-                return ma(state).BindAsync(pairA => f(pairA.Item2)(pairA.Item1));
+                return ma(state).Bind(pairA => f(pairA.Item2)(pairA.Item1));
             }
             catch(Exception e)
             {
@@ -25,11 +26,11 @@ public static class OmaExtensions
             }
         };
     
-    public async static Task<Either<CommandError, (S, A)>> RunAsync<S, A>(this MyState<S, A> ma, S state)
+    public static Either<CommandError, (S, A)> RunAsync<S, A>(this MyState<S, A> ma, S state)
     {
         try
         {
-            return await ma(state);
+            return ma(state);
         }
         catch (Exception e)
         {
@@ -40,13 +41,18 @@ public static class OmaExtensions
 
 public class CommandState
 {
+    public ILogger Logger;
+    public IEnumerable<ICommandExecutor> CommandExecutors;
+    
     public ICommand Command { get; }
 
     public TimeSpan? ExecutionDuration { get; set; }
     public int? ExecutedRetries { get; set; }
     
-    public CommandState(ICommand command)
+    public CommandState(ILogger logger, IEnumerable<ICommandExecutor> commandExecutors, ICommand command)
     {
+        Logger = logger;
+        CommandExecutors = commandExecutors;
         Command = command;
     }
 }
@@ -55,25 +61,22 @@ public interface ICommandExecutor
 {
     bool Handles(ICommand command);
     
-    Task<MyState<CommandState, CommandOutcome>> ExecuteAsync(ICommand command, CancellationToken cancelToken = default);
+    Either<CommandError, CommandOutcome> ExecuteAsync(ICommand command, CancellationToken cancelToken = default);
 }
 
 public interface ICommandExecutor<in TCommand> : ICommandExecutor
 {
     bool ICommandExecutor.Handles(ICommand command) => command is TCommand;
     
-    async Task<MyState<CommandState, CommandOutcome>> ICommandExecutor.ExecuteAsync(ICommand command, CancellationToken cancelToken)
+    Either<CommandError, CommandOutcome> ICommandExecutor.ExecuteAsync(ICommand command, CancellationToken cancelToken)
     {
         if (command is not TCommand castedCommand)
         {
-            throw new Exception();
-
-            // TODO
-            // return Prelude.Left<CommandError>(new ProgrammingError($"Passed command is not of type {typeof(TCommand).Name}", Code: 1));
+            return Left<CommandError>(new ProgrammingError($"Passed command is not of type {typeof(TCommand).Name}", Code: 1));
         }
 
-        return await ExecuteAsync(castedCommand, cancelToken: cancelToken);
+        return ExecuteAsync(castedCommand, cancelToken: cancelToken);
     }
     
-    Task<MyState<CommandState, CommandOutcome>> ExecuteAsync(TCommand command, CancellationToken cancelToken = default);
+    Either<CommandError, CommandOutcome> ExecuteAsync(TCommand command, CancellationToken cancelToken = default);
 }

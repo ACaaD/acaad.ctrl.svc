@@ -6,6 +6,7 @@
     <AnalysisLevel>latest</AnalysisLevel>
   </PropertyGroup>
   <ItemGroup Label="Host">
+    <PackageVersion Include="FluentAssertions" Version="7.0.0" />
     <PackageVersion Include="LanguageExt.Core" Version="4.4.9" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
