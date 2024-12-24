@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using LanguageExt;
 using LanguageExt.Common;
 using LanguageExt.TypeClasses;
@@ -17,6 +18,7 @@ public class DelegatingCommandExecutor : ICommandExecutor
 
     private readonly MyState<CommandState, CommandOutcome> _callChain;
     
+    [ExcludeFromCodeCoverage]
     public bool Handles(ICommand command) => true;
     
     public DelegatingCommandExecutor(
@@ -46,8 +48,8 @@ public class DelegatingCommandExecutor : ICommandExecutor
         _logger.LogDebug("Finished command in {elapsed} (Success={isSuccess})", swExec.Measure(), outcomeWithState);
         
         return outcomeWithState.BiBind<CommandOutcome>( 
-            tuple => tuple.Outcome with { ExecutionDuration = swExec.Elapsed }, 
-            err => err with { ExecutionDuration = swExec.Elapsed } 
+            tuple => tuple.Outcome with { ExecutionDuration = Option<TimeSpan>.Some(swExec.Elapsed) }, 
+            err => err with { ExecutionDuration = Option<TimeSpan>.Some(swExec.Elapsed) } 
         );
     }
 

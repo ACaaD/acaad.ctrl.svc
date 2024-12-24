@@ -6,6 +6,6 @@ public record CommandOutcome : ICommandExecutionMetadata
 {
     public string OutcomeRaw { get; set; } = string.Empty;
     
-    public TimeSpan ExecutionDuration { get; set; }
-    public int ExecutedRetries { get; set; }
+    public Option<TimeSpan> ExecutionDuration { get; set; } = Option<TimeSpan>.None;
+    public Option<int> ExecutedRetries { get; set; } = Option<int>.None;
 }

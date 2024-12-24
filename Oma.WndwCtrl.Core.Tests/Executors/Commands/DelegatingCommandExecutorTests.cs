@@ -13,29 +13,33 @@ namespace Oma.WndwCtrl.Core.Tests.Executors.Commands;
 public class DelegatingCommandExecutorTests
 {
     private const string _rawOutcome = "This is a test outcome.";
+    
     private readonly DelegatingCommandExecutor _instance;
+    private readonly ICommand _commandMock;
+    private readonly ICommandExecutor _executorMock;
     
     public DelegatingCommandExecutorTests()
     {
         var loggerMock = Substitute.For<ILogger<DelegatingCommandExecutor>>();
-        var executorMock = Substitute.For<ICommandExecutor>();
+        _executorMock = Substitute.For<ICommandExecutor>();
 
         var outcome = new CommandOutcome()
         {       
             OutcomeRaw = _rawOutcome
         };
         
-        executorMock.Handles(Arg.Any<ICommand>()).Returns(true);
-        executorMock.ExecuteAsync(Arg.Any<ICommand>()).Returns(Right(outcome));
+        _executorMock.Handles(Arg.Any<ICommand>()).Returns(true);
+        _executorMock.ExecuteAsync(Arg.Any<ICommand>()).Returns(Right(outcome));
+     
+        _commandMock = Substitute.For<ICommand>();
         
-        _instance = new(loggerMock, [executorMock]);
+        _instance = new(loggerMock, [_executorMock]);
     }
 
     [Fact]
     public async Task ShouldSuccessfullyExecute()
     {
-        ICommand commandMock = Substitute.For<ICommand>();
-        var result = await _instance.ExecuteAsync(commandMock);
+        var result = await _instance.ExecuteAsync(_commandMock);
         
         result.IsRight.Should().BeTrue();
 
@@ -43,5 +47,47 @@ public class DelegatingCommandExecutorTests
             Right: val => val.OutcomeRaw.Should().Be(_rawOutcome),
             Left: val => val.Should().BeNull()
         );
+    }
+
+    [Fact]
+    public async Task ShouldFailIfNoExecutorIsFound()
+    {
+        _executorMock.Handles(Arg.Any<ICommand>()).Returns(false);
+        
+        var result = await _instance.ExecuteAsync(_commandMock);
+        
+        result.IsLeft.Should().BeTrue();
+        result.Match(_ => { }, err => err.Message.Should().Contain("programming"));
+    }
+    
+    [Fact]
+    public async Task ShouldFailIfExecutorFails()
+    {
+        var simulatedError = new TechnicalError("Simulated sub-command executor error", Code: 1337);
+        
+        _executorMock.ExecuteAsync(Arg.Any<ICommand>())
+            .Returns(Left<CommandError>(simulatedError));
+        
+        var result = await _instance.ExecuteAsync(_commandMock);
+        
+        result.IsLeft.Should().BeTrue();
+        result.Match(_ => { }, err => err.Should().BeOfType<CommandError>());
+    }
+    
+    [Fact]
+    public async Task ShouldPopulateMetadataOnError()
+    {
+        _executorMock.Handles(Arg.Any<ICommand>()).Returns(false);
+        
+        var result = await _instance.ExecuteAsync(_commandMock);
+        
+        result.IsLeft.Should().BeTrue();
+        
+        result.Match(_ => { },
+            err =>
+            {
+                err.ExecutedRetries.Should<Option<int>>().Be(Option<int>.None, because: "No executor is run.");
+                err.ExecutionDuration.Should<Option<TimeSpan>>().NotBe(Option<TimeSpan>.None, because: "execution duration is always populated");
+            });
     }
 }

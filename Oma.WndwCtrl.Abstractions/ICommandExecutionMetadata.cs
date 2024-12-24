@@ -1,8 +1,10 @@
+using LanguageExt;
+
 namespace Oma.WndwCtrl.Abstractions;
 
 public interface ICommandExecutionMetadata
 {
-    TimeSpan ExecutionDuration { get; }
+    Option<TimeSpan> ExecutionDuration { get; }
     
-    int ExecutedRetries { get; }
+    Option<int> ExecutedRetries { get; }
 }
