@@ -45,20 +45,20 @@ public class DelegatingCommandExecutor : ICommandExecutor
         
         _logger.LogDebug("Finished command in {elapsed} (Success={isSuccess})", swExec.Measure(), outcomeWithState);
         
-        return outcomeWithState.BiMap(
-            tuple => tuple.Item2,
-            err => err
+        return outcomeWithState.BiBind<CommandOutcome>( 
+            tuple => tuple.Outcome with { ExecutionDuration = swExec.Elapsed }, 
+            err => err with { ExecutionDuration = swExec.Elapsed } 
         );
     }
 
     private static MyState<CommandState, Unit> SetStartTime()
     {
-        return async state => (state with { StartDate = DateTime.UtcNow }, Unit.Default);
+        return state => Task.FromResult<Either<CommandError, (CommandState State, Unit Outcome)>>((state with { StartDate = DateTime.UtcNow }, Unit.Default));
     }
     
     private static MyState<CommandState, ICommandExecutor> FindCommandExecutor(Unit _)
     {
-        return async state =>
+        return state =>
         {
             ICommandExecutor? executor = state.CommandExecutors.FirstOrDefault(executor => executor.Handles(state.Command));
             
@@ -66,12 +66,12 @@ public class DelegatingCommandExecutor : ICommandExecutor
             {
                 state.Logger.LogError("No command executor found that handles command type {typeName}.", state.Command.GetType().FullName);
 
-                return Prelude.Left<CommandError>(new ProgrammingError(
+                return Task.FromResult<Either<CommandError, (CommandState State, ICommandExecutor Outcome)>>(Prelude.Left<CommandError>(new ProgrammingError(
                     $"No command executor found that handles command type {state.Command.GetType().FullName}.",
-                    2));
+                    2)));
             }
         
-            return (state, executor);
+            return Task.FromResult<Either<CommandError, (CommandState State, ICommandExecutor Outcome)>>((state, executor));
         };
     }
     

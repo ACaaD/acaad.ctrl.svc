@@ -6,7 +6,7 @@ using Oma.WndwCtrl.Abstractions.Model;
 
 namespace Oma.WndwCtrl.Abstractions;
 
-public delegate Task<Either<CommandError, (S, A)>> MyState<S, A>(S state);
+public delegate Task<Either<CommandError, (S State, A Outcome)>> MyState<S, A>(S state);
 
 public static class OmaExtensions
 {
@@ -23,7 +23,7 @@ public static class OmaExtensions
             }
         };
     
-    public async static Task<Either<CommandError, (S, A)>> RunAsync<S, A>(this MyState<S, A> ma, S state)
+    public async static Task<Either<CommandError, (S State, A Outcome)>> RunAsync<S, A>(this MyState<S, A> ma, S state)
     {
         try
         {
