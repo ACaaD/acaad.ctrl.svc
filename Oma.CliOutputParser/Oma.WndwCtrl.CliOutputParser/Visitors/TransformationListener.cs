@@ -7,27 +7,30 @@ namespace Oma.WndwCtrl.CliOutputParser.Visitors;
 
 public class TransformationListener : CliOutputParserBaseListener
 {
-    public TransformationListener(string input)
+    private readonly Action<string> _log;
+
+    public TransformationListener(Action<string> log, string input)
     {
+        _log = log;
         CurrentValues = [input];
     }
-    
+
     private void UpdateValues(IEnumerable<object> newValues)
     {
         CurrentValues = newValues;
     }
-    
+
     public IEnumerable<object> CurrentValues { get; set; }
 
-    private void LogDataRecursive(IEnumerable<object> nestedList, Action<object> logAction)
+    private string LogDataRecursive(IEnumerable<object> nestedList, Action<object> logAction)
     {
-        Console.Write("[");
-        
+        string toLog = "[";
+
         if (nestedList is IEnumerable<IEnumerable<object>> list)
         {
             foreach (var listItem in list)
             {
-                LogDataRecursive(listItem, logAction);    
+                toLog += LogDataRecursive(listItem, logAction);
             }
         }
 
@@ -35,30 +38,31 @@ public class TransformationListener : CliOutputParserBaseListener
         {
             object[]? arr = nestedList?.ToArray() ?? new object[0];
             int count = arr.Length;
-        
+
             for (int i = 0; i < count; i++)
             {
-                Console.Write(arr[i]);
+                toLog += $"'{arr[i].ToString()}'";
                 if (i != count - 1)
                 {
-                    Console.Write(", ");
+                    toLog += ", ";
                 }
-            }   
+            }
         }
-        
-        Console.Write($"]");
+
+        toLog += "]";
+        return toLog;
     }
-    
+
     private IEnumerable<object> MapItemsRecursive(IEnumerable<object> nestedList, Func<object, object> map)
     {
         if (nestedList is IEnumerable<IEnumerable<object>> list)
         {
             return list.Select(l => MapItemsRecursive(l, map));
         }
-        
+
         return nestedList.Select(map);
     }
-    
+
     private IEnumerable<object> UnfoldItemsRecursive(IEnumerable<object> nestedList, Func<object, IEnumerable<object>> unfold)
     {
         if (nestedList is IEnumerable<IEnumerable<object>> tst)
@@ -68,7 +72,7 @@ public class TransformationListener : CliOutputParserBaseListener
 
         return nestedList.Select(unfold);
     }
-    
+
     private object FoldItemsRecursive(IEnumerable<object> nestedList, Func<IEnumerable<object>, object> fold)
     {
         if (nestedList is IEnumerable<IEnumerable<object>> tst)
@@ -81,25 +85,28 @@ public class TransformationListener : CliOutputParserBaseListener
 
     public override void ExitMap(Grammar.CliOutputParser.MapContext context)
     {
-        Console.WriteLine($"{Environment.NewLine}After Map");
-        LogDataRecursive(CurrentValues, Console.Write);
-        
+        _log($"{Environment.NewLine}After Map:");
+        string toLog = LogDataRecursive(CurrentValues, Console.Write);
+        _log(toLog);
+
         base.ExitMap(context);
     }
 
     public override void ExitMultiply(Grammar.CliOutputParser.MultiplyContext context)
     {
-        Console.WriteLine($"{Environment.NewLine}After Multiply");
-        LogDataRecursive(CurrentValues, Console.Write);
-        
+        _log($"{Environment.NewLine}After Multiply:");
+        string toLog = LogDataRecursive(CurrentValues, Console.Write);
+        _log(toLog);
+
         base.ExitMultiply(context);
     }
 
     public override void ExitReduce(Grammar.CliOutputParser.ReduceContext context)
     {
-        Console.WriteLine($"{Environment.NewLine}After Reduce");
-        LogDataRecursive(CurrentValues, Console.Write);
-        
+        _log($"{Environment.NewLine}After Reduce:");
+        string toLog = LogDataRecursive(CurrentValues, Console.Write);
+        _log(toLog);
+
         base.ExitReduce(context);
     }
 
@@ -112,9 +119,9 @@ public class TransformationListener : CliOutputParserBaseListener
             var newVal = val.ToString()!.From(from);
             return newVal;
         };
-        
+
         CurrentValues = MapItemsRecursive(CurrentValues, map);
-        
+
         base.ExitAnchorFrom(context);
     }
 
@@ -123,9 +130,9 @@ public class TransformationListener : CliOutputParserBaseListener
         string to = context.STRING_LITERAL().GetText().Trim('"');
 
         Func<object, object> map = val => val.ToString()!.To(to);
-        
+
         CurrentValues = MapItemsRecursive(CurrentValues, map);
-        
+
         base.ExitAnchorTo(context);
     }
 
@@ -133,7 +140,7 @@ public class TransformationListener : CliOutputParserBaseListener
     {
         string pattern = context.REGEX_LITERAL().GetText().Trim('$').Trim('"');
         Regex r = new(pattern, RegexOptions.Multiline);
-        
+
         Func<object, IEnumerable<object>> unfold = val =>
         {
             List<string> result = new();
@@ -145,20 +152,20 @@ public class TransformationListener : CliOutputParserBaseListener
             }
             return result;
         };
-        
+
         CurrentValues = UnfoldItemsRecursive(CurrentValues, unfold);
-        
+
         base.EnterRegexMatch(context);
     }
-    
+
     public override void ExitRegexYield(Grammar.CliOutputParser.RegexYieldContext context)
     {
         // TODO: FIX (First instead of Average)
         Func<IEnumerable<object>, object> fold = val => val.First();
-        
+
         var result = FoldItemsRecursive(CurrentValues, fold);
         StoreFoldResult(result);
-        
+
         base.ExitRegexYield(context);
     }
 
@@ -166,10 +173,10 @@ public class TransformationListener : CliOutputParserBaseListener
     {
         // TODO: FIX (First instead of Average)
         Func<IEnumerable<object>, object> fold = val => val.First();
-        
+
         var result = FoldItemsRecursive(CurrentValues, fold);
         StoreFoldResult(result);
-        
+
         base.ExitValuesAvg(context);
     }
 
@@ -180,10 +187,10 @@ public class TransformationListener : CliOutputParserBaseListener
             var result = val.First();
             return result;
         };
-        
+
         var result = FoldItemsRecursive(CurrentValues, fold);
         StoreFoldResult(result);
-        
+
         base.ExitValuesFirst(context);
     }
 
@@ -206,10 +213,10 @@ public class TransformationListener : CliOutputParserBaseListener
             var result = val.Last();
             return result;
         };
-        
+
         var result = FoldItemsRecursive(CurrentValues, fold);
         StoreFoldResult(result);
-        
+
         base.ExitValuesLast(context);
     }
 }

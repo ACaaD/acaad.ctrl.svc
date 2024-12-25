@@ -25,7 +25,7 @@ public class CliOutputParserImplTests
                                             4 5 6
                                             7 8 9
                                             """;
-    
+
     private const string _testInputNested2 = """
                                             1.a 1.b 1.c
                                             2.d 2.e 2.f
@@ -34,9 +34,9 @@ public class CliOutputParserImplTests
 
     private readonly CliOutputParserImpl _instance;
 
-    public CliOutputParserImplTests()
+    public CliOutputParserImplTests(ITestOutputHelper outputHelper)
     {
-        _instance = new();
+        _instance = new(outputHelper.WriteLine);
     }
 
     [Fact]
@@ -81,8 +81,8 @@ public class CliOutputParserImplTests
 
         var action = () =>
         {
-            var enumerable = _instance.Parse(transformationInput, _testInputPing); 
-            output = enumerable.ToList(); 
+            var enumerable = _instance.Parse(transformationInput, _testInputPing);
+            output = enumerable.ToList();
         };
 
         action.Should().NotThrow();
@@ -105,16 +105,16 @@ public class CliOutputParserImplTests
 
         var action = () =>
         {
-            var enumerable = _instance.Parse(transformationInput, _testInputNested); 
-            output = enumerable.ToList(); 
+            var enumerable = _instance.Parse(transformationInput, _testInputNested);
+            output = enumerable.ToList();
         };
-        
+
         action.Should().NotThrow();
-        
+
         output.Should().HaveCount(1);
         output.First().Should().Be("9");
     }
-    
+
     [Fact]
     public void ShouldHandleDoubleNestedTransformations()
     {
@@ -127,13 +127,13 @@ public class CliOutputParserImplTests
                                            Values.Last();
                                            Values.Last();
                                            """;
-        
+
         List<object> output = new();
 
         var action = () => { output = _instance.Parse(transformationInput, _testInputNested2).ToList(); };
 
         action.Should().NotThrow();
-        
+
         output.Should().HaveCount(1);
         output.First().Should().Be("i");
     }

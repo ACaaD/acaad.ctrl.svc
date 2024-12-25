@@ -18,7 +18,7 @@ public class CollectingErrorListener : IAntlrErrorListener<int>, IAntlrErrorList
 {
     private List<ProcessingError<int>> _lexerErrors = new();
     private List<ProcessingError<IToken>> _parserErrors = new();
-    
+
     public void SyntaxError(
         TextWriter output, IRecognizer recognizer, int offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e
     )
@@ -38,21 +38,28 @@ public class CollectingErrorListener : IAntlrErrorListener<int>, IAntlrErrorList
 
 public class CliOutputParserImpl
 {
+    private readonly Action<string> _log;
+
+    public CliOutputParserImpl(Action<string> log)
+    {
+        _log = log;
+    }
+
     public IEnumerable<object> Parse(string transformation, string text)
     {
         CollectingErrorListener errorListener = new();
         AntlrInputStream charStream = new(transformation);
         CliOutputLexer lexer = new(charStream);
-        
-        lexer.AddErrorListener(errorListener); 
-        
+
+        lexer.AddErrorListener(errorListener);
+
         CommonTokenStream tokenStream = new(lexer);
-        
+
         CliOutputParser.Grammar.CliOutputParser parser = new(tokenStream);
         parser.AddErrorListener(errorListener);
-        
+
         CliOutputParser.Grammar.CliOutputParser.TransformationContext? tree = parser.transformation();
-        
+
         if (errorListener.Errors.Count > 0)
         {
             foreach (var error in errorListener.Errors)
@@ -63,9 +70,9 @@ public class CliOutputParserImpl
             throw new InvalidOperationException(string.Join(Environment.NewLine, errorListener.Errors));
         }
 
-        TransformationListener listener = new(text);
-        
-        ParseTreeWalker walker = new ParseTreeWalker(); 
+        TransformationListener listener = new(_log, text);
+
+        ParseTreeWalker walker = new ParseTreeWalker();
         walker.Walk(listener, tree);
 
         return listener.CurrentValues;
