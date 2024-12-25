@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using Oma.WndwCtrl.CliOutputParser.Extensions;
 using Oma.WndwCtrl.CliOutputParser.Grammar;
@@ -14,8 +15,7 @@ public class TransformationListener : CliOutputParserBaseListener
         _log = log;
         CurrentValues = [input];
 
-        _log("Input received:");
-        _log(LogDataRecursive(CurrentValues));
+        LogCurrentState("input");
     }
 
     private void UpdateValues(IEnumerable<object> newValues)
@@ -73,7 +73,8 @@ public class TransformationListener : CliOutputParserBaseListener
             return tst.Select(l => UnfoldItemsRecursive(l, unfold));
         }
 
-        return nestedList.Select(unfold);
+        var unfoldResult = nestedList.Select(unfold); 
+        return unfoldResult;
     }
 
     private object FoldItemsRecursive(IEnumerable<object> nestedList, Func<IEnumerable<object>, object> fold)
@@ -86,30 +87,30 @@ public class TransformationListener : CliOutputParserBaseListener
         return fold(nestedList);
     }
 
+    private void LogCurrentState(string name)
+    {
+        _log($"{Environment.NewLine}After {name}:");
+        _log($"JSON::{JsonSerializer.Serialize(CurrentValues)}");
+        
+        string toLog = LogDataRecursive(CurrentValues);
+        _log($"RECU::{toLog}");
+    }
+    
     public override void ExitMap(Grammar.CliOutputParser.MapContext context)
     {
-        _log($"{Environment.NewLine}After Map:");
-        string toLog = LogDataRecursive(CurrentValues);
-        _log(toLog);
-
+        LogCurrentState("map");
         base.ExitMap(context);
     }
 
     public override void ExitMultiply(Grammar.CliOutputParser.MultiplyContext context)
     {
-        _log($"{Environment.NewLine}After Multiply:");
-        string toLog = LogDataRecursive(CurrentValues);
-        _log(toLog);
-
+        LogCurrentState("multiply");
         base.ExitMultiply(context);
     }
 
     public override void ExitReduce(Grammar.CliOutputParser.ReduceContext context)
     {
-        _log($"{Environment.NewLine}After Reduce:");
-        string toLog = LogDataRecursive(CurrentValues);
-        _log(toLog);
-
+        LogCurrentState("reduce");
         base.ExitReduce(context);
     }
 
@@ -146,12 +147,16 @@ public class TransformationListener : CliOutputParserBaseListener
 
         Func<object, IEnumerable<object>> unfold = val =>
         {
-            List<string> result = new();
+            List<List<string>> result = new();
             var matches = r.Matches(val.ToString()!);
 
             foreach (var match in matches)
             {
-                result.Add(match.ToString()!);
+                List<string> innerResult = new();
+                innerResult.Add(match.ToString()!);
+                
+                /* TODO: Add groups */
+                result.Add(innerResult);
             }
             return result;
         };

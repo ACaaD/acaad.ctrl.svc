@@ -36,9 +36,7 @@ public class CliOutputParserImplTests
 
     public CliOutputParserImplTests(ITestOutputHelper outputHelper)
     {
-
-
-        _instance = new(obj => outputHelper.WriteLine(obj.ToString()));
+        _instance = new(obj => outputHelper.WriteLine(obj.ToString()?.Replace("\r", string.Empty)));
     }
 
     [Fact]
