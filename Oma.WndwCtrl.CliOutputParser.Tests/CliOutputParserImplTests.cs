@@ -127,9 +127,6 @@ public class CliOutputParserImplTests
                                            Values.Last();
                                            Values.Last();
                                            """;
-
-        // 1.1 1.2 1.3
-        // 
         
         List<object> output = new();
 
