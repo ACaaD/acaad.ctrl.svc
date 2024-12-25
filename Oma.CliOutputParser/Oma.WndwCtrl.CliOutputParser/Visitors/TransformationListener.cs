@@ -66,15 +66,21 @@ public class TransformationListener : CliOutputParserBaseListener
         return nestedList.Select(map);
     }
 
-    private IEnumerable<object> UnfoldItemsRecursive(IEnumerable<object> nestedList, Func<object, IEnumerable<object>> unfold)
+    private IEnumerable<IEnumerable<object>> UnfoldItemsRecursive(IEnumerable<object> nestedList, Func<IEnumerable<object>, IEnumerable<IEnumerable<object>>> unfold)
     {
         if (nestedList is IEnumerable<IEnumerable<object>> tst)
         {
             return tst.Select(l => UnfoldItemsRecursive(l, unfold));
         }
 
-        var unfoldResult = nestedList.Select(unfold); 
-        return unfoldResult;
+        if (nestedList is IEnumerable<object>)
+        {
+            var unfoldResult = unfold(nestedList); 
+            return unfoldResult;   
+        }
+        
+        Console.WriteLine("whatsgoingon");
+        throw new InvalidOperationException("abc");
     }
 
     private object FoldItemsRecursive(IEnumerable<object> nestedList, Func<IEnumerable<object>, object> fold)
@@ -145,19 +151,27 @@ public class TransformationListener : CliOutputParserBaseListener
         string pattern = context.REGEX_LITERAL().GetText().Trim('$').Trim('"');
         Regex r = new(pattern, RegexOptions.Multiline);
 
-        Func<object, IEnumerable<object>> unfold = val =>
+        Func<IEnumerable<object>, IEnumerable<IEnumerable<object>>> unfold = val =>
         {
             List<List<string>> result = new();
-            var matches = r.Matches(val.ToString()!);
 
-            foreach (var match in matches)
+            foreach (var items in val)
             {
-                List<string> innerResult = new();
-                innerResult.Add(match.ToString()!);
-                
-                /* TODO: Add groups */
-                result.Add(innerResult);
+                var matches = r.Matches(items.ToString()!);
+
+                foreach (Match match in matches)
+                {
+                    List<string> innerResult = new();
+
+                    foreach (Group group in match.Groups)
+                    {
+                        innerResult.Add(group.ToString());
+                    }
+                    
+                    result.Add(innerResult);
+                }
             }
+            
             return result;
         };
 

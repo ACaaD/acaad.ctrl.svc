@@ -94,11 +94,11 @@ public class CliOutputParserImplTests
     public void ShouldHandleNestedTransformations()
     {
         const string transformationInput = """
-                                           Regex.Match($"^.*$");
-                                           Regex.Match($"\d");
-                                           Values.Last();
-                                           Values.Last();
-                                           Values.Last(); // Why is this heeeere
+                                           Regex.Match($"^.*$"); // [ s ] -> [ [ s ] ]
+                                           Regex.Match($"(\d)"); // [ [ s ] ] -> [ [ [ s ] ] ]
+                                           Values.Last(); // Choose inner-most regex group
+                                           Values.Last(); // Choose from line
+                                           Values.First(); // Choose i dont know what
                                            """;
 
         List<object> output = new();
@@ -112,7 +112,7 @@ public class CliOutputParserImplTests
         action.Should().NotThrow();
 
         output.Should().HaveCount(1);
-        output.First().Should().Be("9");
+        output.First().Should().Be("7");
     }
 
     [Fact]
