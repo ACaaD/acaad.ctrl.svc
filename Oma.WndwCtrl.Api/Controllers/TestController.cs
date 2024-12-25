@@ -53,19 +53,19 @@ public class TestController : ControllerBase
     [FromServices] public required ICliOutputParser CliOutputParser { get; init; }
     [FromServices] public required ScopeLogDrain ParserLogDrain { get; init; }
 
-    [HttpPost("transformation")]
-    [EndpointName($"Test_{nameof(TestTransformationAsync)}")]
-    [EndpointSummary("Test Transformation")]
-    [EndpointDescription("Run an ad-hoc transformation")]
+    [HttpPost("transformation/parser")]
+    [EndpointName($"Test_{nameof(TestTransformationCliParserAsync)}")]
+    [EndpointSummary("Transformation - Cli Parser")]
+    [EndpointDescription("Run an ad-hoc transformation processed by the CLI parser")]
     [Produces("application/json")]
-    public IActionResult TestTransformationAsync([FromBody]TransformationTestRequest request)
+    public IActionResult TestTransformationCliParserAsync([FromBody]TransformationTestRequest request)
     {
         var transformResult = CliOutputParser.Parse(
             string.Join(string.Empty, request.Transformation),
             string.Join(string.Empty, request.TestText)
         );
-        
-        HttpContext.Response.Headers.AppendList("cli-parser-logs", ParserLogDrain.Messages);
+
+        AppendLogsToHeader();
         
         return transformResult.BiFold<IActionResult>(
             state: null!,
@@ -86,5 +86,33 @@ public class TestController : ControllerBase
                     : null
             )
         );
+    }
+
+    private void AppendLogsToHeader()
+    {
+#if !DEBUG
+        return;
+#endif
+        
+        try
+        {
+            var toAppend = ParserLogDrain.Messages.Select(m => m
+                .Replace("\t", string.Empty)
+                .Replace("\r", string.Empty)
+                .Replace("\n", string.Empty)
+            ).ToList();
+
+            for (int i = 0; i < toAppend.Count; i++)
+            {
+                HttpContext.Response.Headers.Append(
+                    $"cli-parser-logs-{i:d4}", 
+                    toAppend[i]
+                );   
+            }
+        }
+        catch
+        {
+            // catch-all on purpose. Debugging feature.
+        }
     }
 }
