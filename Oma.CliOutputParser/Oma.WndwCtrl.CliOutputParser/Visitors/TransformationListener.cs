@@ -18,6 +18,36 @@ public class TransformationListener : CliOutputParserBaseListener
     }
     
     public IEnumerable<object> CurrentValues { get; set; }
+
+    private void LogDataRecursive(IEnumerable<object> nestedList, Action<object> logAction)
+    {
+        Console.Write("[");
+        
+        if (nestedList is IEnumerable<IEnumerable<object>> list)
+        {
+            foreach (var listItem in list)
+            {
+                LogDataRecursive(listItem, logAction);    
+            }
+        }
+
+        if (nestedList is not IEnumerable<IEnumerable<object>> _)
+        {
+            object[]? arr = nestedList?.ToArray() ?? new object[0];
+            int count = arr.Length;
+        
+            for (int i = 0; i < count; i++)
+            {
+                Console.Write(arr[i]);
+                if (i != count - 1)
+                {
+                    Console.Write(", ");
+                }
+            }   
+        }
+        
+        Console.Write($"]");
+    }
     
     private IEnumerable<object> MapItemsRecursive(IEnumerable<object> nestedList, Func<object, object> map)
     {
@@ -51,16 +81,25 @@ public class TransformationListener : CliOutputParserBaseListener
 
     public override void ExitMap(Grammar.CliOutputParser.MapContext context)
     {
+        Console.WriteLine($"{Environment.NewLine}After Map");
+        LogDataRecursive(CurrentValues, Console.Write);
+        
         base.ExitMap(context);
     }
 
     public override void ExitMultiply(Grammar.CliOutputParser.MultiplyContext context)
     {
+        Console.WriteLine($"{Environment.NewLine}After Multiply");
+        LogDataRecursive(CurrentValues, Console.Write);
+        
         base.ExitMultiply(context);
     }
 
     public override void ExitReduce(Grammar.CliOutputParser.ReduceContext context)
     {
+        Console.WriteLine($"{Environment.NewLine}After Reduce");
+        LogDataRecursive(CurrentValues, Console.Write);
+        
         base.ExitReduce(context);
     }
 
