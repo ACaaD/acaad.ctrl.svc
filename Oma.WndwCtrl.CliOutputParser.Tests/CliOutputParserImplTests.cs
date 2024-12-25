@@ -89,6 +89,32 @@ public class CliOutputParserImplTests
         output.First().Should().Be(4); // Not 6 because there is no match in the regex.
     }
     
+    
+    [Fact]
+    public void ShouldIndexListWhenUsingValuesAt()
+    {
+        const string text = """
+                            9 8 7 6 5 4 3 2 1 
+                            """;
+
+        const string transformation = """
+                                      Regex.Match($"(\d)");
+                                      Values.Index(1); // Picks the group instead of the full match; But they are the same
+                                      Values.At(2); // Index=0 is the entire match
+                                      """;
+        
+        List<object> output = new();
+        
+        var action = () =>
+        {
+            var enumerable = _instance.Parse(transformation, text);
+            output = enumerable.ToList();
+        };
+        action.Should().NotThrow();
+        output.Should().HaveCount(1);
+        output.First().Should().Be("7");
+    }
+    
     [Fact]
     public void ShouldFailOnExtraneousInput()
     {
@@ -170,5 +196,36 @@ public class CliOutputParserImplTests
 
         output.Should().HaveCount(1);
         output.First().Should().Be("i");
+    }
+
+    [Theory]
+    [InlineData("Min", 1)]
+    [InlineData("Max", 9)]
+    [InlineData("Average", 5)]
+    [InlineData("Sum", 45)]
+    [InlineData("First", "9")]
+    [InlineData("Last", "1")]
+    public void ShouldApplyAggregateFunctions(string aggregate, object expectedValue)
+    {
+        const string text = """
+                            9 8 7 6 5 4 3 2 1
+                            """;
+
+        string transformation = $"""
+                                      Regex.Match($"(\d)");
+                                      Values.Index(1); // Picks the group instead of the full match; But they are the same
+                                      Values.{aggregate}(); // Index=0 is the entire match
+                                      """;
+        
+        List<object> output = new();
+        
+        var action = () =>
+        {
+            var enumerable = _instance.Parse(transformation, text);
+            output = enumerable.ToList();
+        };
+        action.Should().NotThrow();
+        output.Should().HaveCount(1);
+        output.First().Should().Be(expectedValue);
     }
 }

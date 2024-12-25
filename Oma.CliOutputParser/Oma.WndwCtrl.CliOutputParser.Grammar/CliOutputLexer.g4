@@ -18,14 +18,15 @@ YIELD_ALL       : 'YieldAll';
 YIELD           : 'Yield';
 
 VALUES          : 'Values';
-AVERAGE         : 'Average';
 FIRST           : 'First';
 LAST            : 'Last';
 
-MEDIAN          : 'Median';
+AVERAGE         : 'Average';
 MAX             : 'Max';
 MIN             : 'Min';
 SUM             : 'Sum';
+AT              : 'At';
+INDEX           : 'Index';
 
 DOT             : '.';
 LPAREN          : '(';
