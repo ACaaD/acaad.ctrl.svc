@@ -24,6 +24,12 @@ public class CliOutputParserImplTests
                                             4 5 6
                                             7 8 9
                                             """;
+    
+    private const string _testInputNested2 = """
+                                            1.a 1.b 1.c
+                                            2.d 2.e 2.f
+                                            3.g 3.h 3.i
+                                            """;
 
     private readonly CliOutputParserImpl _instance;
 
@@ -70,12 +76,13 @@ public class CliOutputParserImplTests
                                            Anchor.To("151.101.64.67");
                                            """;
 
-        string output = string.Empty;
+        List<object> output = new();
 
-        var action = () => { output = _instance.Parse(transformationInput, _testInputPing); };
+        var action = () => { output = _instance.Parse(transformationInput, _testInputPing).ToList(); };
 
         action.Should().NotThrow();
-        output.Should().Be("statistics for 151.101.64.67");
+        output.Should().HaveCount(1);
+        output.First().Should().Be("statistics for 151.101.64.67");
     }
 
     [Fact]
@@ -88,11 +95,38 @@ public class CliOutputParserImplTests
                                            Values.First();
                                            """;
 
-        string output = string.Empty;
+        List<object> output = new();
 
-        var action = () => { output = _instance.Parse(transformationInput, _testInputNested); };
+        var action = () => { output = _instance.Parse(transformationInput, _testInputNested).ToList(); };
 
         action.Should().NotThrow();
-        output.Should().Be("1");
+        
+        output.Should().HaveCount(1);
+        output.First().Should().Be("9");
+    }
+    
+    [Fact]
+    public void ShouldHandleDoubleNestedTransformations()
+    {
+        const string transformationInput = """
+                                           Regex.Match($"^.*$");
+                                           Regex.Match($"\d\.\w");
+                                           Regex.Match($".");
+                                           Values.First();
+                                           Values.First();
+                                           Values.Last();
+                                           """;
+
+        // 1.1 1.2 1.3
+        // 
+        
+        List<object> output = new();
+
+        var action = () => { output = _instance.Parse(transformationInput, _testInputNested).ToList(); };
+
+        action.Should().NotThrow();
+        
+        output.Should().HaveCount(1);
+        output.First().Should().Be("9");
     }
 }

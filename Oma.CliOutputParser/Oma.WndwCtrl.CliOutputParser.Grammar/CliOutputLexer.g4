@@ -20,6 +20,7 @@ YIELD           : 'Yield';
 VALUES          : 'Values';
 AVERAGE         : 'Average';
 FIRST           : 'First';
+LAST            : 'Last';
 
 MEDIAN          : 'Median';
 MAX             : 'Max';

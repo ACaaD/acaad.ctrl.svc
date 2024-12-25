@@ -38,7 +38,7 @@ public class CollectingErrorListener : IAntlrErrorListener<int>, IAntlrErrorList
 
 public class CliOutputParserImpl
 {
-    public string Parse(string transformation, string text)
+    public IEnumerable<object> Parse(string transformation, string text)
     {
         CollectingErrorListener errorListener = new();
         AntlrInputStream charStream = new(transformation);
@@ -68,12 +68,6 @@ public class CliOutputParserImpl
         ParseTreeWalker walker = new ParseTreeWalker(); 
         walker.Walk(listener, tree);
 
-        var valList = listener.CurrentValues.ToList();
-        if (valList.Count == 1)
-        {
-            return valList[0].ToString()!;
-        } 
-        
-        return string.Join(", ", valList);
+        return listener.CurrentValues;
     }
 }

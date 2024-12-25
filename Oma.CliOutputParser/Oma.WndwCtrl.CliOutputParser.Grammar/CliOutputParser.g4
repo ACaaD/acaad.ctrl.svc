@@ -15,7 +15,7 @@ map             : anchorFrom
 
 multiply        : regexMatch ;
 
-reduce          : regexYield | valuesAvg | valuesFirst;
+reduce          : regexYield | valuesAvg | valuesFirst | valuesLast;
 
 anchorFrom      : ANCHOR DOT FROM LPAREN STRING_LITERAL RPAREN SEMI;
 anchorTo        : ANCHOR DOT TO LPAREN STRING_LITERAL RPAREN SEMI;
@@ -25,6 +25,7 @@ regexYield      : REGEX DOT YIELD_GROUP LPAREN INT RPAREN SEMI;
 
 valuesAvg       : VALUES DOT AVERAGE LPAREN RPAREN SEMI;
 valuesFirst     : VALUES DOT FIRST LPAREN RPAREN SEMI;
+valuesLast      : VALUES DOT LAST LPAREN RPAREN SEMI;
 
 aggregateFunction
     : AVERAGE

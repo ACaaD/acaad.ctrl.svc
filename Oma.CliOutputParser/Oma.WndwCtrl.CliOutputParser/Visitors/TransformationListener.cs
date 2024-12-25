@@ -80,8 +80,7 @@ public class TransformationListener : CliOutputParserBaseListener
 
     public override void ExitMultiply(Grammar.CliOutputParser.MultiplyContext context)
     {
-        var newValues = UnfoldItemsRecursive(CurrentValues).ToList().AsEnumerable();
-        _currentUnfold = null;
+        var newValues = UnfoldItemsRecursive(CurrentValues);
         
         UpdateValues(newValues);    
         base.ExitMultiply(context);
@@ -93,14 +92,12 @@ public class TransformationListener : CliOutputParserBaseListener
         
         if (newValues is IEnumerable<object> newVal)
         {
-            UpdateValues(newVal.ToList().AsEnumerable());       
+            UpdateValues(newVal);       
         }
         else
         {
             Console.WriteLine("help");
         }
-        
-        _currentFold = null;
         
         base.ExitReduce(context);
     }
@@ -171,5 +168,15 @@ public class TransformationListener : CliOutputParserBaseListener
             return result;
         };
         base.ExitValuesFirst(context);
+    }
+    
+    public override void ExitValuesLast(Grammar.CliOutputParser.ValuesLastContext context)
+    {
+        _currentFold = val =>
+        {
+            var result = val.Last();
+            return result;
+        };
+        base.ExitValuesLast(context);
     }
 }
