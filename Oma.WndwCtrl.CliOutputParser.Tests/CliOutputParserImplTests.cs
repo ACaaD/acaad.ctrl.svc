@@ -78,7 +78,11 @@ public class CliOutputParserImplTests
 
         List<object> output = new();
 
-        var action = () => { output = _instance.Parse(transformationInput, _testInputPing).ToList(); };
+        var action = () =>
+        {
+            var enumerable = _instance.Parse(transformationInput, _testInputPing); 
+            output = enumerable.ToList(); 
+        };
 
         action.Should().NotThrow();
         output.Should().HaveCount(1);
@@ -91,14 +95,19 @@ public class CliOutputParserImplTests
         const string transformationInput = """
                                            Regex.Match($"^.*$");
                                            Regex.Match($"\d");
-                                           Values.First();
-                                           Values.First();
+                                           Values.Last();
+                                           Values.Last();
+                                           Values.Last(); // Why is this heeeere
                                            """;
 
         List<object> output = new();
 
-        var action = () => { output = _instance.Parse(transformationInput, _testInputNested).ToList(); };
-
+        var action = () =>
+        {
+            var enumerable = _instance.Parse(transformationInput, _testInputNested); 
+            output = enumerable.ToList(); 
+        };
+        
         action.Should().NotThrow();
         
         output.Should().HaveCount(1);
@@ -122,7 +131,7 @@ public class CliOutputParserImplTests
         
         List<object> output = new();
 
-        var action = () => { output = _instance.Parse(transformationInput, _testInputNested).ToList(); };
+        var action = () => { output = _instance.Parse(transformationInput, _testInputNested2).ToList(); };
 
         action.Should().NotThrow();
         

@@ -13,92 +13,55 @@ public class TransformationListener : CliOutputParserBaseListener
         CurrentValues = [input];
     }
     
-    private Func<object, object>? _currentMap = val => val;
-    private Func<object, IEnumerable<object>>? _currentUnfold;
-    private Func<IEnumerable<object>, object>? _currentFold;
-    
     private void UpdateValues(IEnumerable<object> newValues)
     {
         CurrentValues = newValues;
     }
     
-    private IEnumerable<object> IterateItemsRecursive(IEnumerable<object> nestedList)
+    private IEnumerable<object> MapItemsRecursive(IEnumerable<object> nestedList, Func<object, object> map)
     {
-        if (_currentMap is null)
-        {
-            throw new InvalidOperationException($"{nameof(_currentMap)} is null"); 
-        }
-        
         if (nestedList is IEnumerable<IEnumerable<object>> list)
         {
-            return list.Select(IterateItemsRecursive);
+            return list.Select(l => MapItemsRecursive(l, map));
         }
         
-        return nestedList.Select(_currentMap);
+        return nestedList.Select(map);
     }
     
     public IEnumerable<object> CurrentValues { get; set; }
-    public string currentUnfold;
-    private IEnumerable<object> UnfoldItemsRecursive(IEnumerable<object> nestedList)
+    
+    private IEnumerable<object> UnfoldItemsRecursive(IEnumerable<object> nestedList, Func<object, IEnumerable<object>> unfold)
     {
-        if (_currentUnfold is null)
-        {
-            throw new InvalidOperationException($"{nameof(_currentUnfold)} is null");
-        }
-        
         if (nestedList is IEnumerable<IEnumerable<object>> tst)
         {
-            return tst.Select(UnfoldItemsRecursive);
+            return tst.Select(l => UnfoldItemsRecursive(l, unfold));
         }
 
-        return nestedList.Select(_currentUnfold);
+        return nestedList.Select(unfold);
     }
     
-    private object FoldItemsRecursive(IEnumerable<object> nestedList)
+    private object FoldItemsRecursive(IEnumerable<object> nestedList, Func<IEnumerable<object>, object> fold)
     {
-        if (_currentFold is null)
-        {
-            throw new InvalidOperationException($"{nameof(_currentFold)} is null");
-        }
-
         if (nestedList is IEnumerable<IEnumerable<object>> tst)
         {
-            return tst.Select(FoldItemsRecursive).AsEnumerable();
+            return tst.Select(l => FoldItemsRecursive(l, fold));
         }
 
-        return _currentFold(nestedList);
+        return fold(nestedList);
     }
     
     public override void ExitMap(Grammar.CliOutputParser.MapContext context)
     {
-        var newValues = IterateItemsRecursive(CurrentValues);
-        _currentMap = v => v; // TODO: grammar wrong?
-        
-        UpdateValues(newValues);    
         base.ExitMap(context);
     }
 
     public override void ExitMultiply(Grammar.CliOutputParser.MultiplyContext context)
     {
-        var newValues = UnfoldItemsRecursive(CurrentValues);
-        
-        UpdateValues(newValues);    
         base.ExitMultiply(context);
     }
 
     public override void ExitReduce(Grammar.CliOutputParser.ReduceContext context)
     {
-        var newValues = FoldItemsRecursive(CurrentValues);
-        
-        if (newValues is IEnumerable<object> newVal)
-        {
-            UpdateValues(newVal);       
-        }
-        else
-        {
-            Console.WriteLine("help");
-        }
-        
         base.ExitReduce(context);
     }
 
@@ -106,11 +69,13 @@ public class TransformationListener : CliOutputParserBaseListener
     {
         string from = context.STRING_LITERAL().GetText().Trim('"');
 
-        _currentMap = val =>
+        Func<object, object> map = val =>
         {
             var newVal = val.ToString()!.From(from);
             return newVal;
         };
+        
+        CurrentValues = MapItemsRecursive(CurrentValues, map);
         
         base.ExitAnchorFrom(context);
     }
@@ -119,7 +84,9 @@ public class TransformationListener : CliOutputParserBaseListener
     {
         string to = context.STRING_LITERAL().GetText().Trim('"');
 
-        _currentMap = val => val.ToString()!.To(to);
+        Func<object, object> map = val => val.ToString()!.To(to);
+        
+        CurrentValues = MapItemsRecursive(CurrentValues, map);
         
         base.ExitAnchorTo(context);
     }
@@ -128,10 +95,8 @@ public class TransformationListener : CliOutputParserBaseListener
     {
         string pattern = context.REGEX_LITERAL().GetText().Trim('$').Trim('"');
         Regex r = new(pattern, RegexOptions.Multiline);
-
-        currentUnfold = pattern;
         
-        _currentUnfold = val =>
+        Func<object, IEnumerable<object>> unfold = val =>
         {
             List<string> result = new();
             var matches = r.Matches(val.ToString()!);
@@ -143,40 +108,70 @@ public class TransformationListener : CliOutputParserBaseListener
             return result;
         };
         
+        CurrentValues = UnfoldItemsRecursive(CurrentValues, unfold);
+        
         base.EnterRegexMatch(context);
     }
-
+    
     public override void ExitRegexYield(Grammar.CliOutputParser.RegexYieldContext context)
     {
         // TODO: FIX (First instead of Average)
-        _currentFold = val => val.First();
+        Func<IEnumerable<object>, object> fold = val => val.First();
+        
+        var result = FoldItemsRecursive(CurrentValues, fold);
+        StoreFoldResult(result);
+        
         base.ExitRegexYield(context);
     }
 
     public override void ExitValuesAvg(Grammar.CliOutputParser.ValuesAvgContext context)
     {
         // TODO: FIX (First instead of Average)
-        _currentFold = val => val.First();
+        Func<IEnumerable<object>, object> fold = val => val.First();
+        
+        var result = FoldItemsRecursive(CurrentValues, fold);
+        StoreFoldResult(result);
+        
         base.ExitValuesAvg(context);
     }
 
     public override void ExitValuesFirst(Grammar.CliOutputParser.ValuesFirstContext context)
     {
-        _currentFold = val =>
+        Func<IEnumerable<object>, object> fold = val =>
         {
             var result = val.First();
             return result;
         };
+        
+        var result = FoldItemsRecursive(CurrentValues, fold);
+        StoreFoldResult(result);
+        
         base.ExitValuesFirst(context);
     }
-    
+
+    private void StoreFoldResult(object result)
+    {
+        if (result is IEnumerable<object> results)
+        {
+            CurrentValues = results;
+        }
+        else
+        {
+            CurrentValues = new List<object>() { result }.AsEnumerable();
+        }
+    }
+
     public override void ExitValuesLast(Grammar.CliOutputParser.ValuesLastContext context)
     {
-        _currentFold = val =>
+        Func<IEnumerable<object>, object> fold = val =>
         {
             var result = val.Last();
             return result;
         };
+        
+        var result = FoldItemsRecursive(CurrentValues, fold);
+        StoreFoldResult(result);
+        
         base.ExitValuesLast(context);
     }
 }
