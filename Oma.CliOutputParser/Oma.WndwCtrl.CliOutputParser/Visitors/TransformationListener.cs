@@ -7,12 +7,15 @@ namespace Oma.WndwCtrl.CliOutputParser.Visitors;
 
 public class TransformationListener : CliOutputParserBaseListener
 {
-    private readonly Action<string> _log;
+    private readonly Action<object> _log;
 
-    public TransformationListener(Action<string> log, string input)
+    public TransformationListener(Action<object> log, string input)
     {
         _log = log;
         CurrentValues = [input];
+
+        _log("Input received:");
+        _log(LogDataRecursive(CurrentValues));
     }
 
     private void UpdateValues(IEnumerable<object> newValues)
@@ -22,7 +25,7 @@ public class TransformationListener : CliOutputParserBaseListener
 
     public IEnumerable<object> CurrentValues { get; set; }
 
-    private string LogDataRecursive(IEnumerable<object> nestedList, Action<object> logAction)
+    private string LogDataRecursive(IEnumerable<object> nestedList)
     {
         string toLog = "[";
 
@@ -30,7 +33,7 @@ public class TransformationListener : CliOutputParserBaseListener
         {
             foreach (var listItem in list)
             {
-                toLog += LogDataRecursive(listItem, logAction);
+                toLog += LogDataRecursive(listItem);
             }
         }
 
@@ -86,7 +89,7 @@ public class TransformationListener : CliOutputParserBaseListener
     public override void ExitMap(Grammar.CliOutputParser.MapContext context)
     {
         _log($"{Environment.NewLine}After Map:");
-        string toLog = LogDataRecursive(CurrentValues, Console.Write);
+        string toLog = LogDataRecursive(CurrentValues);
         _log(toLog);
 
         base.ExitMap(context);
@@ -95,7 +98,7 @@ public class TransformationListener : CliOutputParserBaseListener
     public override void ExitMultiply(Grammar.CliOutputParser.MultiplyContext context)
     {
         _log($"{Environment.NewLine}After Multiply:");
-        string toLog = LogDataRecursive(CurrentValues, Console.Write);
+        string toLog = LogDataRecursive(CurrentValues);
         _log(toLog);
 
         base.ExitMultiply(context);
@@ -104,7 +107,7 @@ public class TransformationListener : CliOutputParserBaseListener
     public override void ExitReduce(Grammar.CliOutputParser.ReduceContext context)
     {
         _log($"{Environment.NewLine}After Reduce:");
-        string toLog = LogDataRecursive(CurrentValues, Console.Write);
+        string toLog = LogDataRecursive(CurrentValues);
         _log(toLog);
 
         base.ExitReduce(context);

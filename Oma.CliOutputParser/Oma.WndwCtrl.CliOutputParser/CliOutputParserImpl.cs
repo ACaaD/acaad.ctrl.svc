@@ -38,9 +38,9 @@ public class CollectingErrorListener : IAntlrErrorListener<int>, IAntlrErrorList
 
 public class CliOutputParserImpl
 {
-    private readonly Action<string> _log;
+    private readonly Action<object> _log;
 
-    public CliOutputParserImpl(Action<string> log)
+    public CliOutputParserImpl(Action<object> log)
     {
         _log = log;
     }
