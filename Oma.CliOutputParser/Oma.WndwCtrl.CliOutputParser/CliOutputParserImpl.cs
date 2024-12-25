@@ -1,6 +1,5 @@
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
-using Oma.WndwCtrl.CliOutputParser.Grammar;
 using Oma.WndwCtrl.CliOutputParser.Visitors;
 
 namespace Oma.WndwCtrl.CliOutputParser;
@@ -20,14 +19,14 @@ public class CollectingErrorListener : IAntlrErrorListener<int>, IAntlrErrorList
     private List<ProcessingError<IToken>> _parserErrors = new();
     
     public void SyntaxError(
-        IRecognizer recognizer, int offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e
+        TextWriter output, IRecognizer recognizer, int offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e
     )
     {
         _lexerErrors.Add(new(msg, line, charPositionInLine, offendingSymbol));
     }
 
     public void SyntaxError(
-        IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e
+        TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e
     )
     {
         _parserErrors.Add(new(msg, line, charPositionInLine, offendingSymbol));

@@ -17,8 +17,8 @@
     <PackageVersion Include="Scalar.AspNetCore" Version="1.2.69" />
   </ItemGroup>
   <ItemGroup Label="ANTLR">
-    <PackageVersion Include="Antlr4" Version="4.6.6" />
-    <PackageVersion Include="Antlr4.Runtime" Version="4.6.6" />
+    <PackageVersion Include="Antlr4.Runtime.Standard" Version="4.13.1" />
+    <PackageVersion Include="Antlr4BuildTasks" Version="12.8.0" />
   </ItemGroup>
   <ItemGroup Label="Code Analysis">
     <PackageVersion Include="JetBrains.Annotations" Version="2024.3.0" />

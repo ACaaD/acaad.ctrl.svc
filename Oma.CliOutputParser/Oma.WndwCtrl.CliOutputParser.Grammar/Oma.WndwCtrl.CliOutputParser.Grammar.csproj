@@ -7,17 +7,18 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Antlr4">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-        
-      <PackageReference Include="Antlr4.Runtime" />
+        <PackageReference Include="Antlr4.Runtime.Standard" />
+        <PackageReference Include="Antlr4BuildTasks" />
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="CliOutputLexer.g4" />
-      <Content Include="CliOutputParser.g4" />
+        <Antlr4 Include="CliOutputLexer.g4" />
+        
+        <Antlr4 Include="CliOutputParser.g4">
+            <Listener>true</Listener>
+            <AntOutDir>gen</AntOutDir>
+            <Package>Oma.WndwCtrl.CliOutputParser.Grammar</Package>
+        </Antlr4>
     </ItemGroup>
 
 </Project>

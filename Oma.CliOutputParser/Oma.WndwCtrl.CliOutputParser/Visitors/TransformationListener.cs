@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Text.RegularExpressions;
-using Antlr4.Runtime.Misc;
 using Oma.WndwCtrl.CliOutputParser.Extensions;
 using Oma.WndwCtrl.CliOutputParser.Grammar;
 
@@ -49,7 +48,7 @@ public class TransformationListener : CliOutputParserBaseListener
 
         return fold(nestedList);
     }
-    
+
     public override void ExitMap(Grammar.CliOutputParser.MapContext context)
     {
         base.ExitMap(context);
