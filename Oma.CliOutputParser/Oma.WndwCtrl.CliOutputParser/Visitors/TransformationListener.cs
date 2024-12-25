@@ -18,6 +18,8 @@ public class TransformationListener : CliOutputParserBaseListener
         CurrentValues = newValues;
     }
     
+    public IEnumerable<object> CurrentValues { get; set; }
+    
     private IEnumerable<object> MapItemsRecursive(IEnumerable<object> nestedList, Func<object, object> map)
     {
         if (nestedList is IEnumerable<IEnumerable<object>> list)
@@ -27,8 +29,6 @@ public class TransformationListener : CliOutputParserBaseListener
         
         return nestedList.Select(map);
     }
-    
-    public IEnumerable<object> CurrentValues { get; set; }
     
     private IEnumerable<object> UnfoldItemsRecursive(IEnumerable<object> nestedList, Func<object, IEnumerable<object>> unfold)
     {

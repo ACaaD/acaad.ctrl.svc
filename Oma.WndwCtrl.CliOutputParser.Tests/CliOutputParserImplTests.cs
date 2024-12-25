@@ -121,8 +121,9 @@ public class CliOutputParserImplTests
                                            Regex.Match($"^.*$");
                                            Regex.Match($"\d\.\w");
                                            Regex.Match($".");
-                                           Values.First();
-                                           Values.First();
+                                           Values.Last();
+                                           Values.Last();
+                                           Values.Last();
                                            Values.Last();
                                            """;
 
@@ -136,6 +137,6 @@ public class CliOutputParserImplTests
         action.Should().NotThrow();
         
         output.Should().HaveCount(1);
-        output.First().Should().Be("9");
+        output.First().Should().Be("i");
     }
 }
