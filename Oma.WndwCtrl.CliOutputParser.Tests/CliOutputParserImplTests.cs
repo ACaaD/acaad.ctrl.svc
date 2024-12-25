@@ -50,11 +50,45 @@ public class CliOutputParserImplTests
                                            Values.Average();
                                            """;
 
-        var action = () => _instance.Parse(transformationInput, _testInputPing);
-
+        List<object> output = new();
+        
+        var action = () =>
+        {
+            var enumerable = _instance.Parse(transformationInput, _testInputPing);
+            output = enumerable.ToList();
+        };
         action.Should().NotThrow();
+        output.Should().HaveCount(1);
+        output.First().Should().Be(8.25);
     }
 
+    [Fact]
+    public void ShouldSkipIfItemNotValidInReduce()
+    {
+        const string text = """
+                            match 1
+                            no-match 2
+                            match 3
+                            """;
+
+        const string transformation = """
+                                      Regex.Match($"^match\s(\d)");
+                                      Regex.YieldGroup(1); 
+                                      Values.Sum();
+                                      """;
+        
+        List<object> output = new();
+        
+        var action = () =>
+        {
+            var enumerable = _instance.Parse(transformation, text);
+            output = enumerable.ToList();
+        };
+        action.Should().NotThrow();
+        output.Should().HaveCount(1);
+        output.First().Should().Be(4); // Not 6 because there is no match in the regex.
+    }
+    
     [Fact]
     public void ShouldFailOnExtraneousInput()
     {
@@ -94,7 +128,7 @@ public class CliOutputParserImplTests
     public void ShouldHandleNestedTransformations()
     {
         const string transformationInput = """
-                                           Regex.Match($"^.*$"); // [ s ] -> [ [ s ] ]
+                                           Regex.Match($"^.*$"); // [ s ] -> [ [ s1, s2 ] ]
                                            Regex.Match($"(\d)"); // [ [ s ] ] -> [ [ [ s ] ] ]
                                            Values.Last(); // Choose inner-most regex group
                                            Values.Last(); // Choose from line

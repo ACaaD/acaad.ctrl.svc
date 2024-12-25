@@ -17,12 +17,7 @@ public class TransformationListener : CliOutputParserBaseListener
 
         LogCurrentState("input");
     }
-
-    private void UpdateValues(IEnumerable<object> newValues)
-    {
-        CurrentValues = newValues;
-    }
-
+    
     public IEnumerable<object> CurrentValues { get; set; }
 
     private string LogDataRecursive(IEnumerable<object> nestedList)
@@ -73,21 +68,17 @@ public class TransformationListener : CliOutputParserBaseListener
             return tst.Select(l => UnfoldItemsRecursive(l, unfold));
         }
 
-        if (nestedList is IEnumerable<object>)
-        {
-            var unfoldResult = unfold(nestedList); 
-            return unfoldResult;   
-        }
-        
-        Console.WriteLine("whatsgoingon");
-        throw new InvalidOperationException("abc");
+        var unfoldResult = unfold(nestedList); 
+        return unfoldResult;   
     }
 
-    private object FoldItemsRecursive(IEnumerable<object> nestedList, Func<IEnumerable<object>, object> fold)
+    private object? FoldItemsRecursive(IEnumerable<object> nestedList, Func<IEnumerable<object>, object?> fold)
     {
         if (nestedList is IEnumerable<IEnumerable<object>> tst)
         {
-            return tst.Select(l => FoldItemsRecursive(l, fold));
+            return tst
+                .Select(l => FoldItemsRecursive(l, fold))
+                .Where(v => v is not null);
         }
 
         return fold(nestedList);
@@ -182,8 +173,19 @@ public class TransformationListener : CliOutputParserBaseListener
 
     public override void ExitRegexYield(Grammar.CliOutputParser.RegexYieldContext context)
     {
-        // TODO: FIX (First instead of Average)
-        Func<IEnumerable<object>, object> fold = val => val.First();
+        int index = int.Parse(context.INT().GetText());
+
+        Func<IEnumerable<object>, object?> fold = val =>
+        {
+            var itemList = val.ToList();
+
+            if (index > itemList.Count - 1)
+            {
+                return null;
+            }
+
+            return itemList[index];
+        };
 
         var result = FoldItemsRecursive(CurrentValues, fold);
         StoreFoldResult(result);
@@ -193,13 +195,26 @@ public class TransformationListener : CliOutputParserBaseListener
 
     public override void ExitValuesAvg(Grammar.CliOutputParser.ValuesAvgContext context)
     {
-        // TODO: FIX (First instead of Average)
-        Func<IEnumerable<object>, object> fold = val => val.First();
+        Func<IEnumerable<object>, object?> fold = val => val
+            .Where(v => int.TryParse(v.ToString()!, out _))
+            .Average(v => int.Parse(v.ToString()!));
 
         var result = FoldItemsRecursive(CurrentValues, fold);
         StoreFoldResult(result);
 
         base.ExitValuesAvg(context);
+    }
+
+    public override void ExitValuesSum(Grammar.CliOutputParser.ValuesSumContext context)
+    {
+        Func<IEnumerable<object>, object?> fold = val => val
+            .Where(v => int.TryParse(v.ToString()!, out _))
+            .Sum(v => int.Parse(v.ToString()!));
+
+        var result = FoldItemsRecursive(CurrentValues, fold);
+        StoreFoldResult(result);
+
+        base.ExitValuesSum(context);
     }
 
     public override void ExitValuesFirst(Grammar.CliOutputParser.ValuesFirstContext context)
@@ -216,7 +231,13 @@ public class TransformationListener : CliOutputParserBaseListener
         base.ExitValuesFirst(context);
     }
 
-    private void StoreFoldResult(object result)
+    public override void EnterStatement(Grammar.CliOutputParser.StatementContext context)
+    {
+        _log($"{Environment.NewLine}\t### COMMAND -> {context.GetChild(0).GetText()}");
+        base.EnterStatement(context);
+    }
+
+    private void StoreFoldResult(object? result)
     {
         if (result is IEnumerable<object> results)
         {
@@ -224,7 +245,14 @@ public class TransformationListener : CliOutputParserBaseListener
         }
         else
         {
-            CurrentValues = new List<object>() { result }.AsEnumerable();
+            var newList = new List<object>();
+
+            if (result is not null)
+            {
+                newList.Add(result);
+            }
+            
+            CurrentValues = newList.AsEnumerable();
         }
     }
 
