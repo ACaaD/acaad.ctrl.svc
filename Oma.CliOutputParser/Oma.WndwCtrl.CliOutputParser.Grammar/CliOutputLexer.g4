@@ -14,8 +14,6 @@ TO_END          : 'ToEnd';
 REGEX           : 'Regex';
 MATCH           : 'Match';
 YIELD_GROUP     : 'YieldGroup';
-YIELD_ALL       : 'YieldAll';
-YIELD           : 'Yield';
 
 VALUES          : 'Values';
 FIRST           : 'First';
