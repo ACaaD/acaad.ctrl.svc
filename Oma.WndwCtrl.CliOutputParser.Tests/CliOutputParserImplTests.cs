@@ -1,7 +1,23 @@
 using FluentAssertions;
+using LanguageExt;
+using LanguageExt.Common;
+using Oma.WndwCtrl.CliOutputParser.Interfaces;
 using Xunit.Abstractions;
 
 namespace Oma.WndwCtrl.CliOutputParser.Tests;
+
+internal class XUnitLogger : IParserLogger
+{
+    private readonly ITestOutputHelper _output;
+
+    public XUnitLogger(ITestOutputHelper output)
+    {
+        _output = output;
+    }
+
+    public void Log(object message)
+        => _output.WriteLine(message.ToString()?.Replace("\r", string.Empty));
+}
 
 public class CliOutputParserImplTests
 {
@@ -36,7 +52,8 @@ public class CliOutputParserImplTests
 
     public CliOutputParserImplTests(ITestOutputHelper outputHelper)
     {
-        _instance = new(obj => outputHelper.WriteLine(obj.ToString()?.Replace("\r", string.Empty)));
+        XUnitLogger logger = new(outputHelper);
+        _instance = new(logger);
     }
 
     [Fact]
@@ -49,17 +66,19 @@ public class CliOutputParserImplTests
                                            Regex.YieldGroup(1); 
                                            Values.Average();
                                            """;
-
-        List<object> output = new();
         
-        var action = () =>
-        {
-            var enumerable = _instance.Parse(transformationInput, _testInputPing);
-            output = enumerable.ToList();
-        };
-        action.Should().NotThrow();
-        output.Should().HaveCount(1);
-        output.First().Should().Be(8.25);
+        Either<Error, IEnumerable<object>> transformationResult 
+            =  _instance.Parse(transformationInput, _testInputPing);
+        
+        transformationResult.Match(
+            Right: output =>
+            {
+                List<object> res = output.ToList();
+                res.Should().HaveCount(1);
+                res.First().Should().Be(8.25);      
+            },
+            Left: val => val.Should().BeNull()
+        );
     }
 
     [Fact]
@@ -77,16 +96,18 @@ public class CliOutputParserImplTests
                                       Values.Sum();
                                       """;
         
-        List<object> output = new();
+        Either<Error, IEnumerable<object>> transformationResult 
+            =  _instance.Parse(transformation, text);
         
-        var action = () =>
-        {
-            var enumerable = _instance.Parse(transformation, text);
-            output = enumerable.ToList();
-        };
-        action.Should().NotThrow();
-        output.Should().HaveCount(1);
-        output.First().Should().Be(4); // Not 6 because there is no match in the regex.
+        transformationResult.Match(
+            Right: output =>
+            {
+                List<object> res = output.ToList();
+                res.Should().HaveCount(1);
+                res.First().Should().Be(4);      
+            },
+            Left: val => val.Should().BeNull()
+        );
     }
     
     [Fact]
@@ -97,10 +118,14 @@ public class CliOutputParserImplTests
                                            Regex.Match($"time=(\d+)ms").YieldGroup(1); 
                                            Values.Average2();
                                            """;
-
-        var action = () => _instance.Parse(transformationInput, _testInputPing);
-
-        action.Should().Throw<Exception>();
+        
+        Either<Error, IEnumerable<object>> transformationResult 
+            =  _instance.Parse(transformationInput, _testInputPing);
+        
+        transformationResult.Match(
+            Right: val => val.Should().BeNull(),
+            Left: val => val.Should().BeOfType<ManyErrors>()
+        );
     }
 
     [Fact]
@@ -111,17 +136,18 @@ public class CliOutputParserImplTests
                                            Anchor.To("151.101.64.67");
                                            """;
 
-        List<object> output = new();
-
-        var action = () =>
-        {
-            var enumerable = _instance.Parse(transformationInput, _testInputPing);
-            output = enumerable.ToList();
-        };
-
-        action.Should().NotThrow();
-        output.Should().HaveCount(1);
-        output.First().Should().Be("statistics for 151.101.64.67");
+        Either<Error, IEnumerable<object>> transformationResult 
+            =  _instance.Parse(transformationInput, _testInputPing);
+        
+        transformationResult.Match(
+            Right: output =>
+            {
+                List<object> res = output.ToList();
+                res.Should().HaveCount(1);
+                res.First().Should().Be("statistics for 151.101.64.67");      
+            },
+            Left: val => val.Should().BeNull()
+        );
     }
 
     [Fact]
@@ -135,18 +161,18 @@ public class CliOutputParserImplTests
                                            Values.First(); // Choose i dont know what
                                            """;
 
-        List<object> output = new();
-
-        var action = () =>
-        {
-            var enumerable = _instance.Parse(transformationInput, _testInputNested);
-            output = enumerable.ToList();
-        };
-
-        action.Should().NotThrow();
-
-        output.Should().HaveCount(1);
-        output.First().Should().Be("7");
+        Either<Error, IEnumerable<object>> transformationResult 
+            =  _instance.Parse(transformationInput, _testInputNested);
+        
+        transformationResult.Match(
+            Right: output =>
+            {
+                List<object> res = output.ToList();
+                res.Should().HaveCount(1);
+                res.First().Should().Be("7");      
+            },
+            Left: val => val.Should().BeNull()
+        );
     }
 
     [Fact]
@@ -162,13 +188,17 @@ public class CliOutputParserImplTests
                                            Values.Last();
                                            """;
 
-        List<object> output = new();
-
-        var action = () => { output = _instance.Parse(transformationInput, _testInputNested2).ToList(); };
-
-        action.Should().NotThrow();
-
-        output.Should().HaveCount(1);
-        output.First().Should().Be("i");
+        Either<Error, IEnumerable<object>> transformationResult 
+            =  _instance.Parse(transformationInput, _testInputNested2);
+        
+        transformationResult.Match(
+            Right: output =>
+            {
+                List<object> res = output.ToList();
+                res.Should().HaveCount(1);
+                res.First().Should().Be("i");      
+            },
+            Left: val => val.Should().BeNull()
+        );
     }
 }

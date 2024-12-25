@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Errors;
 using Oma.WndwCtrl.Abstractions.Model;
+using Oma.WndwCtrl.Api.Model;
 using Oma.WndwCtrl.Core.FlowExecutors;
 using Oma.WndwCtrl.Core.Model.Commands;
 
@@ -15,7 +16,7 @@ public class TestController : ControllerBase
 {
     [FromServices] public required AdHocFlowExecutor FlowExecutor { get; init; }
 
-    [HttpPost]
+    [HttpPost("command")]
     [EndpointName($"Test_{nameof(TestCommandAsync)}")]
     [EndpointSummary("Test Command")]
     [EndpointDescription("Run an ad-hoc command")]
@@ -45,5 +46,15 @@ public class TestController : ControllerBase
                     : null
             )
         );
+    }
+
+    [HttpPost("transformation")]
+    [EndpointName($"Test_{nameof(TestTransformationAsync)}")]
+    [EndpointSummary("Test Transformation")]
+    [EndpointDescription("Run an ad-hoc transformation")]
+    [Produces("application/json")]
+    public async Task<IActionResult> TestTransformationAsync([FromBody]TransformationTestRequest request)
+    {
+        return Ok(request);
     }
 }
