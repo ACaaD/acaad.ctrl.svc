@@ -1,6 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Oma.WndwCtrl.Abstractions;
+using Oma.WndwCtrl.Api.Transformations.CliParser;
+using Oma.WndwCtrl.CliOutputParser;
+using Oma.WndwCtrl.CliOutputParser.Interfaces;
 using Oma.WndwCtrl.Configuration.Extensions;
 using Oma.WndwCtrl.Core.Extensions;
 
@@ -14,6 +17,12 @@ public static class IServiceCollectionExtensions
         services.AddConfiguration()
             .AddCommandExecutors()
             .TryAddSingleton<IApiService, CtrlApiService>();
+            
+        services
+            // We actually want to override the parser to access it from the request scope
+            .AddScoped<ICliOutputParser, CliOutputParserImpl>()  
+            .AddScoped<ScopeLogDrain>()
+            .AddScoped<IParserLogger>(sp => sp.GetRequiredService<ScopeLogDrain>());
         
         return services;
     }

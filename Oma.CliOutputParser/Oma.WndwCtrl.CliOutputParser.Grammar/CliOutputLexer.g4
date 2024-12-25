@@ -1,7 +1,7 @@
 lexer grammar CliOutputLexer;
 
-STRING_LITERAL  : '"' (~["\\] | '\\' .)* '"';
-REGEX_LITERAL   : '$' '"' (~["\\] | '\\' .)* '"';
+STRING_LITERAL  : '\'' (~['\\] | '\\' .)* '\'';
+REGEX_LITERAL   : '$' '\'' (~['\\] | '\\' .)* '\'';
 INT             : [0-9]+;
 COMMENT         : '/*' .*? '*/' -> skip;
 LINE_COMMENT    : '//' ~[\r\n]* -> skip;

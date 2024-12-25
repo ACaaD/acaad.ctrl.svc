@@ -62,9 +62,9 @@ public class CliOutputParserImplTests
     public void ShouldParseTransformationSuccessfully()
     {
         const string transformationInput = """
-                                           Anchor.From("Pinging xkcd.com");
-                                           Anchor.To("Ping statistics");
-                                           Regex.Match($"time=(\d+)ms");
+                                           Anchor.From('Pinging xkcd.com');
+                                           Anchor.To('Ping statistics');
+                                           Regex.Match($'time=(\d+)ms');
                                            Regex.YieldGroup(1); 
                                            Values.Average();
                                            """;
@@ -93,7 +93,7 @@ public class CliOutputParserImplTests
                             """;
 
         const string transformation = """
-                                      Regex.Match($"^match\s(\d)");
+                                      Regex.Match($'^match\s(\d)');
                                       Regex.YieldGroup(1); 
                                       Values.Sum();
                                       """;
@@ -116,8 +116,8 @@ public class CliOutputParserImplTests
     public void ShouldFailOnExtraneousInput()
     {
         const string transformationInput = """
-                                           Anchor.From("Pinging xkcd.com").To("Ping statistics");
-                                           Regex.Match($"time=(\d+)ms").YieldGroup(1); 
+                                           Anchor.From('Pinging xkcd.com').To('Ping statistics');
+                                           Regex.Match($'time=(\d+)ms').YieldGroup(1); 
                                            Values.Average2();
                                            """;
         
@@ -134,8 +134,8 @@ public class CliOutputParserImplTests
     public void ShouldApplyAnchors()
     {
         const string transformationInput = """
-                                           Anchor.From("statistics");
-                                           Anchor.To("151.101.64.67");
+                                           Anchor.From('statistics');
+                                           Anchor.To('151.101.64.67');
                                            """;
 
         Either<Error, IEnumerable<object>> transformationResult 
@@ -156,8 +156,8 @@ public class CliOutputParserImplTests
     public void ShouldHandleNestedTransformations()
     {
         const string transformationInput = """
-                                           Regex.Match($"^.*$"); // [ s ] -> [ [ s1, s2 ] ]
-                                           Regex.Match($"(\d)"); // [ [ s ] ] -> [ [ [ s ] ] ]
+                                           Regex.Match($'^.*$'); // [ s ] -> [ [ s1, s2 ] ]
+                                           Regex.Match($'(\d)'); // [ [ s ] ] -> [ [ [ s ] ] ]
                                            Values.Last(); // Choose inner-most regex group
                                            Values.Last(); // Choose from line
                                            Values.First(); // Choose i dont know what
@@ -181,9 +181,9 @@ public class CliOutputParserImplTests
     public void ShouldHandleDoubleNestedTransformations()
     {
         const string transformationInput = """
-                                           Regex.Match($"^.*$");
-                                           Regex.Match($"\d\.\w");
-                                           Regex.Match($".");
+                                           Regex.Match($'^.*$');
+                                           Regex.Match($'\d\.\w');
+                                           Regex.Match($'.');
                                            Values.Last();
                                            Values.Last();
                                            Values.Last();
@@ -218,7 +218,7 @@ public class CliOutputParserImplTests
                             """;
 
         string transformation = $"""
-                                  Regex.Match($"(\d)");
+                                  Regex.Match($'(\d)');
                                   Values.Index(1); // Picks the group instead of the full match; But they are the same
                                   Values.{aggregate}(); // Index=0 is the entire match
                                 """;

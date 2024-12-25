@@ -6,7 +6,7 @@ public partial class TransformationListener
 {
     public override void ExitAnchorFrom(Grammar.CliOutputParser.AnchorFromContext context)
     {
-        string from = context.STRING_LITERAL().GetText().Trim('"');
+        string from = context.STRING_LITERAL().GetText().Trim('\'');
 
         CurrentValues = MapItemsRecursive(CurrentValues, Map);
 
@@ -22,7 +22,7 @@ public partial class TransformationListener
 
     public override void ExitAnchorTo(Grammar.CliOutputParser.AnchorToContext context)
     {
-        string to = context.STRING_LITERAL().GetText().Trim('"');
+        string to = context.STRING_LITERAL().GetText().Trim('\'');
 
         CurrentValues = MapItemsRecursive(CurrentValues, Map);
 

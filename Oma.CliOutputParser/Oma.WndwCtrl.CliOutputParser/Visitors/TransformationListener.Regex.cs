@@ -6,7 +6,7 @@ public partial class TransformationListener
 {
     public override void ExitRegexMatch(Grammar.CliOutputParser.RegexMatchContext context)
     {
-        string pattern = context.REGEX_LITERAL().GetText().Trim('$').Trim('"');
+        string pattern = context.REGEX_LITERAL().GetText().Trim('$').Trim('\'');
         Regex r = new(pattern, RegexOptions.Multiline);
 
         CurrentValues = UnfoldItemsRecursive(CurrentValues, Unfold);

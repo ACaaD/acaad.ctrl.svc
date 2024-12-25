@@ -7,6 +7,7 @@
     </PropertyGroup>
     
     <ItemGroup>
+      <ProjectReference Include="..\Oma.CliOutputParser\Oma.WndwCtrl.CliOutputParser\Oma.WndwCtrl.CliOutputParser.csproj" />
       <ProjectReference Include="..\Oma.WndwCtrl.Configuration\Oma.WndwCtrl.Configuration.csproj" />
       <ProjectReference Include="..\Oma.WndwCtrl.CoreAsp\Oma.WndwCtrl.CoreAsp.csproj" />
       <ProjectReference Include="..\Oma.WndwCtrl.Core\Oma.WndwCtrl.Core.csproj" />
