@@ -6,7 +6,7 @@ using Xunit.Abstractions;
 
 namespace Oma.WndwCtrl.CliOutputParser.Tests;
 
-internal class XUnitLogger : IParserLogger
+public class XUnitLogger : IParserLogger
 {
     private readonly ITestOutputHelper _output;
 
@@ -16,7 +16,9 @@ internal class XUnitLogger : IParserLogger
     }
 
     public void Log(object message)
-        => _output.WriteLine(message.ToString()?.Replace("\r", string.Empty));
+    {
+        _output.WriteLine(message.ToString()?.Replace("\r", string.Empty));
+    }
 }
 
 public class CliOutputParserImplTests
@@ -197,6 +199,39 @@ public class CliOutputParserImplTests
                 List<object> res = output.ToList();
                 res.Should().HaveCount(1);
                 res.First().Should().Be("i");      
+            },
+            Left: val => val.Should().BeNull()
+        );
+    }
+
+    [Theory]
+    [InlineData("Min", 1)]
+    [InlineData("Max", 9)]
+    [InlineData("Average", 5)]
+    [InlineData("Sum", 45)]
+    [InlineData("First", "9")]
+    [InlineData("Last", "1")]
+    public void ShouldApplyAggregateFunctions(string aggregate, object expectedValue)
+    {
+        const string text = """
+                            9 8 7 6 5 4 3 2 1
+                            """;
+
+        string transformation = $"""
+                                  Regex.Match($"(\d)");
+                                  Values.Index(1); // Picks the group instead of the full match; But they are the same
+                                  Values.{aggregate}(); // Index=0 is the entire match
+                                """;
+        
+        Either<Error, IEnumerable<object>> transformationResult 
+            =  _instance.Parse(transformation, text);
+        
+        transformationResult.Match(
+            Right: output =>
+            {
+                List<object> res = output.ToList();
+                res.Should().HaveCount(1);
+                res.First().Should().Be(expectedValue);      
             },
             Left: val => val.Should().BeNull()
         );
