@@ -15,9 +15,12 @@ REGEX           : 'Regex';
 MATCH           : 'Match';
 YIELD_GROUP     : 'YieldGroup';
 YIELD_ALL       : 'YieldAll';
+YIELD           : 'Yield';
 
 VALUES          : 'Values';
 AVERAGE         : 'Average';
+FIRST           : 'First';
+
 MEDIAN          : 'Median';
 MAX             : 'Max';
 MIN             : 'Min';

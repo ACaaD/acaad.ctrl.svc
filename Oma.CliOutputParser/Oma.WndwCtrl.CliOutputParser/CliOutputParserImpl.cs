@@ -1,4 +1,5 @@
 using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
 using Oma.WndwCtrl.CliOutputParser.Grammar;
 using Oma.WndwCtrl.CliOutputParser.Visitors;
 
@@ -37,9 +38,7 @@ public class CollectingErrorListener : IAntlrErrorListener<int>, IAntlrErrorList
 
 public class CliOutputParserImpl
 {
-    private readonly TransformationVisitor _transformationVisitor = new TransformationVisitor();
-    
-    public object? Parse(string transformation)
+    public string Parse(string transformation, string text)
     {
         CollectingErrorListener errorListener = new();
         AntlrInputStream charStream = new(transformation);
@@ -49,10 +48,10 @@ public class CliOutputParserImpl
         
         CommonTokenStream tokenStream = new(lexer);
         
-        CliOutParser.Grammar.CliOutputParser parser = new(tokenStream);
+        CliOutputParser.Grammar.CliOutputParser parser = new(tokenStream);
         parser.AddErrorListener(errorListener);
         
-        CliOutParser.Grammar.CliOutputParser.TransformationContext? tree = parser.transformation();
+        CliOutputParser.Grammar.CliOutputParser.TransformationContext? tree = parser.transformation();
         
         if (errorListener.Errors.Count > 0)
         {
@@ -63,9 +62,18 @@ public class CliOutputParserImpl
 
             throw new InvalidOperationException(string.Join(Environment.NewLine, errorListener.Errors));
         }
+
+        TransformationListener listener = new(text);
         
-        object? rules = tree.Accept(_transformationVisitor);
-            
-        return rules;
+        ParseTreeWalker walker = new ParseTreeWalker(); 
+        walker.Walk(listener, tree);
+
+        var valList = listener.CurrentValues.ToList();
+        if (valList.Count == 1)
+        {
+            return valList[0].ToString()!;
+        } 
+        
+        return string.Join(", ", valList);
     }
 }
