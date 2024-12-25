@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Text.Json;
-using System.Text.RegularExpressions;
-using Oma.WndwCtrl.CliOutputParser.Extensions;
 using Oma.WndwCtrl.CliOutputParser.Grammar;
 
 namespace Oma.WndwCtrl.CliOutputParser.Visitors;
@@ -18,25 +14,11 @@ public partial class TransformationListener : CliOutputParserBaseListener
         LogCurrentState("input");
     }
     
-    public IEnumerable<object> CurrentValues { get; set; }
+    public IEnumerable<object> CurrentValues { get; private set; }
     
     public override void EnterStatement(Grammar.CliOutputParser.StatementContext context)
     {
         _log($"{Environment.NewLine}\t### COMMAND -> {context.GetChild(0).GetText()}");
         base.EnterStatement(context);
-    }
-    
-    public override void ExitValuesLast(Grammar.CliOutputParser.ValuesLastContext context)
-    {
-        Func<IEnumerable<object>, object> fold = val =>
-        {
-            var result = val.Last();
-            return result;
-        };
-
-        var result = FoldItemsRecursive(CurrentValues, fold);
-        StoreFoldResult(result);
-
-        base.ExitValuesLast(context);
     }
 }

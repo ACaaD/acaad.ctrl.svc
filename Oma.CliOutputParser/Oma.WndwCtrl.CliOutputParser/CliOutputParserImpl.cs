@@ -5,9 +5,7 @@ using Oma.WndwCtrl.CliOutputParser.Visitors;
 
 namespace Oma.WndwCtrl.CliOutputParser;
 
-public record ProcessingError(string Message, int Line, int CharPositionInLine)
-{
-}
+public record ProcessingError(string Message, int Line, int CharPositionInLine);
 
 public record ProcessingError<TType>(string Message, int Line, int CharPositionInLine, TType OffendingSymbol) : ProcessingError(Message, Line, CharPositionInLine)
 {
@@ -16,8 +14,8 @@ public record ProcessingError<TType>(string Message, int Line, int CharPositionI
 
 public class CollectingErrorListener : IAntlrErrorListener<int>, IAntlrErrorListener<IToken>
 {
-    private List<ProcessingError<int>> _lexerErrors = new();
-    private List<ProcessingError<IToken>> _parserErrors = new();
+    private readonly List<ProcessingError<int>> _lexerErrors = [];
+    private readonly List<ProcessingError<IToken>> _parserErrors = [];
 
     public void SyntaxError(
         TextWriter output, IRecognizer recognizer, int offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e
@@ -36,15 +34,8 @@ public class CollectingErrorListener : IAntlrErrorListener<int>, IAntlrErrorList
     public List<ProcessingError> Errors => _lexerErrors.Cast<ProcessingError>().Concat(_parserErrors).ToList();
 }
 
-public class CliOutputParserImpl
+public class CliOutputParserImpl(Action<object> log)
 {
-    private readonly Action<object> _log;
-
-    public CliOutputParserImpl(Action<object> log)
-    {
-        _log = log;
-    }
-
     public IEnumerable<object> Parse(string transformation, string text)
     {
         CollectingErrorListener errorListener = new();
@@ -62,7 +53,7 @@ public class CliOutputParserImpl
 
         if (errorListener.Errors.Count > 0)
         {
-            foreach (var error in errorListener.Errors)
+            foreach (ProcessingError error in errorListener.Errors)
             {
                 Console.WriteLine(error);
             }
@@ -70,9 +61,9 @@ public class CliOutputParserImpl
             throw new InvalidOperationException(string.Join(Environment.NewLine, errorListener.Errors));
         }
 
-        TransformationListener listener = new(_log, text);
+        TransformationListener listener = new(log, text);
 
-        ParseTreeWalker walker = new ParseTreeWalker();
+        ParseTreeWalker walker = new();
         walker.Walk(listener, tree);
 
         return listener.CurrentValues;

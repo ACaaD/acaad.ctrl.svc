@@ -31,30 +31,24 @@ public partial class TransformationListener
         base.ExitReduce(context);
     }
     
-    private string LogDataRecursive(IEnumerable<object> nestedList)
+    private static string LogDataRecursive(IEnumerable<object> nestedList)
     {
         string toLog = "[";
 
         if (nestedList is IEnumerable<IEnumerable<object>> list)
         {
-            foreach (var listItem in list)
-            {
-                toLog += LogDataRecursive(listItem);
-            }
+            toLog = list.Aggregate(toLog, (current, listItem) => current + LogDataRecursive(listItem));
         }
 
-        if (nestedList is not IEnumerable<IEnumerable<object>> _)
-        {
-            object[]? arr = nestedList?.ToArray() ?? new object[0];
-            int count = arr.Length;
+        object[] arr = nestedList.ToArray();
+        int count = arr.Length;
 
-            for (int i = 0; i < count; i++)
+        for (int i = 0; i < count; i++)
+        {
+            toLog += $"'{arr[i]}'";
+            if (i != count - 1)
             {
-                toLog += $"'{arr[i].ToString()}'";
-                if (i != count - 1)
-                {
-                    toLog += ", ";
-                }
+                toLog += ", ";
             }
         }
 

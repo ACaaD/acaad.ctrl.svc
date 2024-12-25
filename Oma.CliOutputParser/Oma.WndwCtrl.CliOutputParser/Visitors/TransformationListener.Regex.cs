@@ -9,54 +9,53 @@ public partial class TransformationListener
         string pattern = context.REGEX_LITERAL().GetText().Trim('$').Trim('"');
         Regex r = new(pattern, RegexOptions.Multiline);
 
-        Func<IEnumerable<object>, IEnumerable<IEnumerable<object>>> unfold = val =>
-        {
-            List<List<string>> result = new();
+        CurrentValues = UnfoldItemsRecursive(CurrentValues, Unfold);
 
-            foreach (var items in val)
+        base.EnterRegexMatch(context);
+        return;
+
+        IEnumerable<IEnumerable<object>> Unfold(IEnumerable<object> val)
+        {
+            List<List<string>> result = [];
+
+            foreach (object items in val)
             {
-                var matches = r.Matches(items.ToString()!);
+                MatchCollection matches = r.Matches(items.ToString()!);
 
                 foreach (Match match in matches)
                 {
-                    List<string> innerResult = new();
+                    List<string> innerResult = [];
 
                     foreach (Group group in match.Groups)
                     {
                         innerResult.Add(group.ToString());
                     }
-                    
+
                     result.Add(innerResult);
                 }
             }
-            
+
             return result;
-        };
-
-        CurrentValues = UnfoldItemsRecursive(CurrentValues, unfold);
-
-        base.EnterRegexMatch(context);
+        }
     }
 
     public override void ExitRegexYield(Grammar.CliOutputParser.RegexYieldContext context)
     {
         int index = int.Parse(context.INT().GetText());
 
-        Func<IEnumerable<object>, object?> fold = val =>
-        {
-            var itemList = val.ToList();
-
-            if (index > itemList.Count - 1)
-            {
-                return null;
-            }
-
-            return itemList[index];
-        };
-
-        var result = FoldItemsRecursive(CurrentValues, fold);
+        object? result = FoldItemsRecursive(CurrentValues, Fold);
         StoreFoldResult(result);
 
         base.ExitRegexYield(context);
+        return;
+
+        object? Fold(IEnumerable<object> val)
+        {
+            var itemList = val.ToList();
+
+            return index > itemList.Count - 1
+                ? null
+                : itemList[index];
+        }
     }
 }
