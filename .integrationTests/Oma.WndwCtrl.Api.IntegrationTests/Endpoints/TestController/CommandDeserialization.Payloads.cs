@@ -10,7 +10,6 @@ public partial class CommandDeserialization
                                              "retries": 1,
                                              "timeout": "00:00:00",
                                              "transformations": [
-                                               {}
                                              ]
                                            }
                                            """;
