@@ -1,4 +1,7 @@
+using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using Microsoft.AspNetCore.Mvc;
+using Oma.WndwCtrl.Core.Extensions;
 using Oma.WndwCtrl.CoreAsp.Conventions;
 using Scalar.AspNetCore;
 
@@ -29,7 +32,12 @@ public class WebApplicationWrapper<TAssemblyDescriptor>
                 
                 PostConfigureMvcOptions(opts);
             })
-            .AddApiExplorer();
+            .AddApiExplorer()
+            .AddJsonOptions(opts =>
+            {
+                 ModifyJsonSerializerOptions(opts.JsonSerializerOptions);
+                 ConfigureJsonOptions(opts);
+            });
 
         PostConfigureMvc(mvcBuilder);
         
@@ -50,12 +58,20 @@ public class WebApplicationWrapper<TAssemblyDescriptor>
         await PreAppRun(Application).StartAsync(cancelToken);
     }
 
+    public static void ModifyJsonSerializerOptions(JsonSerializerOptions jsonSerializerOptions)
+    {
+        jsonSerializerOptions.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+            .WithAddedModifier(JsonExtensions.AddNativePolymorphicTypeInfo);
+    }
+
     protected virtual IConfigurationBuilder ConfigurationConfiguration(IConfigurationBuilder configurationBuilder) =>
         configurationBuilder;
     
     protected virtual IMvcCoreBuilder PostConfigureMvc(IMvcCoreBuilder builder) => builder;
     protected virtual MvcOptions PreConfigureMvcOptions(MvcOptions options) => options;
     protected virtual MvcOptions PostConfigureMvcOptions(MvcOptions options) => options;
+    protected virtual JsonOptions ConfigureJsonOptions(JsonOptions jsonOptions) => jsonOptions;
+    
     protected virtual IServiceCollection ConfigureServices(IServiceCollection services) => services;
     
     protected virtual WebApplication PostAppBuild(WebApplication app) => app;

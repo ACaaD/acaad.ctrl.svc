@@ -17,16 +17,6 @@ public class CtrlApiService(ILogger<CtrlApiService> logger, ComponentConfigurati
 {
     private readonly ILogger _logger = logger;
 
-    protected override IMvcCoreBuilder PostConfigureMvc(IMvcCoreBuilder builder)
-    {
-        builder.AddJsonOptions(opts =>
-        {
-            // Leave that in for later
-        });
-        
-        return base.PostConfigureMvc(builder);
-    }
-
     protected override MvcOptions PreConfigureMvcOptions(MvcOptions options)
     {
         options.Conventions.Add(new ComponentApplicationConvention(configurationAccessor));

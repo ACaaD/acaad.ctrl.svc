@@ -6,9 +6,7 @@ public partial class CommandDeserialization
     {
         internal const string NoOpCommand = """
                                            {
-                                             "type": "cli",
-                                             "fileName": "",
-                                             "arguments": "",
+                                             "type": "custom",
                                              "retries": 1,
                                              "timeout": "00:00:00",
                                              "transformations": [
@@ -19,9 +17,7 @@ public partial class CommandDeserialization
         
         internal const string ParserTransformationCommand = """
                                             {
-                                              "type": "cli",
-                                              "fileName": "",
-                                              "arguments": "",
+                                              "type": "custom",
                                               "retries": 1,
                                               "timeout": "00:00:00",
                                               "transformations": [

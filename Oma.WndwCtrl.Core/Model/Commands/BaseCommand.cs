@@ -6,20 +6,16 @@ using Oma.WndwCtrl.Core.Model.Transformations;
 namespace Oma.WndwCtrl.Core.Model.Commands;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
-[JsonDerivedType(typeof(CliCommand), typeDiscriminator: "cli")]
+[JsonDerivedType(typeof(CustomCommand), typeDiscriminator: "custom")]
+[JsonDerivedType(typeof(BaseCommand), typeDiscriminator: "cli")]
 public class BaseCommand : ICommand
 {
-    [JsonConstructor]
-    public BaseCommand(int retries, TimeSpan timeout, IList<BaseTransformation> transformations)
-    {
-        Retries = retries;
-        Timeout = timeout;
-        Transformations = transformations;
-    }
-    
-    public int Retries { get; set; } = 3;
+    [JsonPropertyName("retries")]
+    public int Retries { get; set; }
 
-    public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(5);
-    
+    [JsonPropertyName("timeout")]
+    public TimeSpan Timeout { get; set; }
+
+    [JsonPropertyName("transformations")]
     public IEnumerable<ITransformation> Transformations { get; set; }
 }

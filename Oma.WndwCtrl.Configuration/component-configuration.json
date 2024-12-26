@@ -5,7 +5,8 @@
       "queryCommand": {
         "type": "cli",
         "fileName": "ping",
-        "arguments": "xkcd.com"
+        "arguments": "xkcd.com",
+        "transformation": []
       }
     },
     "failing-sensor": {
@@ -13,7 +14,8 @@
       "queryCommand": {
         "type": "cli",
         "fileName": "doesnt-exist",
-        "arguments": "N/A"
+        "arguments": "N/A",
+        "transformation": []
       }
     },
     "invalid-parameters": {
@@ -21,7 +23,8 @@
       "queryCommand": {
         "type": "cli",
         "fileName": "ping",
-        "arguments": "--this-should-not-work"
+        "arguments": "--this-should-not-work",
+        "transformation": []
       }
     }
   }
