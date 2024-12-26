@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".unitTests", ".unitTests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oma.WndwCtrl.Configuration", "Oma.WndwCtrl.Configuration\Oma.WndwCtrl.Configuration.csproj", "{59A5673B-4548-4B2A-B40F-04E34FF61291}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oma.WndwCtrl.Core.Tests", "Oma.WndwCtrl.Core.Tests\Oma.WndwCtrl.Core.Tests.csproj", "{E7217C2E-5C78-4106-977D-3091CFA63F43}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oma.WndwCtrl.Core.Tests", ".unitTests\Oma.WndwCtrl.Core.Tests\Oma.WndwCtrl.Core.Tests.csproj", "{E7217C2E-5C78-4106-977D-3091CFA63F43}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CommandLineOutputParser", "CommandLineOutputParser", "{662259BC-0801-4D5F-A0F9-9A0F56DC3DC2}"
 EndProject
@@ -28,6 +28,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oma.WndwCtrl.CliOutputParser", "Oma.CliOutputParser\Oma.WndwCtrl.CliOutputParser\Oma.WndwCtrl.CliOutputParser.csproj", "{8E048DF7-91E3-4794-B028-B48E3E8D6577}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oma.WndwCtrl.CliOutputParser.Tests", "Oma.WndwCtrl.CliOutputParser.Tests\Oma.WndwCtrl.CliOutputParser.Tests.csproj", "{9DE16AFD-961F-4A5F-86DC-332E67FA13CD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".integrationTests", ".integrationTests", "{CB01FB73-6F61-43AA-81EB-C3A19BA74122}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oma.WndwCtrl.Api.IntegrationTests", ".integrationTests\Oma.WndwCtrl.Api.IntegrationTests\Oma.WndwCtrl.Api.IntegrationTests.csproj", "{F8585B59-62BF-47BB-BF7E-1FA14BA75A6D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,11 +79,17 @@ Global
 		{9DE16AFD-961F-4A5F-86DC-332E67FA13CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DE16AFD-961F-4A5F-86DC-332E67FA13CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DE16AFD-961F-4A5F-86DC-332E67FA13CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8585B59-62BF-47BB-BF7E-1FA14BA75A6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8585B59-62BF-47BB-BF7E-1FA14BA75A6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8585B59-62BF-47BB-BF7E-1FA14BA75A6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8585B59-62BF-47BB-BF7E-1FA14BA75A6D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{E7217C2E-5C78-4106-977D-3091CFA63F43} = {307F90ED-24AD-4725-960B-0A7AAFFE8C6D}
 		{940D2EB6-D160-4EB5-BE64-2C60D296FA7D} = {662259BC-0801-4D5F-A0F9-9A0F56DC3DC2}
 		{8E048DF7-91E3-4794-B028-B48E3E8D6577} = {662259BC-0801-4D5F-A0F9-9A0F56DC3DC2}
 		{9DE16AFD-961F-4A5F-86DC-332E67FA13CD} = {662259BC-0801-4D5F-A0F9-9A0F56DC3DC2}
+		{F8585B59-62BF-47BB-BF7E-1FA14BA75A6D} = {CB01FB73-6F61-43AA-81EB-C3A19BA74122}
+		{E7217C2E-5C78-4106-977D-3091CFA63F43} = {307F90ED-24AD-4725-960B-0A7AAFFE8C6D}
 	EndGlobalSection
 EndGlobal

@@ -11,4 +11,6 @@ public class BaseCommand : ICommand
     public int Retries { get; set; } = 3;
 
     public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(5);
+    
+    public IList<ITransformation> Transformations { get; } = new List<ITransformation>();
 }

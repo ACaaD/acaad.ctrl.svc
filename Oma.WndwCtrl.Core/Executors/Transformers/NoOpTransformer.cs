@@ -3,7 +3,7 @@ using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Errors;
 using Oma.WndwCtrl.Abstractions.Model;
 
-namespace Oma.WndwCtrl.Core.Transformers;
+namespace Oma.WndwCtrl.Core.Executors.Transformers;
 
 public class NoOpTransformer : IOutcomeTransformer
 {
