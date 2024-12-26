@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using LanguageExt;
@@ -14,6 +15,7 @@ namespace Oma.WndwCtrl.CliOutputParser;
 
 public class CliOutputParserImpl(IParserLogger parserLogger) : ICliOutputParser
 {
+    [SuppressMessage("ReSharper", "PossibleMultipleEnumeration", Justification = "Won't fix; Not performance critical.")]
     public Either<Error, ParserResult> Parse(string transformation, string text)
     {
         CollectingErrorListener errorListener = new();
@@ -39,11 +41,10 @@ public class CliOutputParserImpl(IParserLogger parserLogger) : ICliOutputParser
         ParseTreeWalker walker = new();
         walker.Walk(listener, tree);
 
-        if (listener.CurrentValues is List<object> { Count: 1 } flatList)
-        {
-            return Right(new ParserResult() { flatList.First() });    
-        }
+        var enumeratedList = listener.CurrentValues.ToList();
         
-        return Right(new ParserResult() { listener.CurrentValues });
+        return enumeratedList.Count == 1
+            ? new ParserResult() { enumeratedList.First() }
+            : new ParserResult() { enumeratedList.ToList() };
     }
 }

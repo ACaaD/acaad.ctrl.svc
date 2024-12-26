@@ -68,7 +68,7 @@ public class CliOutputParserImplTests
                                            Values.Average();
                                            """;
         
-        Either<Error, IEnumerable<object>> transformationResult 
+        Either<Error, ParserResult> transformationResult 
             =  _instance.Parse(transformationInput, _testInputPing);
         
         transformationResult.Match(
@@ -97,7 +97,7 @@ public class CliOutputParserImplTests
                                       Values.Sum();
                                       """;
         
-        Either<Error, IEnumerable<object>> transformationResult 
+        Either<Error, ParserResult> transformationResult 
             =  _instance.Parse(transformation, text);
         
         transformationResult.Match(
@@ -120,7 +120,7 @@ public class CliOutputParserImplTests
                                            Values.Average2();
                                            """;
         
-        Either<Error, IEnumerable<object>> transformationResult 
+        Either<Error, ParserResult> transformationResult 
             =  _instance.Parse(transformationInput, _testInputPing);
         
         transformationResult.Match(
@@ -137,15 +137,15 @@ public class CliOutputParserImplTests
                                            Anchor.To('151.101.64.67');
                                            """;
 
-        Either<Error, IEnumerable<object>> transformationResult 
+        Either<Error, ParserResult> transformationResult 
             =  _instance.Parse(transformationInput, _testInputPing);
         
         transformationResult.Match(
             Right: output =>
             {
-                List<object> res = output.ToList();
-                res.Should().HaveCount(1);
-                res.First().Should().Be("statistics for 151.101.64.67");      
+                output.Should().HaveCount(1);
+                string actual = output.First().ToString()!;  
+                actual.Should().Be("statistics for 151.101.64.67");
             },
             Left: val => val.Should().BeNull()
         );
@@ -162,7 +162,7 @@ public class CliOutputParserImplTests
                                            Values.First(); // Choose i dont know what
                                            """;
 
-        Either<Error, IEnumerable<object>> transformationResult 
+        Either<Error, ParserResult> transformationResult 
             =  _instance.Parse(transformationInput, _testInputNested);
         
         transformationResult.Match(
@@ -189,7 +189,7 @@ public class CliOutputParserImplTests
                                            Values.Last();
                                            """;
 
-        Either<Error, IEnumerable<object>> transformationResult 
+        Either<Error, ParserResult> transformationResult 
             =  _instance.Parse(transformationInput, _testInputNested2);
         
         transformationResult.Match(
@@ -222,7 +222,7 @@ public class CliOutputParserImplTests
                                   Values.{aggregate}(); // Index=0 is the entire match
                                 """;
         
-        Either<Error, IEnumerable<object>> transformationResult 
+        Either<Error, ParserResult> transformationResult 
             =  _instance.Parse(transformation, text);
         
         transformationResult.Match(
