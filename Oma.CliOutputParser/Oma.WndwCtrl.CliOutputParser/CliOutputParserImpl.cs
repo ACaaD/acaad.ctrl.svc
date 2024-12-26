@@ -14,7 +14,7 @@ namespace Oma.WndwCtrl.CliOutputParser;
 
 public class CliOutputParserImpl(IParserLogger parserLogger) : ICliOutputParser
 {
-    public Either<Error, IEnumerable<object>> Parse(string transformation, string text)
+    public Either<Error, ParserResult> Parse(string transformation, string text)
     {
         CollectingErrorListener errorListener = new();
         AntlrInputStream charStream = new(transformation);
@@ -30,8 +30,8 @@ public class CliOutputParserImpl(IParserLogger parserLogger) : ICliOutputParser
         CliOutputParser.Grammar.CliOutputParser.TransformationContext? tree = parser.transformation();
 
         if (errorListener.Errors.Count > 0)
-        {
-            return Left(Error.Many(errorListener.Errors.Cast<Error>().ToArray()));
+        { 
+            return Error.Many(errorListener.Errors.Cast<Error>().ToArray());
         }
 
         TransformationListener listener = new(parserLogger.Log, text);
@@ -39,6 +39,11 @@ public class CliOutputParserImpl(IParserLogger parserLogger) : ICliOutputParser
         ParseTreeWalker walker = new();
         walker.Walk(listener, tree);
 
-        return Right(listener.CurrentValues);
+        if (listener.CurrentValues is List<object> { Count: 1 } flatList)
+        {
+            return Right(new ParserResult() { flatList.First() });    
+        }
+        
+        return Right(new ParserResult() { listener.CurrentValues });
     }
 }

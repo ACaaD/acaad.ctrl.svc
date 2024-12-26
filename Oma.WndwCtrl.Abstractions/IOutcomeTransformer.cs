@@ -12,7 +12,7 @@ public interface IOutcomeTransformer
     
     Task<Either<FlowError, TransformationOutcome>> TransformCommandOutcomeAsync(
         ITransformation transformation,
-        Either<FlowError, CommandOutcome> commandOutcome, 
+        Either<FlowError, TransformationOutcome> transformationOutcome, 
         CancellationToken cancelToken = default
     );
 }
@@ -23,7 +23,7 @@ public interface IOutcomeTransformer<in TTransformation> : IOutcomeTransformer
     
     async Task<Either<FlowError, TransformationOutcome>> IOutcomeTransformer.TransformCommandOutcomeAsync(
         ITransformation transformation,
-        Either<FlowError, CommandOutcome> commandOutcome, 
+        Either<FlowError, TransformationOutcome> transformationOutcome, 
         CancellationToken cancelToken
     )
     {
@@ -32,12 +32,12 @@ public interface IOutcomeTransformer<in TTransformation> : IOutcomeTransformer
             return Left<FlowError>(new ProgrammingError($"Passed command is not of type {typeof(TTransformation).Name}", Code: 100));
         }
 
-        return await TransformCommandOutcomeAsync(castedTransformation, commandOutcome, cancelToken: cancelToken);
+        return await TransformCommandOutcomeAsync(castedTransformation, transformationOutcome, cancelToken: cancelToken);
     }
 
     Task<Either<FlowError, TransformationOutcome>> TransformCommandOutcomeAsync(
         TTransformation transformation,
-        Either<FlowError, CommandOutcome> commandOutcome,
+        Either<FlowError, TransformationOutcome> transformationOutcome,
         CancellationToken cancelToken = default
     );
 }

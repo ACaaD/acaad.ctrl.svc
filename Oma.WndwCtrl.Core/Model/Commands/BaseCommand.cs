@@ -11,5 +11,5 @@ public class BaseCommand : ICommand
     
     public TimeSpan Timeout { get; set; }
     
-    public IEnumerable<ITransformation> Transformations { get; set; }
+    public required IEnumerable<ITransformation> Transformations { get; set; }
 }

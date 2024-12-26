@@ -64,7 +64,7 @@ public class TestController([FromKeyedServices(ServiceKeys.AdHocFlowExecutor)] I
     public IActionResult TestTransformationCliParserAsync([FromBody]TransformationTestRequest request)
     {
         var transformResult = CliOutputParser.Parse(
-            string.Join(string.Empty, request.Transformation),
+            string.Join(Environment.NewLine, request.Transformation),
             string.Join(string.Empty, request.TestText)
         );
 
