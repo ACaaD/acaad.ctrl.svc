@@ -8,33 +8,34 @@ namespace Oma.WndwCtrl.Core.Extensions;
 
 public static class JsonExtensions
 {
-    private static readonly Type _transformationType = typeof(ITransformation);
-    private static readonly Assembly _assemblyToSearch = typeof(BaseTransformation).Assembly;
+    private static readonly Assembly AssembliesToSearch = typeof(BaseTransformation).Assembly;
     
-    public static void AddNativePolymorphicTypeInfo(JsonTypeInfo jsonTypeInfo)
+    public static Action<JsonTypeInfo> GetPolymorphismModifierFor<T>(Func<Type, string> typeToDiscriminatorTransform)
     {
-        if (jsonTypeInfo.Type != _transformationType)
+        return jsonTypeInfo =>
         {
-            return;
-        }
+            Type baseType = typeof(T);
 
-        jsonTypeInfo.PolymorphismOptions = new JsonPolymorphismOptions
-        {
-            TypeDiscriminatorPropertyName = "type",
-            IgnoreUnrecognizedTypeDiscriminators = true,
-            UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization,
+            if (jsonTypeInfo.Type != baseType)
+            {
+                return;
+            }
+
+            jsonTypeInfo.PolymorphismOptions = new JsonPolymorphismOptions
+            {
+                TypeDiscriminatorPropertyName = "type",
+                IgnoreUnrecognizedTypeDiscriminators = true,
+                UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization,
+            };
+
+            var types = AssembliesToSearch.GetTypes()
+                .Where(t => t is { IsClass: true, IsAbstract: false } && t.IsAssignableTo(baseType));
+
+            foreach (Type t in types)
+            {
+                JsonDerivedType derivedType = new(t, typeToDiscriminatorTransform(t).ToLowerInvariant());
+                jsonTypeInfo.PolymorphismOptions.DerivedTypes.Add(derivedType);
+            }
         };
-
-        var types = _assemblyToSearch.GetTypes()
-            .Where(t => t is { IsClass: true, IsAbstract: false } && t.IsAssignableTo(typeof(ITransformation)));
-
-        foreach (Type t in types)
-        {
-            JsonDerivedType derivedType = new(t, GetDiscriminatorForType(t));
-            jsonTypeInfo.PolymorphismOptions.DerivedTypes.Add(derivedType);
-        }
     }
-
-    private static string GetDiscriminatorForType(Type t) 
-        => t.Name.Replace("Transformation", string.Empty).ToLowerInvariant();
 }

@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using JetBrains.Annotations;
+using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Core.Interfaces;
 using Oma.WndwCtrl.Core.Model.Commands;
 
@@ -13,5 +14,5 @@ public class Sensor : Component, IStateQueryable
 {
     [JsonInclude]
     [JsonRequired]
-    public BaseCommand QueryCommand { get; internal set; } = null!;
+    public ICommand QueryCommand { get; internal set; } = null!;
 }

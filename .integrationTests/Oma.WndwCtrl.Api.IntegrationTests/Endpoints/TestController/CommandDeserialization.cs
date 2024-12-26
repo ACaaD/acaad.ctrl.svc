@@ -6,6 +6,7 @@ using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Model;
 using Oma.WndwCtrl.Api.IntegrationTests.TestFramework;
 using Oma.WndwCtrl.Core.Model.Commands;
+using Oma.WndwCtrl.Core.Model.Transformations;
 
 namespace Oma.WndwCtrl.Api.IntegrationTests.Endpoints.TestController;
 
@@ -44,6 +45,7 @@ public sealed partial class CommandDeserialization : IDisposable
                 response.Outcome.Should().NotBeNull();
                 response.Outcome!.Retries.Should().Be(1);
                 response.Outcome!.Transformations.Should().HaveCount(1);
+                response.Outcome!.Transformations.First().Should().BeOfType<ParserTransformation>();
             });
     }
     

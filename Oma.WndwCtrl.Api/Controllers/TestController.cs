@@ -26,7 +26,7 @@ public class TestController([FromKeyedServices(ServiceKeys.AdHocFlowExecutor)] I
     [EndpointSummary("Test Command")]
     [EndpointDescription("Run an ad-hoc command")]
     [Produces("application/json")]
-    public async Task<IActionResult> TestCommandAsync([FromBody] BaseCommand command) // TODO: Not that nice to require the base class instead of the interface here.
+    public async Task<IActionResult> TestCommandAsync([FromBody] ICommand command)
     {
         // TODO: Obvious security concerns here...
         #if !DEBUG

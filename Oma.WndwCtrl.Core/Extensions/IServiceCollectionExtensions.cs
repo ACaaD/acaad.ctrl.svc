@@ -7,6 +7,7 @@ using Oma.WndwCtrl.Core.Executors;
 using Oma.WndwCtrl.Core.Executors.Commands;
 using Oma.WndwCtrl.Core.Executors.Transformers;
 using Oma.WndwCtrl.Core.FlowExecutors;
+using Oma.WndwCtrl.Core.Interfaces;
 using Oma.WndwCtrl.Core.Logger;
 using Oma.WndwCtrl.Core.Model;
 
@@ -21,11 +22,13 @@ public static class IServiceCollectionExtensions
 
         services.AddSingleton<ICliOutputParser, CliOutputParserImpl>()
             .AddSingleton<IParserLogger, CliParserLogger>();
-        
+
         services.AddScoped<ICommandExecutor, CliCommandExecutor>()
             .AddScoped<IOutcomeTransformer, NoOpTransformer>()
-            .AddKeyedScoped<ICommandExecutor, DelegatingCommandExecutor>(ServiceKeys.EntryExecutor)
-            .AddKeyedScoped<AdHocFlowExecutor>(ServiceKeys.AdHocFlowExecutor);
+            .AddScoped<IOutcomeTransformer, ParserTransformer>()
+            .AddKeyedScoped<IFlowExecutor, AdHocFlowExecutor>(ServiceKeys.AdHocFlowExecutor)
+            .AddKeyedScoped<ICommandExecutor, DelegatingCommandExecutor>(ServiceKeys.EntryCommandExecutor)
+            .AddKeyedScoped<IRootTransformer, DelegatingTransformer>(ServiceKeys.RootTransformer);
         
         return services;
     }

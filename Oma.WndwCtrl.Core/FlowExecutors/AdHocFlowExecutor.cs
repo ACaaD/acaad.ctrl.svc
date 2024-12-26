@@ -11,21 +11,21 @@ namespace Oma.WndwCtrl.Core.FlowExecutors;
 public class AdHocFlowExecutor : IFlowExecutor
 {
     private readonly ICommandExecutor _commandExecutor;
-    private readonly IOutcomeTransformer _outcomeTransformer;
+    private readonly IRootTransformer _rootTransformer;
 
     public AdHocFlowExecutor(
-        [FromKeyedServices(ServiceKeys.EntryExecutor)] ICommandExecutor commandExecutor, 
-        IOutcomeTransformer outcomeTransformer
+        [FromKeyedServices(ServiceKeys.EntryCommandExecutor)] ICommandExecutor commandExecutor, 
+        [FromKeyedServices(ServiceKeys.RootTransformer)] IRootTransformer rootTransformer
     )
     {
         _commandExecutor = commandExecutor;
-        _outcomeTransformer = outcomeTransformer;
+        _rootTransformer = rootTransformer;
     }
 
     public async Task<Either<FlowError, TransformationOutcome>> ExecuteAsync(ICommand command, CancellationToken cancelToken = default)
     {
         Either<FlowError, TransformationOutcome> result = await _commandExecutor.ExecuteAsync(command, cancelToken: cancelToken)
-            .BindAsync(oc => _outcomeTransformer.TransformCommandOutcomeAsync(oc, cancelToken));
+            .BindAsync(oc => _rootTransformer.TransformCommandOutcomeAsync(command, oc, cancelToken));
 
         return result;
     }

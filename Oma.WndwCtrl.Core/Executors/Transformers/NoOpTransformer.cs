@@ -7,8 +7,10 @@ namespace Oma.WndwCtrl.Core.Executors.Transformers;
 
 public class NoOpTransformer : IOutcomeTransformer
 {
+    public bool Handles(ITransformation transformation) => true;
+
     public Task<Either<FlowError, TransformationOutcome>> TransformCommandOutcomeAsync(
-        Either<FlowError, CommandOutcome> commandOutcome, CancellationToken cancelToken = default
+        ITransformation transformation, Either<FlowError, CommandOutcome> commandOutcome, CancellationToken cancelToken = default
     ) =>
         Task.FromResult(commandOutcome.BiBind<TransformationOutcome>(
             Right: outcome => new TransformationOutcome(outcome),

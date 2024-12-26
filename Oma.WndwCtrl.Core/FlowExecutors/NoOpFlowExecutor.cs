@@ -11,12 +11,13 @@ namespace Oma.WndwCtrl.Core.FlowExecutors;
 
 public class NoOpFlowExecutor : IFlowExecutor
 {
-    public async Task<Either<FlowError, TransformationOutcome>> ExecuteAsync(
+    public Task<Either<FlowError, TransformationOutcome>> ExecuteAsync(
         ICommand command, CancellationToken cancelToken = default
-    ) => Right<TransformationOutcome>(new TransformationOutcome<ICommand>(command)
+    ) =>
+        Task.FromResult<Either<FlowError, TransformationOutcome>>(Right<TransformationOutcome>(new TransformationOutcome<ICommand>(command)
     {
         Success = true,
         OutcomeRaw = JsonSerializer.Serialize(command),
         Outcome = command
-    });
+    }));
 }

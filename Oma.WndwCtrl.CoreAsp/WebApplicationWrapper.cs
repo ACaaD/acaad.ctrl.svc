@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using Microsoft.AspNetCore.Mvc;
+using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Core.Extensions;
 using Oma.WndwCtrl.CoreAsp.Conventions;
 using Scalar.AspNetCore;
@@ -61,7 +62,12 @@ public class WebApplicationWrapper<TAssemblyDescriptor>
     public static void ModifyJsonSerializerOptions(JsonSerializerOptions jsonSerializerOptions)
     {
         jsonSerializerOptions.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
-            .WithAddedModifier(JsonExtensions.AddNativePolymorphicTypeInfo);
+            .WithAddedModifier(JsonExtensions.GetPolymorphismModifierFor<ICommand>(
+                t => t.Name.Replace("Command", string.Empty))
+            )
+            .WithAddedModifier(JsonExtensions.GetPolymorphismModifierFor<ITransformation>(
+                t => t.Name.Replace("Transformation", string.Empty))
+            );
     }
 
     protected virtual IConfigurationBuilder ConfigurationConfiguration(IConfigurationBuilder configurationBuilder) =>

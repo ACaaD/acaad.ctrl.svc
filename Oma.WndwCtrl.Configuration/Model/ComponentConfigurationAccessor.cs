@@ -1,12 +1,22 @@
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
+using Oma.WndwCtrl.Abstractions;
+using Oma.WndwCtrl.Core.Extensions;
 
 namespace Oma.WndwCtrl.Configuration.Model;
 
 public class ComponentConfigurationAccessor
 {
-    private static readonly JsonSerializerOptions _jsonOptions = new()
+    private static readonly JsonSerializerOptions JsonOptions = new()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+        .WithAddedModifier(JsonExtensions.GetPolymorphismModifierFor<ICommand>(
+            t => t.Name.Replace("Command", string.Empty))
+        )
+        .WithAddedModifier(JsonExtensions.GetPolymorphismModifierFor<ITransformation>(
+            t => t.Name.Replace("Transformation", string.Empty))
+        )
     };
     
     public ComponentConfiguration Configuration { get; set; } = new();
@@ -17,7 +27,7 @@ public class ComponentConfigurationAccessor
 
         string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, configurationFilePath);
         string fileContent = await File.ReadAllTextAsync(filePath, cancelToken);
-        ComponentConfiguration? configuration = JsonSerializer.Deserialize<ComponentConfiguration>(fileContent, _jsonOptions);
+        ComponentConfiguration? configuration = JsonSerializer.Deserialize<ComponentConfiguration>(fileContent, JsonOptions);
 
         if (configuration is null)
         {

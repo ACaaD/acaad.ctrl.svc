@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Core.Interfaces;
 using Oma.WndwCtrl.Core.Model.Commands;
 
@@ -13,13 +14,13 @@ public class Switch : Component, IStateQueryable
 {
     [JsonInclude]
     [JsonRequired]
-    public BaseCommand QueryCommand { get; internal set; } = null!;
+    public ICommand QueryCommand { get; internal set; } = null!;
 
     [JsonInclude]
     [JsonRequired]
-    public BaseCommand OnCommand { get; internal set; } = null!;
+    public ICommand OnCommand { get; internal set; } = null!;
 
     [JsonInclude]
     [JsonRequired]
-    public BaseCommand OffCommand { get; internal set; } = null!;
+    public ICommand OffCommand { get; internal set; } = null!;
 }
