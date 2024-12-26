@@ -6,5 +6,5 @@ public interface ICommand
     
     TimeSpan Timeout { get; }
     
-    IList<ITransformation> Transformations { get; }
+    IEnumerable<ITransformation> Transformations { get; }
 }

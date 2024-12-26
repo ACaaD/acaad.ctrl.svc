@@ -38,11 +38,12 @@ public sealed partial class CommandDeserialization : IDisposable
         using HttpResponseMessage httpResponse = await _httpClient.SendAsync(httpRequestMessage, _cancelToken);
 
         httpResponse.Should().Be200Ok().And
-            .Satisfy<TransformationOutcome<ICommand>>(response =>
+            .Satisfy<TransformationOutcome<BaseCommand>>(response =>
             {
                 response.Success.Should().BeTrue();
                 response.Outcome.Should().NotBeNull();
-                response.Outcome.Retries.Should().Be(1);
+                response.Outcome!.Retries.Should().Be(1);
+                response.Outcome!.Transformations.Should().HaveCount(1);
             });
     }
     
