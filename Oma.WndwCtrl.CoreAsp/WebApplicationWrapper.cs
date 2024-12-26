@@ -9,14 +9,14 @@ public class WebApplicationWrapper<TAssemblyDescriptor>
 {
     protected WebApplication? Application { get; private set; }
     
-    public async Task StartAsync(CancellationToken cancelToken = default)
+    public async Task StartAsync(CancellationToken cancelToken = default, params string[] args)
     {
         if (Application is not null)
         {
             throw new InvalidOperationException("Application is already running.");
         }
         
-        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
         ConfigurationConfiguration(builder.Configuration);
         

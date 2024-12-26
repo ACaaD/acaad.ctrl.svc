@@ -3,11 +3,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Errors;
 using Oma.WndwCtrl.Abstractions.Model;
+using Oma.WndwCtrl.Core.Interfaces;
 using Oma.WndwCtrl.Core.Model;
 
 namespace Oma.WndwCtrl.Core.FlowExecutors;
 
-public class AdHocFlowExecutor
+public class AdHocFlowExecutor : IFlowExecutor
 {
     private readonly ICommandExecutor _commandExecutor;
     private readonly IOutcomeTransformer _outcomeTransformer;

@@ -28,7 +28,7 @@ public sealed record ServiceWrapper<TService> : IDisposable, IServiceWrapper<TSe
     private Task? StartTask { get; set; }
     private Task? CompletionTask { get; set; }
     
-    public Task StartAsync(CancellationToken cancelToken = default)
+    public Task StartAsync(CancellationToken cancelToken = default, params string[] args)
     {
         if (IsRunning())
         {
@@ -39,7 +39,7 @@ public sealed record ServiceWrapper<TService> : IDisposable, IServiceWrapper<TSe
         
         Status = ServiceStatus.Starting;
         
-        StartTask = Service.StartAsync(CancellationTokenSource.Token);
+        StartTask = Service.StartAsync(CancellationTokenSource.Token, args: args);
 
         StartTask
             .ContinueWith(t =>

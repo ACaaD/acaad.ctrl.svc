@@ -25,7 +25,7 @@ public static class IServiceCollectionExtensions
         services.AddScoped<ICommandExecutor, CliCommandExecutor>()
             .AddScoped<IOutcomeTransformer, NoOpTransformer>()
             .AddKeyedScoped<ICommandExecutor, DelegatingCommandExecutor>(ServiceKeys.EntryExecutor)
-            .AddScoped<AdHocFlowExecutor>();
+            .AddKeyedScoped<AdHocFlowExecutor>(ServiceKeys.AdHocFlowExecutor);
         
         return services;
     }

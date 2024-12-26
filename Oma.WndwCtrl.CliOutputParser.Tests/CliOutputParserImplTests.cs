@@ -2,7 +2,6 @@ using FluentAssertions;
 using LanguageExt;
 using LanguageExt.Common;
 using Oma.WndwCtrl.CliOutputParser.Interfaces;
-using Xunit.Abstractions;
 
 namespace Oma.WndwCtrl.CliOutputParser.Tests;
 

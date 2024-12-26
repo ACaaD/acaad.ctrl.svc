@@ -8,17 +8,20 @@ using Oma.WndwCtrl.Api.Model;
 using Oma.WndwCtrl.Api.Transformations.CliParser;
 using Oma.WndwCtrl.CliOutputParser.Interfaces;
 using Oma.WndwCtrl.Core.FlowExecutors;
+using Oma.WndwCtrl.Core.Interfaces;
+using Oma.WndwCtrl.Core.Model;
 using Oma.WndwCtrl.Core.Model.Commands;
 
 namespace Oma.WndwCtrl.Api.Controllers;
 
 [ApiController]
-[Route("ctrl/[controller]")]
-public class TestController : ControllerBase
+[Route(TestController.BaseRoute)]
+public class TestController([FromKeyedServices(ServiceKeys.AdHocFlowExecutor)] IFlowExecutor flowExecutor) : ControllerBase
 {
-    [FromServices] public required AdHocFlowExecutor FlowExecutor { get; init; }
+    public const string BaseRoute = "ctrl/test";
+    public const string CommandRoute = "command";
     
-    [HttpPost("command")]
+    [HttpPost(CommandRoute)]
     [EndpointName($"Test_{nameof(TestCommandAsync)}")]
     [EndpointSummary("Test Command")]
     [EndpointDescription("Run an ad-hoc command")]
@@ -31,7 +34,7 @@ public class TestController : ControllerBase
         #endif
         
         Either<FlowError, TransformationOutcome> flowResult =
-            await FlowExecutor.ExecuteAsync(command, HttpContext.RequestAborted);
+            await flowExecutor.ExecuteAsync(command, HttpContext.RequestAborted);
 
         return flowResult.BiFold<IActionResult>(
             state: null!,

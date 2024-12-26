@@ -17,10 +17,11 @@ public static class IServiceCollectionExtensions
         services.AddConfiguration()
             .AddCommandExecutors()
             .TryAddSingleton<IApiService, CtrlApiService>();
-            
+        
+        // We actually want to override the parser to access it from the request scope
+        services.Replace(ServiceDescriptor.Scoped<ICliOutputParser, CliOutputParserImpl>());
+        
         services
-            // We actually want to override the parser to access it from the request scope
-            .AddScoped<ICliOutputParser, CliOutputParserImpl>()  
             .AddScoped<ScopeLogDrain>()
             .AddScoped<IParserLogger>(sp => sp.GetRequiredService<ScopeLogDrain>());
         
