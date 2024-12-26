@@ -69,7 +69,7 @@ public class DelegatingCommandExecutorTests
     {
         var simulatedError = new TechnicalError("Simulated sub-command executor error", Code: 1337);
         
-        _executorMock.ExecuteAsync(Arg.Any<ICommand>())
+        _executorMock.ExecuteAsync(Arg.Any<ICommand>(), cancelToken: _cancelToken)
             .Returns(Left<FlowError>(simulatedError));
         
         var result = await _instance.ExecuteAsync(_commandMock, cancelToken: _cancelToken);

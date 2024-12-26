@@ -9,8 +9,6 @@ namespace Oma.WndwCtrl.Api.IntegrationTests.TestFramework;
 
 public sealed class ApiAssemblyFixture : WebApplicationFactory<CtrlApiProgram>, IAsyncLifetime
 {
-    private readonly WebApplicationFactory<CtrlApiProgram> _webApplicationFactory;
-    
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureServices(services =>

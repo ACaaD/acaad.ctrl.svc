@@ -16,5 +16,24 @@ public partial class CommandDeserialization
                                              ]
                                            }
                                            """;
+        
+        internal const string ParserTransformationCommand = """
+                                            {
+                                              "type": "cli",
+                                              "fileName": "",
+                                              "arguments": "",
+                                              "retries": 1,
+                                              "timeout": "00:00:00",
+                                              "transformations": [
+                                                {
+                                                  "type": "parser",
+                                                  "statements": [ 
+                                                    "Anchor.From('START');",
+                                                    "Anchor.From('END');"
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                            """;
     }
 }

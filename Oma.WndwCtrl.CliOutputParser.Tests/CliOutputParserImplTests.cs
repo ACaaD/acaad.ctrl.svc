@@ -16,7 +16,7 @@ public class XUnitLogger : IParserLogger
 
     public void Log(object message)
     {
-        _output.WriteLine(message.ToString()?.Replace("\r", string.Empty));
+        _output.WriteLine(message.ToString()?.Replace("\r", string.Empty) ?? string.Empty);
     }
 }
 
