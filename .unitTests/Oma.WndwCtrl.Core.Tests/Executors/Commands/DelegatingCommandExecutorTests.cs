@@ -31,7 +31,9 @@ public class DelegatingCommandExecutorTests
         };
         
         _executorMock.Handles(Arg.Any<ICommand>()).Returns(true);
-        _executorMock.ExecuteAsync(Arg.Any<ICommand>()).Returns(Right(outcome));
+        
+        _executorMock.ExecuteAsync(Arg.Any<ICommand>(), cancelToken: Arg.Any<CancellationToken>())
+            .Returns(Right(outcome));
      
         _commandMock = Substitute.For<ICommand>();
 
@@ -69,7 +71,7 @@ public class DelegatingCommandExecutorTests
     {
         var simulatedError = new TechnicalError("Simulated sub-command executor error", Code: 1337);
         
-        _executorMock.ExecuteAsync(Arg.Any<ICommand>(), cancelToken: _cancelToken)
+        _executorMock.ExecuteAsync(Arg.Any<ICommand>(), cancelToken: Arg.Any<CancellationToken>())
             .Returns(Left<FlowError>(simulatedError));
         
         var result = await _instance.ExecuteAsync(_commandMock, cancelToken: _cancelToken);

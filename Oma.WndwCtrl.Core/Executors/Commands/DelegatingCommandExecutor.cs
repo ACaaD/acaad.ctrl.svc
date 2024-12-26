@@ -84,10 +84,10 @@ public class DelegatingCommandExecutor : ICommandExecutor
             state.Logger.LogDebug("Executing command {CommandName} with {ExecutedRetries} retries.", state.Command.GetType().Name, state.ExecutedRetries);
             
             var either = await commandExecutor.ExecuteAsync(state.Command);
-            
-            return either.BiMap(
-                oc => (state, oc),
-                FlowError (err) => err
+
+            return either.BiBind<(CommandState, CommandOutcome)>(
+                Right: outcome => Prelude.Right((state, outcome)),
+                Left: err => err
             );
         };
     }
