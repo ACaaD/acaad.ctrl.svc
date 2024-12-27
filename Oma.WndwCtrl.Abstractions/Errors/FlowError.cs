@@ -21,25 +21,19 @@ public record FlowError : Error
         IsExceptional = isExceptional;
         IsExpected = isExpected;
     }
-    
+
+    public override ErrorException ToErrorException()
+    {
+        // TODO
+        throw new NotImplementedException();
+    }
+
     public override int Code { get; }
     public override string Message { get; }
     public override bool IsExceptional { get; }
     public override bool IsExpected { get; }
     
     public override Option<Error> Inner { get; } = Option<Error>.None;
-    
-    public override bool Is<E>()
-    {
-        // TODO: Wrong implementation
-        if(this is E) return true;
-        return false;
-    }
-
-    public override ErrorException ToErrorException()
-    {
-        throw new NotImplementedException();
-    }
     
     public static implicit operator FlowError(TechnicalError error)
         => new(error);

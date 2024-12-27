@@ -53,9 +53,9 @@ public class DelegatingTransformer : IRootTransformer
         
         _logger.LogDebug("Finished command in {elapsed} (Success={isSuccess})", swExec.Measure(), outcomeWithState);
         
-        return outcomeWithState.BiBind<TransformationOutcome>( 
-            tuple => tuple.Outcome, 
-            err => err
+        return outcomeWithState.BiBind<FlowError, TransformationOutcome>(
+            Left: err => err,
+            Right: tuple => tuple.Outcome 
         );
     }
 
@@ -63,9 +63,9 @@ public class DelegatingTransformer : IRootTransformer
     {
         return state =>
         {
-            var result = state.CommandExecutionOutcome.BiBind<(TransformationState State, TransformationOutcome Outcome)>(
-                Right: outcome => (state with { StartDate = DateTime.UtcNow } , new(outcome)),
-                Left: err => err
+            Either<FlowError, (TransformationState State, TransformationOutcome Outcome)> result = state.CommandExecutionOutcome.BiBind<FlowError, (TransformationState State, TransformationOutcome Outcome)>(
+                Left: err => err,
+                Right: outcome => (state with { StartDate = DateTime.UtcNow } , new(outcome))
             );
 
             return Task.FromResult(result);
@@ -159,9 +159,9 @@ public class DelegatingTransformer : IRootTransformer
             var res = await tuple.Transformer
                 .TransformCommandOutcomeAsync(state.CurrentTransformation, transformerInput);
 
-            return res.BiBind<(TransformationState, TransformationOutcome)>(
-                right => (state, right),
-                left => left
+            return res.BiBind<FlowError, (TransformationState, TransformationOutcome)>(
+                left => left,
+                right => (state, right)
             );
         };
     }

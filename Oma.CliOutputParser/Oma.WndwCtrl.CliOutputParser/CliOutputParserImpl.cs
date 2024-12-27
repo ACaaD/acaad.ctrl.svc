@@ -26,7 +26,7 @@ public class CliOutputParserImpl(IParserLogger parserLogger) : ICliOutputParser
     public Either<Error, ParserResult> Parse(string transformation, IEnumerable<object> values)
     {
         TransformationListener Build()
-            => new(parserLogger.Log, values);
+            => new(parserLogger.Log, values.AsEnumerable());
         
         return Parse(transformation, Build);
     }
@@ -58,8 +58,10 @@ public class CliOutputParserImpl(IParserLogger parserLogger) : ICliOutputParser
 
         var enumeratedList = listener.CurrentValues.ToList();
         
-        return enumeratedList.Count == 1
-            ? new ParserResult() { enumeratedList.First() }
-            : new ParserResult() { enumeratedList.ToList() };
+        ParserResult result = enumeratedList.Count == 1
+            ? new() { enumeratedList.First() }
+            : new() { enumeratedList.ToList() };
+
+        return result;
     }
 }

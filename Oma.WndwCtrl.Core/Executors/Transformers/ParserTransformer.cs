@@ -1,7 +1,5 @@
-using System.Collections;
 using LanguageExt;
 using LanguageExt.Common;
-using LanguageExt.DataTypes.Serialisation;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Errors;
 using Oma.WndwCtrl.Abstractions.Model;
@@ -37,9 +35,9 @@ public class ParserTransformer(ICliOutputParser cliOutputParser) : IOutcomeTrans
                 return parseResult.MapLeft<FlowError>(err => new TransformationError(err));
             },
             Left: err => err 
-        ).BiBind<TransformationOutcome>(
-            parseResult => new TransformationOutcome<ParserResult>(parseResult, success: true),
-            err => err
+        ).BiBind<FlowError, TransformationOutcome>(
+            err => err,
+            parseResult => new TransformationOutcome<ParserResult>(parseResult, success: true)
         );
         
         return Task.FromResult(result);

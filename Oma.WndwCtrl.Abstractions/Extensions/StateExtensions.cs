@@ -13,11 +13,12 @@ public static class StateExtensions
         {
             try
             {
-                return await ma(state).BindAsync(pairA => f(pairA.Item2)(pairA.Item1));
+                var newIdk = await ma(state);
+                return newIdk.Bind(pairA => f(pairA.Item2)(pairA.Item1).GetAwaiter().GetResult());
             }
-            catch(Exception e)
+            catch(Exception ex)
             {
-                return Left<FlowError>(new TechnicalError(e.Message, Code: 1337));
+                return Left<FlowError>(new TechnicalError(ex.Message, Code: 1337, ex));
             }
         };
     
@@ -27,9 +28,9 @@ public static class StateExtensions
         {
             return await ma(state);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            return Left<FlowError>(new TechnicalError(e.Message, Code: 1337));
+            return Left<FlowError>(new TechnicalError(ex.Message, Code: 1337, ex));
         }
     }
 }

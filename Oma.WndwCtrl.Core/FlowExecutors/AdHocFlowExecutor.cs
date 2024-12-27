@@ -25,7 +25,7 @@ public class AdHocFlowExecutor : IFlowExecutor
     public async Task<Either<FlowError, TransformationOutcome>> ExecuteAsync(ICommand command, CancellationToken cancelToken = default)
     {
         Either<FlowError, TransformationOutcome> result = await _commandExecutor.ExecuteAsync(command, cancelToken: cancelToken)
-            .BindAsync(oc => _rootTransformer.TransformCommandOutcomeAsync(command, oc, cancelToken));
+            .Bind(oc => _rootTransformer.TransformCommandOutcomeAsync(command, oc, cancelToken));
 
         return result;
     }

@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using LanguageExt;
 using LanguageExt.Common;
-using LanguageExt.TypeClasses;
 using Microsoft.Extensions.Logging;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Errors;
@@ -47,9 +46,9 @@ public class DelegatingCommandExecutor : ICommandExecutor
         
         _logger.LogDebug("Finished command in {elapsed} (Success={isSuccess})", swExec.Measure(), outcomeWithState);
         
-        return outcomeWithState.BiBind<CommandOutcome>( 
-            tuple => tuple.Outcome with { ExecutionDuration = Option<TimeSpan>.Some(swExec.Elapsed) }, 
-            err => err
+        return outcomeWithState.BiBind<FlowError, CommandOutcome>( 
+            Left: err => err,
+            Right: tuple => tuple.Outcome with { ExecutionDuration = Option<TimeSpan>.Some(swExec.Elapsed) }
         );
     }
 
@@ -85,9 +84,9 @@ public class DelegatingCommandExecutor : ICommandExecutor
             
             var either = await commandExecutor.ExecuteAsync(state.Command);
 
-            return either.BiBind<(CommandState, CommandOutcome)>(
-                Right: outcome => Prelude.Right((state, outcome)),
-                Left: err => err
+            return either.BiBind<FlowError, (CommandState, CommandOutcome)>(
+                Left: err => err,
+                Right: outcome => Prelude.Right((state, outcome))
             );
         };
     }
