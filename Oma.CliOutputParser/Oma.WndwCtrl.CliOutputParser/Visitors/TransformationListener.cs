@@ -6,6 +6,14 @@ public partial class TransformationListener : CliOutputParserBaseListener
 {
     private readonly Action<object> _log;
 
+    public TransformationListener(Action<object> log, IEnumerable<object> values)
+    {
+        _log = log;
+        CurrentValues = values;
+
+        LogCurrentState("input");
+    }
+    
     public TransformationListener(Action<object> log, string input)
     {
         _log = log;

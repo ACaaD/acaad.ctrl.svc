@@ -15,8 +15,23 @@ namespace Oma.WndwCtrl.CliOutputParser;
 
 public class CliOutputParserImpl(IParserLogger parserLogger) : ICliOutputParser
 {
-    [SuppressMessage("ReSharper", "PossibleMultipleEnumeration", Justification = "Won't fix; Not performance critical.")]
     public Either<Error, ParserResult> Parse(string transformation, string text)
+    {
+        TransformationListener Build()
+            => new(parserLogger.Log, text);
+        
+        return Parse(transformation, Build);
+    }
+    
+    public Either<Error, ParserResult> Parse(string transformation, IEnumerable<object> values)
+    {
+        TransformationListener Build()
+            => new(parserLogger.Log, values);
+        
+        return Parse(transformation, Build);
+    }
+    
+    private Either<Error, ParserResult> Parse(string transformation, Func<TransformationListener> transformationListenerFactory)
     {
         CollectingErrorListener errorListener = new();
         AntlrInputStream charStream = new(transformation);
@@ -36,7 +51,7 @@ public class CliOutputParserImpl(IParserLogger parserLogger) : ICliOutputParser
             return Error.Many(errorListener.Errors.Cast<Error>().ToArray());
         }
 
-        TransformationListener listener = new(parserLogger.Log, text);
+        TransformationListener listener = transformationListenerFactory();
 
         ParseTreeWalker walker = new();
         walker.Walk(listener, tree);

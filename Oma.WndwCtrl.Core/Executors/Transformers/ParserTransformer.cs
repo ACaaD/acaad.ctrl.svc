@@ -1,3 +1,4 @@
+using System.Collections;
 using LanguageExt;
 using LanguageExt.Common;
 using LanguageExt.DataTypes.Serialisation;
@@ -21,7 +22,17 @@ public class ParserTransformer(ICliOutputParser cliOutputParser) : IOutcomeTrans
                 // Cannot use empty string for concatenation, otherwise comments will break a snippet,
                 // Since all commands after the comment are treated as a comment as well.
                 string commandText = string.Join(Environment.NewLine, transformation.Statements);
-                Either<Error, ParserResult> parseResult = cliOutputParser.Parse(commandText, outcome.OutcomeRaw);
+                
+                Either<Error, ParserResult> parseResult;
+
+                if (outcome is TransformationOutcome<ParserResult> parsedOutcome)
+                {
+                    parseResult = cliOutputParser.Parse(commandText, parsedOutcome.Outcome);   
+                }
+                else
+                {
+                    parseResult = cliOutputParser.Parse(commandText, outcome.OutcomeRaw);
+                }
 
                 return parseResult.MapLeft<FlowError>(err => new TransformationError(err));
             },
