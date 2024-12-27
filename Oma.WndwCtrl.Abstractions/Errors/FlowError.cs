@@ -15,7 +15,7 @@ public record FlowError : Error
     {
     }
     
-    protected FlowError(string message, bool isExceptional, bool isExpected)
+    public FlowError(string message, bool isExceptional, bool isExpected)
     {
         Message = message;
         IsExceptional = isExceptional;

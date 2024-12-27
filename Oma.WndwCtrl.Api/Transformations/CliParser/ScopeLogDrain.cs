@@ -8,6 +8,9 @@ public class ScopeLogDrain : IParserLogger
     
     public void Log(object message)
     {
+#if DEBUG
+        Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] {message}");
+#endif
         Messages.Add(message.ToString() ?? string.Empty);
     }
 }

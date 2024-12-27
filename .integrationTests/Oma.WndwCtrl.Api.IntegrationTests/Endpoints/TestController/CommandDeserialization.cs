@@ -2,6 +2,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Model;
 using Oma.WndwCtrl.Api.IntegrationTests.TestFramework;
@@ -10,17 +11,15 @@ using Oma.WndwCtrl.Core.Model.Transformations;
 
 namespace Oma.WndwCtrl.Api.IntegrationTests.Endpoints.TestController;
 
-public sealed partial class CommandDeserialization : IDisposable
+public sealed partial class CommandDeserialization : ApiFixtureTestBase<MockedFlowExecutorApiFixture>
 {
     private const string CommandRoute = $"{Controllers.TestController.BaseRoute}/{Controllers.TestController.CommandRoute}";
-
-    private readonly HttpClient _httpClient;
-    private readonly CancellationToken _cancelToken;
     
-    public CommandDeserialization(ApiAssemblyFixture apiAssemblyFixture)
+    public CommandDeserialization(MockedFlowExecutorApiFixture mockedFlowExecutorApiFixture) : base(
+        mockedFlowExecutorApiFixture,
+        CommandRoute
+    )
     {
-        _cancelToken = TestContext.Current.CancellationToken;
-        _httpClient = apiAssemblyFixture.CreateClient();
     }
 
     [Fact]
@@ -61,32 +60,6 @@ public sealed partial class CommandDeserialization : IDisposable
         using HttpResponseMessage httpResponse = await _httpClient.SendAsync(httpRequestMessage, _cancelToken);
 
         httpResponse.Should().Be400BadRequest();
-    }
-
-    private static HttpRequestMessage ConstructCommandHttpRequestMessage(string payload, bool isJson = true)
-    {
-        ArgumentNullException.ThrowIfNull(payload);
-
-        HttpContent? json = null;
-        HttpRequestMessage? httpRequestMessage = null;
-
-        try
-        {
-            object? inputValue = isJson
-                ? JsonSerializer.Deserialize<object>(payload)
-                : payload;
-            
-            json = JsonContent.Create(inputValue);
-            httpRequestMessage = new(HttpMethod.Post, CommandRoute);
-            httpRequestMessage.Content = json;
-            return httpRequestMessage;
-        }
-        catch
-        {
-            json?.Dispose();
-            httpRequestMessage?.Dispose();
-            throw;
-        }
     }
     
     public void Dispose()

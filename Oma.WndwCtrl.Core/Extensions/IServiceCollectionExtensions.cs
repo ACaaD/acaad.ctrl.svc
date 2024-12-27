@@ -19,6 +19,7 @@ public static class IServiceCollectionExtensions
     public static IServiceCollection AddCommandExecutors(this IServiceCollection services)
     {
         // TODO: Will cause problems when called multiple times.
+        // Also: The name is wrong
 
         services.AddSingleton<ICliOutputParser, CliOutputParserImpl>()
             .AddSingleton<IParserLogger, CliParserLogger>();

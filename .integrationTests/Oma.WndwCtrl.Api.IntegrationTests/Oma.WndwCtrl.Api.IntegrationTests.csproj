@@ -39,4 +39,8 @@
     <ProjectReference Include="..\..\Oma.WndwCtrl.Api\Oma.WndwCtrl.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Mocks\" />
+  </ItemGroup>
+
 </Project>
