@@ -61,7 +61,4 @@ public sealed partial class CommandDeserialization : ApiFixtureTestBase<MockedFl
 
         httpResponse.Should().Be400BadRequest();
     }
-    
-    public void Dispose()
-        => _httpClient.Dispose();
 }

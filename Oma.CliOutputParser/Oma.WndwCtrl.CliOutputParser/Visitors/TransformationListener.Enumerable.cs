@@ -44,14 +44,17 @@ public partial class TransformationListener
     {
         if (nestedList.IsNested)
         {
-            var result = nestedList.Children.Select(l => FoldItemsRecursive(l, fold));
+            var result = nestedList.Children.Select(l => FoldItemsRecursive(l, fold))
+                .Where(obj => obj is not null)
+                .Select(obj => obj!)
+                .ToList();
             
             // TODO: Check this function.
             // If only the first item is used, then it could lead to problems in multi-nesting
             // if there is no value for the first item, but for the others (IsNested determined incorrectly)
             
             var isNested = result.FirstOrDefault() is NestedEnumerable nE && nE.IsNested;
-            return NestedEnumerable.FromEnumerableInternal(result.Where(v => v is not null), isNested);
+            return NestedEnumerable.FromEnumerableInternal(result, isNested);
         }
         
         return fold(nestedList);
