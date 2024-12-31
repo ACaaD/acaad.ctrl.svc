@@ -25,8 +25,7 @@ public class ParserTransformer(ICliOutputParser cliOutputParser) : IOutcomeTrans
 
                 if (outcome is TransformationOutcome<ParserResult> parsedOutcome)
                 {
-                    IEnumerable<object> values = parsedOutcome.Outcome!
-                        .Get();
+                    IEnumerable<object> values = parsedOutcome.Outcome!;
                     
                     parseResult = cliOutputParser.Parse(commandText, values);   
                 }

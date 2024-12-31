@@ -1,4 +1,5 @@
 using Oma.WndwCtrl.CliOutputParser.Grammar;
+using Oma.WndwCtrl.CliOutputParser.Model;
 
 namespace Oma.WndwCtrl.CliOutputParser.Visitors;
 
@@ -9,7 +10,7 @@ public partial class TransformationListener : CliOutputParserBaseListener
     public TransformationListener(Action<object> log, IEnumerable<object> values)
     {
         _log = log;
-        CurrentValues = values;
+        CurrentValues = NestedEnumerable.FromEnumerable(values);
 
         LogCurrentState("input");
     }
@@ -17,12 +18,12 @@ public partial class TransformationListener : CliOutputParserBaseListener
     public TransformationListener(Action<object> log, string input)
     {
         _log = log;
-        CurrentValues = [input];
+        CurrentValues = NestedEnumerable.FromString(input);
 
         LogCurrentState("input");
     }
     
-    public IEnumerable<object> CurrentValues { get; private set; }
+    public NestedEnumerable CurrentValues { get; private set; }
     
     public override void EnterStatement(Grammar.CliOutputParser.StatementContext context)
     {

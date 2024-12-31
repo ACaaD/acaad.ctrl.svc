@@ -56,13 +56,20 @@ public class CliOutputParserImpl(IParserLogger parserLogger) : ICliOutputParser
         ParseTreeWalker walker = new();
         walker.Walk(listener, tree);
 
-        var enumeratedList = listener.CurrentValues;
-        bool canCount = enumeratedList.TryGetNonEnumeratedCount(out int count);
-        
-        ParserResult result = canCount && count == 1
-            ? new(enumeratedList.First())
-            : new(enumeratedList);
+        var enumeratedList = listener.CurrentValues.ToList();
 
+        if (enumeratedList.Count == 1)
+        {
+            return new ParserResult() { enumeratedList.Single() };
+        }
+
+        ParserResult result = new();
+
+        foreach (var item in enumeratedList)
+        {
+            result.Add(item);
+        }
+        
         return result;
     }
 }
