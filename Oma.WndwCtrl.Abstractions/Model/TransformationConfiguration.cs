@@ -4,7 +4,7 @@ using Oma.WndwCtrl.Abstractions.Errors;
 
 namespace Oma.WndwCtrl.Abstractions.Model;
 
-public record TransformationState
+public record TransformationConfiguration
 {
     public ILogger Logger { get; }
     public Seq<IOutcomeTransformer> OutcomeTransformers { get; }
@@ -12,7 +12,7 @@ public record TransformationState
     
     public Either<FlowError, TransformationOutcome> InitialOutcome { get; }
 
-    public TransformationState(
+    public TransformationConfiguration(
         ILogger logger,
         IEnumerable<IOutcomeTransformer> outcomeTransformers,
         ICommand command,
