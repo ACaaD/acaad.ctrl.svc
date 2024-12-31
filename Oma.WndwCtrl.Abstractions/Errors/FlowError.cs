@@ -14,6 +14,10 @@ public record FlowError : Error
     protected FlowError(TechnicalError technicalError) : this((Error)technicalError)
     {
     }
+
+    public FlowError(string message, bool isExceptional) : this(message, isExceptional, isExpected: !isExceptional)
+    {
+    }
     
     public FlowError(string message, bool isExceptional, bool isExpected)
     {
