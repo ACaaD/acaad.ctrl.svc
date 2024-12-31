@@ -33,6 +33,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".integrationTests", ".integ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oma.WndwCtrl.Api.IntegrationTests", ".integrationTests\Oma.WndwCtrl.Api.IntegrationTests\Oma.WndwCtrl.Api.IntegrationTests.csproj", "{F8585B59-62BF-47BB-BF7E-1FA14BA75A6D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oma.WndwCtrl.FpCore", "Oma.WndwCtrl.FpCore\Oma.WndwCtrl.FpCore.csproj", "{70239D35-A10F-4890-BF2C-B0BFE0228C30}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,10 @@ Global
 		{F8585B59-62BF-47BB-BF7E-1FA14BA75A6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8585B59-62BF-47BB-BF7E-1FA14BA75A6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8585B59-62BF-47BB-BF7E-1FA14BA75A6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70239D35-A10F-4890-BF2C-B0BFE0228C30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70239D35-A10F-4890-BF2C-B0BFE0228C30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70239D35-A10F-4890-BF2C-B0BFE0228C30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70239D35-A10F-4890-BF2C-B0BFE0228C30}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{E7217C2E-5C78-4106-977D-3091CFA63F43} = {307F90ED-24AD-4725-960B-0A7AAFFE8C6D}
