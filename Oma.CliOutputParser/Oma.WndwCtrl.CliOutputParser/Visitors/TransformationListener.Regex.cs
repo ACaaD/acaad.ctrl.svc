@@ -16,7 +16,7 @@ public partial class TransformationListener
 
         IEnumerable<IEnumerable<object>> Unfold(IEnumerable<object> val)
         {
-            List<List<string>> result = [];
+            IEnumerable<IEnumerable<string>> result = [];
 
             foreach (object items in val)
             {
@@ -31,11 +31,12 @@ public partial class TransformationListener
                         innerResult.Add(group.ToString());
                     }
 
-                    result.Add(innerResult);
+                    result = result.Concat<IEnumerable<string>>([innerResult.Select(l => l).AsEnumerable()]);
                 }
             }
 
-            return result;
+            var res = result.AsEnumerable();
+            return res;
         }
     }
 

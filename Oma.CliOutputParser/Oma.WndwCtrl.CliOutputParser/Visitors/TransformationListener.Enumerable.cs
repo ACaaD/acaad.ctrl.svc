@@ -1,3 +1,6 @@
+using System.Collections;
+using Oma.WndwCtrl.CliOutputParser.Interfaces;
+
 namespace Oma.WndwCtrl.CliOutputParser.Visitors;
 
 public partial class TransformationListener
@@ -16,15 +19,23 @@ public partial class TransformationListener
     {
         if (nestedList is IEnumerable<IEnumerable<object>> tst)
         {
-            return tst.Select(l => UnfoldItemsRecursive(l, unfold));
+            return tst.Select(l => UnfoldItemsRecursive(l, unfold)).AsEnumerable();
         }
 
-        var unfoldResult = unfold(nestedList); 
+        var unfoldResult = unfold(nestedList).AsEnumerable(); 
         return unfoldResult;   
     }
 
     private static object? FoldItemsRecursive(IEnumerable<object> nestedList, Func<IEnumerable<object>, object?> fold)
     {
+        if (nestedList is ParserResult tst2)
+        {
+            Console.WriteLine("help");
+            
+        }
+        
+        
+        
         if (nestedList is IEnumerable<IEnumerable<object>> tst)
         {
             return tst
