@@ -60,7 +60,7 @@ public class CliOutputParserImpl(IParserLogger parserLogger) : ICliOutputParser
         
         ParserResult result = enumeratedList.Count == 1
             ? new() { enumeratedList.First() }
-            : new() { enumeratedList.ToList() };
+            : new(enumeratedList);
 
         return result;
     }

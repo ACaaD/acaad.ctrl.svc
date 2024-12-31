@@ -6,6 +6,14 @@ namespace Oma.WndwCtrl.CliOutputParser.Interfaces;
 
 public class ParserResult : List<object>
 {
+    public ParserResult()
+    {
+    }
+
+    public ParserResult(IEnumerable<object> collection)
+    {
+        AddRange(collection);
+    }
 }
 
 public interface ICliOutputParser
