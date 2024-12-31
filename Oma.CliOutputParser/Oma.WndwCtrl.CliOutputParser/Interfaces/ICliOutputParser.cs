@@ -24,16 +24,13 @@ public class ParserResult : IEnumerable<object>
         _items.AddRange(collection);
     }
 
-    public IEnumerator<object> GetEnumerator() =>  Get().GetEnumerator();
+    public IEnumerator<object> GetEnumerator() =>  ((IEnumerable<object>)Get().Select(i => i)).GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator() =>  Get().GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => Get().Select(i => i).GetEnumerator();
 
     public IEnumerable<object> Get()
     {
-        foreach (object item in _items)
-        {
-            yield return item;
-        }
+        return _items.AsEnumerable();
     }
 }
 

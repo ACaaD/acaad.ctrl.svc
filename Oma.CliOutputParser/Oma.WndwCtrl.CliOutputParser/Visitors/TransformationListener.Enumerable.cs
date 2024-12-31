@@ -28,14 +28,6 @@ public partial class TransformationListener
 
     private static object? FoldItemsRecursive(IEnumerable<object> nestedList, Func<IEnumerable<object>, object?> fold)
     {
-        if (nestedList is ParserResult tst2)
-        {
-            Console.WriteLine("help");
-            
-        }
-        
-        
-        
         if (nestedList is IEnumerable<IEnumerable<object>> tst)
         {
             return tst
