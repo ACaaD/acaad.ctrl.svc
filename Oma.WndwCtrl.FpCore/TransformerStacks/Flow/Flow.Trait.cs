@@ -13,6 +13,24 @@ public class FlowT<TFlowConfiguration, A> : K<Flow<TFlowConfiguration>, A>
         ExecuteFlow = executeFlow;
     }
     
+    public FlowT<TFlowConfiguration, B> Map<B>(Func<A, B> f) =>
+        this.Kind().Map(f).As();
+    
+    public FlowT<TFlowConfiguration, B> Select<B>(Func<A, B> f) =>
+        this.Kind().Map(f).As();
+    
+    public FlowT<TFlowConfiguration, C> SelectMany<B, C>(Func<A, K<Flow<TFlowConfiguration>, B>> bind, Func<A, B, C> project) =>
+        Bind(a => bind(a).Map(b => project(a, b)));
+    
+    public FlowT<TFlowConfiguration, C> SelectMany<B, C>(Func<A, IO<B>> bind, Func<A, B, C> project) =>
+        SelectMany(a => MonadIO.liftIO<Flow<TFlowConfiguration>, B>(bind(a)), project);
+    
+    public FlowT<TFlowConfiguration, C> SelectMany<B, C>(Func<A, K<IO, B>> bind, Func<A, B, C> project) =>
+        SelectMany(a => MonadIO.liftIO<Flow<TFlowConfiguration>, B>(bind(a).As()), project);
+
+    public FlowT<TFlowConfiguration, C> SelectMany<B, C>(Func<A, Pure<B>> bind, Func<A, B, C> project) =>
+        Map(a => project(a, bind(a).Value));
+    
     public static implicit operator FlowT<TFlowConfiguration, A>(Pure<A> ma) =>
         Flow<TFlowConfiguration>.Pure(ma.Value).As();
 

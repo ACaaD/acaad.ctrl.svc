@@ -1,3 +1,4 @@
+using System.Diagnostics.Contracts;
 using LanguageExt;
 using LanguageExt.Common;
 
@@ -31,6 +32,12 @@ public record FlowError : Error
         // TODO
         throw new NotImplementedException();
     }
+
+    [Pure]
+    public static FlowError NoTransformerFound(ITransformation transformation) =>
+        new FlowError(
+            $"No transformation executor found that handles transformation type {transformation.GetType().FullName}.",
+            isExceptional: false);
 
     public override int Code { get; }
     public override string Message { get; }

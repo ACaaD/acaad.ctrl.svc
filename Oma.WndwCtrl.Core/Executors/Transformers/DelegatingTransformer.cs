@@ -14,6 +14,8 @@ using Oma.WndwCtrl.Abstractions.Model;
 using Oma.WndwCtrl.CliOutputParser.Errors;
 using Oma.WndwCtrl.FpCore.TransformerStacks.Flow;
 
+using static Oma.WndwCtrl.FpCore.TransformerStacks.Flow.FlowExtensions;
+
 using static LanguageExt.Prelude;
 
 namespace Oma.WndwCtrl.Core.Executors.Transformers;
@@ -32,69 +34,76 @@ public class DelegatingTransformer : IRootTransformer
         _transformers = transformers;
     }
     
-    public static FlowT<TransformationState, TransformationOutcome> OverallFlowT => (
-        from tuple in FindMatchingTransformer
-        from res in ExecuteTransformerIO(tuple)
-        select res
-    ).As();
-    
-    private static FlowT<TransformationState, (ITransformation, IOutcomeTransformer)> FindMatchingTransformer =>
+    public static FlowT<TransformationState, TransformationOutcome> OverallFlow => 
     (
-        from tuple in Flow<TransformationState>.asks2(state => (state.Command, state.OutcomeTransformers))
+        // from tuple in Flow<TransformationState>.asks2(state => (state.Command, state.OutcomeTransformers))
+        from outcome in initialOutcome
+        from allT in transformations
         
-        // TODO: Handle in "loop" somehow
-        from transformation in Flow<TransformationState>.lift<ITransformation>(NextTransformation(tuple.Command)
-            .ToEither<FlowError>(() => new FlowError($"Could not locate current transformation", isExpected: false, isExceptional: true)))
+        // TODO: Presumably the order is incorrect here and the fold must be applied first, then the lift.
+        from eitherChained in 
+            allT.Fold<Seq, ITransformation, FlowT<TransformationState, TransformationOutcome>>(outcome, t =>
+            {
+                return lastEither =>
+                {
+                    FlowT<TransformationState, TransformationOutcome> res = 
+                        from transformer in FindApplicableTransformer(t)
+                        from result in ExecuteTransformerIO(t, transformer, lastEither)
+                        select result;
+
+                    return res;
+                };
+            })
         
-        from transformer in Flow<TransformationState>.lift(tuple.OutcomeTransformers.Find(t => t.Handles(transformation))
-            .ToEither<FlowError>(() => new FlowError($"Could not locate transformer for input '{transformation}'", isExceptional: true)))
-        
-        select (transformation, transformer)
+        select eitherChained
     ).As();
 
-    private static FlowT<TransformationState, TransformationOutcome> ExecuteTransformerIO(
-        (ITransformation transformation, IOutcomeTransformer transformer) tuple
-    ) =>
-    (
+    public static FlowT<TransformationState, IOutcomeTransformer> FindApplicableTransformer(
+        ITransformation transformation
+    ) => (
         from _ in Flow<TransformationState>.asks2(state => state.Command)
         
-        /* IO COMPUTATION */
-        from either in Flow<TransformationState>.liftAsync(async envIO =>
-        {
-            Either<FlowError, TransformationOutcome> currentValue = default; // TODO
+        from allTransformers in config.Map(cfg => cfg.OutcomeTransformers)
+        
+        from found in Flow<TransformationState>.lift(
+           allTransformers.Find(t => t.Handles(transformation))
+               .ToEither<FlowError>(() => FlowError.NoTransformerFound(transformation))
+        )
+        
+        select found
+    ).As();
+    
+    public static FlowT<TransformationState, TransformationState> config =>
+        new (ReaderT.ask<EitherT<FlowError, IO>, TransformationState>());
+    
+    private static FlowT<TransformationState, Seq<ITransformation>> transformations =>
+        config.Map(cfg => cfg.Command)
+            .Map(command => command.Transformations)
+            .Map(t => new Seq<ITransformation>(t))
+            .As(); // TODO: Figure out why this is needed here.
 
-            Either<FlowError, TransformationOutcome> tRes =
-                await tuple.transformer.TransformCommandOutcomeAsync(tuple.transformation, currentValue, envIO.Token);
-            
-            return tRes;
-        })
+    private static FlowT<TransformationState, Either<FlowError, TransformationOutcome>> initialOutcome =>
+        config.Map(cfg => cfg.InitialOutcome).As();
+    
+    // TODO: Is passing the FlowT here correct?
+    private static FlowT<TransformationState, TransformationOutcome> ExecuteTransformerIO(
+        ITransformation transformation, IOutcomeTransformer transformer, FlowT<TransformationState, TransformationOutcome> outcome
+    ) =>
+    (
+        from unwrapped in outcome
+    
+        /* IO COMPUTATION */
+        from ioRes in Flow<TransformationState>.liftAsync(async envIO => 
+            await transformer.TransformCommandOutcomeAsync(transformation, unwrapped, envIO.Token)
+        )
         /* IO COMPUTATION */
         
         /* LIFT INTO EITHER */
-        from result in Flow<TransformationState>.lift(either)
+        from result in Flow<TransformationState>.lift(ioRes)
         /* LIFT INTO EITHER */
         
         select result
     ).As();
-    
-    private static FlowT<TransformationState, TransformationOutcome> ExecuteTransformerSync((ITransformation transformation, IOutcomeTransformer transformer) tuple) =>
-    (
-        from currentVal in Flow<TransformationState>.lift((Either<FlowError, TransformationOutcome>)default)
-        from _ in Flow<TransformationState>.lift(tuple.transformer.TransformCommandOutcomeAsync(tuple.transformation, currentVal).GetAwaiter().GetResult())
-        select _
-    ).As();
-    
-    private static Option<ITransformation> NextTransformation(ICommand command)
-    {
-        var result = command.Transformations.FirstOrDefault();
-
-        if (result is not null)
-        {
-            return Option<ITransformation>.Some(result);
-        }
-        
-        return Option<ITransformation>.None;
-    }
     
     public async Task<Either<FlowError, TransformationOutcome>> TransformCommandOutcomeAsync(
         ICommand command,
@@ -107,11 +116,11 @@ public class DelegatingTransformer : IRootTransformer
         using IDisposable? ls = _logger.BeginScope(commandOutcome);
         _logger.LogTrace("Received command outcome to transform.");
         
-        TransformationState initialState = new(_logger, _transformers, command);
+        TransformationState initialState = new(_logger, _transformers, command, commandOutcome);
         
         // No point doing this here
         Expression<Func<TransformationState, EnvIO, ValueTask<Either<FlowError, TransformationOutcome>>>> expression = (config, io) 
-            => OverallFlowT.ExecuteFlow
+            => OverallFlow.ExecuteFlow
                 .Run(config)
                 .Run()
                 .RunAsync(io);
@@ -126,105 +135,4 @@ public class DelegatingTransformer : IRootTransformer
 
         return outcomeWithState;
     }
-    
-    // private static MyState<TransformationState, TransformationOutcome> ExecuteTransformersAsync(TransformationOutcome transformationOutcome)
-    // {
-    //     var applyTransformationCallChain = FindTransformer()
-    //         .BindAsync(LogTransformerExecution)
-    //         .BindAsync(ExecuteTransformerAsync)
-    //         .BindAsync(StoreTransformationOutcomeAsync);
-    //     
-    //     return async state =>
-    //     {
-    //         Either<FlowError, (TransformationState State, TransformationOutcome Outcome)> currentState 
-    //             = (state with { CurrentOutcome = transformationOutcome }, transformationOutcome);
-    //         
-    //         foreach (ITransformation transformation in state.Command.Transformations)
-    //         {
-    //             currentState = await currentState.BindAsync(tuple =>
-    //             {
-    //                 TransformationState actualState = tuple.State with
-    //                 {
-    //                     CurrentTransformation = transformation,
-    //                 };
-    //                 
-    //                 return applyTransformationCallChain.RunAsync(actualState);
-    //             });
-    //         }
-    //         
-    //         return currentState;
-    //     };
-    // }
-    //
-    // private static MyState<TransformationState, (IOutcomeTransformer Transformer, TransformationOutcome TransformationOutcome)> FindTransformer()
-    // {
-    //     return state =>
-    //     {
-    //         /* This sucks... */
-    //         if (state.CurrentTransformation is null)
-    //         {
-    //             return Fail<TransformationState, (IOutcomeTransformer Transformer, TransformationOutcome TransformationOutcome)>(new ProgrammingError(
-    //                 $"Current transformation is null. This should never happen.",
-    //                 50_000));
-    //         }
-    //         
-    //         if (state.CurrentOutcome is null)
-    //         {
-    //             return Fail<TransformationState, (IOutcomeTransformer Transformer, TransformationOutcome TransformationOutcome)>(new ProgrammingError(
-    //                 $"Current outcome is null. This should never happen.",
-    //                 50_000));
-    //         }
-    //         /* This sucks... */
-    //         
-    //         IOutcomeTransformer? transformer = state.OutcomeTransformers
-    //             .FirstOrDefault(executor => executor.Handles(state.CurrentTransformation));
-    //
-    //         return transformer is null
-    //             ? Fail<TransformationState, (IOutcomeTransformer Transformer, TransformationOutcome TransformationOutcome)>(new ProgrammingError(
-    //                 $"No transformation executor found that handles transformation type {state.CurrentTransformation.GetType().FullName}.",
-    //                 2))
-    //             : Success(state, (transformer, InitialOutcome: state.CurrentOutcome));
-    //     };
-    // }
-    //
-    // private static MyState<TransformationState, (IOutcomeTransformer Transformer, TransformationOutcome TransformationOutcome)> LogTransformerExecution(
-    //     (IOutcomeTransformer Transformer, TransformationOutcome TransformationOutcome) tuple
-    // )
-    // {
-    //     return state =>
-    //     {
-    //         state.Logger.LogInformation("Executing transformer {type}.", tuple.Transformer.GetType().Name);
-    //         return Success(state, tuple);
-    //     };
-    // }
-    //
-    // private static MyState<TransformationState, TransformationOutcome> ExecuteTransformerAsync(
-    //     (IOutcomeTransformer Transformer, TransformationOutcome TransformationOutcome) tuple
-    // )
-    // {
-    //     return async state =>
-    //     {
-    //         if (state.CurrentTransformation is null)
-    //         {
-    //             return Left<FlowError>(new ProgrammingError("Current transformation is null when executing (sub) transformer. This should never happen.", 50_001));
-    //         }
-    //         
-    //         Either<FlowError, TransformationOutcome> transformerInput = Right(tuple.TransformationOutcome);
-    //
-    //         var res = await tuple.Transformer
-    //             .TransformCommandOutcomeAsync(state.CurrentTransformation, transformerInput);
-    //
-    //         return res.BiBind<FlowError, (TransformationState, TransformationOutcome)>(
-    //             left => left,
-    //             right => (state, right)
-    //         );
-    //     };
-    // }
-    //
-    // private static MyState<TransformationState, TransformationOutcome> StoreTransformationOutcomeAsync(
-    //     TransformationOutcome transformationOutcome
-    // )
-    // {
-    //     return state => Success(state with { CurrentOutcome = transformationOutcome }, transformationOutcome);
-    // }
 }

@@ -6,18 +6,22 @@ namespace Oma.WndwCtrl.Abstractions.Model;
 
 public record TransformationState
 {
-    public ILogger Logger;
-    public Seq<IOutcomeTransformer> OutcomeTransformers;
-    public ICommand Command { get; set; }
+    public ILogger Logger { get; }
+    public Seq<IOutcomeTransformer> OutcomeTransformers { get; }
+    public ICommand Command { get; }
+    
+    public Either<FlowError, TransformationOutcome> InitialOutcome { get; }
 
     public TransformationState(
         ILogger logger,
         IEnumerable<IOutcomeTransformer> outcomeTransformers,
-        ICommand command
+        ICommand command,
+        Either<FlowError, CommandOutcome> commandOutcome
     )
     {
         Logger = logger;
         OutcomeTransformers = new Seq<IOutcomeTransformer>(outcomeTransformers);
         Command = command;
+        InitialOutcome = commandOutcome.Map(co => new TransformationOutcome(co));
     }
 }

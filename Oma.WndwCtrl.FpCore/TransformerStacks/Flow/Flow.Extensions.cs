@@ -14,4 +14,10 @@ public static class FlowExtensions
     
     public static IO<Either<FlowError, A>> Run<TFlowConfiguration, A>(this K<Flow<TFlowConfiguration>, A> ma, TFlowConfiguration state) =>
         ma.As().ExecuteFlow.Run(state).As().Run().As();
+    
+    public static FlowT<TFlowConfiguration, C> SelectMany<TFlowConfiguration, A, B, C>(
+        this K<Flow<TFlowConfiguration>, A> ma,
+        Func<A, K<Flow<TFlowConfiguration>, B>> bind,
+        Func<A, B, C> project) =>
+        ma.As().SelectMany(bind, project);
 }
