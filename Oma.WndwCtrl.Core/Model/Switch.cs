@@ -11,15 +11,15 @@ namespace Oma.WndwCtrl.Core.Model;
 /// </summary>
 public class Switch : Component, IStateQueryable
 {
-    [JsonInclude]
-    [JsonRequired]
-    public ICommand QueryCommand { get; internal set; } = null!;
+  [JsonInclude]
+  [JsonRequired]
+  public ICommand OnCommand { get; internal set; } = null!;
 
-    [JsonInclude]
-    [JsonRequired]
-    public ICommand OnCommand { get; internal set; } = null!;
+  [JsonInclude]
+  [JsonRequired]
+  public ICommand OffCommand { get; internal set; } = null!;
 
-    [JsonInclude]
-    [JsonRequired]
-    public ICommand OffCommand { get; internal set; } = null!;
+  [JsonInclude]
+  [JsonRequired]
+  public ICommand QueryCommand { get; internal set; } = null!;
 }

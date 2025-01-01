@@ -8,8 +8,12 @@ namespace Oma.WndwCtrl.Core.Executors.Transformers;
 
 public class NoOpTransformer : IOutcomeTransformer<NoOpTransformation>
 {
-    public Task<Either<FlowError, TransformationOutcome>> TransformCommandOutcomeAsync(
-        NoOpTransformation transformation, Either<FlowError, TransformationOutcome> transformationOutcome,
-        CancellationToken cancelToken = default
-    ) => Task.FromResult(transformationOutcome);
+  public Task<Either<FlowError, TransformationOutcome>> TransformCommandOutcomeAsync(
+    NoOpTransformation transformation,
+    Either<FlowError, TransformationOutcome> transformationOutcome,
+    CancellationToken cancelToken = default
+  )
+  {
+    return Task.FromResult(transformationOutcome);
+  }
 }

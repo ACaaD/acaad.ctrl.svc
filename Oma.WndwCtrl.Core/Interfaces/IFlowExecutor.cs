@@ -7,7 +7,8 @@ namespace Oma.WndwCtrl.Core.Interfaces;
 
 public interface IFlowExecutor
 {
-    Task<Either<FlowError, TransformationOutcome>> ExecuteAsync(
-        ICommand command, CancellationToken cancelToken = default
-    );
+  Task<Either<FlowError, TransformationOutcome>> ExecuteAsync(
+    ICommand command,
+    CancellationToken cancelToken = default
+  );
 }

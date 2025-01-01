@@ -5,8 +5,8 @@ namespace Oma.WndwCtrl.Core.Logger;
 
 public class CliParserLogger(ILogger<ICliOutputParser> logger) : IParserLogger
 {
-    public void Log(object message)
-    {
-        logger.LogTrace("{msg}", message);
-    }
+  public void Log(object message)
+  {
+    logger.LogTrace("{msg}", message);
+  }
 }

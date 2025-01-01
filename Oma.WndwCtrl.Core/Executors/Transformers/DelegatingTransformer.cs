@@ -20,12 +20,6 @@ public class DelegatingTransformer : IRootTransformer
       ValueTask<Either<FlowError, TransformationOutcome>>>
     _transformerStack;
 
-  [ExcludeFromCodeCoverage]
-  public bool Handles(ITransformation transformation)
-  {
-    return true;
-  }
-
   public DelegatingTransformer(
     ILogger<DelegatingTransformer> logger,
     IEnumerable<IOutcomeTransformer> transformers
@@ -72,20 +66,6 @@ public class DelegatingTransformer : IRootTransformer
     select eitherChained
   ).As();
 
-  private static FlowT<TransformationConfiguration, IOutcomeTransformer> FindApplicableTransformer(
-    ITransformation transformation
-  )
-  {
-    return (
-      from allTransformers in Config.Map(cfg => cfg.OutcomeTransformers)
-      from found in Flow<TransformationConfiguration>.lift(
-        allTransformers.Find(t => t.Handles(transformation))
-          .ToEither<FlowError>(() => FlowError.NoTransformerFound(transformation))
-      )
-      select found
-    ).As();
-  }
-
   private static FlowT<TransformationConfiguration, TransformationConfiguration> Config =>
     new(ReaderT.ask<EitherT<FlowError, IO>, TransformationConfiguration>());
 
@@ -98,23 +78,6 @@ public class DelegatingTransformer : IRootTransformer
   private static FlowT<TransformationConfiguration, Either<FlowError, TransformationOutcome>>
     InitialOutcome =>
     Config.Map(cfg => cfg.InitialOutcome).As();
-
-  // TODO: Is passing the FlowT here correct?
-  private static FlowT<TransformationConfiguration, TransformationOutcome> ExecuteTransformerIO(
-    ITransformation transformation,
-    IOutcomeTransformer transformer,
-    FlowT<TransformationConfiguration, TransformationOutcome> outcome
-  )
-  {
-    return (
-      from unwrapped in outcome
-      from ioRes in Flow<TransformationConfiguration>.liftAsync(async envIO =>
-        await transformer.TransformCommandOutcomeAsync(transformation, unwrapped, envIO.Token)
-      )
-      from result in Flow<TransformationConfiguration>.lift(ioRes)
-      select result
-    ).As();
-  }
 
   public async Task<Either<FlowError, TransformationOutcome>> TransformCommandOutcomeAsync(
     ICommand command,
@@ -136,5 +99,42 @@ public class DelegatingTransformer : IRootTransformer
     _logger.LogDebug("Finished command in {elapsed} (Success={isSuccess})", swExec.Measure(), outcome);
 
     return outcome;
+  }
+
+  [ExcludeFromCodeCoverage]
+  public bool Handles(ITransformation transformation)
+  {
+    return true;
+  }
+
+  private static FlowT<TransformationConfiguration, IOutcomeTransformer> FindApplicableTransformer(
+    ITransformation transformation
+  )
+  {
+    return (
+      from allTransformers in Config.Map(cfg => cfg.OutcomeTransformers)
+      from found in Flow<TransformationConfiguration>.lift(
+        allTransformers.Find(t => t.Handles(transformation))
+          .ToEither<FlowError>(() => FlowError.NoTransformerFound(transformation))
+      )
+      select found
+    ).As();
+  }
+
+  // TODO: Is passing the FlowT here correct?
+  private static FlowT<TransformationConfiguration, TransformationOutcome> ExecuteTransformerIO(
+    ITransformation transformation,
+    IOutcomeTransformer transformer,
+    FlowT<TransformationConfiguration, TransformationOutcome> outcome
+  )
+  {
+    return (
+      from unwrapped in outcome
+      from ioRes in Flow<TransformationConfiguration>.liftAsync(async envIO =>
+        await transformer.TransformCommandOutcomeAsync(transformation, unwrapped, envIO.Token)
+      )
+      from result in Flow<TransformationConfiguration>.lift(ioRes)
+      select result
+    ).As();
   }
 }

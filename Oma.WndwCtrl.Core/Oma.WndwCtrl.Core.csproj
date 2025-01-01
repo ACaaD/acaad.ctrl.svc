@@ -4,16 +4,16 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
-    
+
     <ItemGroup>
-      <PackageReference Include="JetBrains.Annotations" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
-      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+        <PackageReference Include="JetBrains.Annotations"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"/>
     </ItemGroup>
-    
+
     <ItemGroup>
-      <ProjectReference Include="..\Oma.CliOutputParser\Oma.WndwCtrl.CliOutputParser\Oma.WndwCtrl.CliOutputParser.csproj" />
-      <ProjectReference Include="..\Oma.WndwCtrl.Abstractions\Oma.WndwCtrl.Abstractions.csproj" />
-      <ProjectReference Include="..\Oma.WndwCtrl.FpCore\Oma.WndwCtrl.FpCore.csproj" />
+        <ProjectReference Include="..\Oma.CliOutputParser\Oma.WndwCtrl.CliOutputParser\Oma.WndwCtrl.CliOutputParser.csproj"/>
+        <ProjectReference Include="..\Oma.WndwCtrl.Abstractions\Oma.WndwCtrl.Abstractions.csproj"/>
+        <ProjectReference Include="..\Oma.WndwCtrl.FpCore\Oma.WndwCtrl.FpCore.csproj"/>
     </ItemGroup>
 </Project>

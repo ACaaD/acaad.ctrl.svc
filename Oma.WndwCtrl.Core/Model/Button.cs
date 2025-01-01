@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 using System.Windows.Input;
-using Oma.WndwCtrl.Core.Model.Commands;
+
 namespace Oma.WndwCtrl.Core.Model;
 
 /// <summary>
@@ -8,7 +8,7 @@ namespace Oma.WndwCtrl.Core.Model;
 /// </summary>
 public class Button : Component
 {
-    [JsonInclude]
-    [JsonRequired]
-    public ICommand Command { get; internal set; } = null!;
+  [JsonInclude]
+  [JsonRequired]
+  public ICommand Command { get; internal set; } = null!;
 }
