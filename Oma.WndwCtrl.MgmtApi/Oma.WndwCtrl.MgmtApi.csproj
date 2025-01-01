@@ -18,8 +18,4 @@
         <ProjectReference Include="..\Oma.WndwCtrl.CoreAsp\Oma.WndwCtrl.CoreAsp.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <None Include="mgmt-api.config.json"/>
-    </ItemGroup>
-
 </Project>

@@ -5,15 +5,8 @@ namespace Oma.WndwCtrl.Api.Controllers;
 
 [ApiController]
 [Route("ctrl/[controller]")]
-public class ConfigurationController : ControllerBase
+public class ConfigurationController(ComponentConfigurationAccessor configurationAccessor) : ControllerBase
 {
-  private readonly ComponentConfigurationAccessor _configurationAccessor;
-
-  public ConfigurationController(ComponentConfigurationAccessor configurationAccessor)
-  {
-    _configurationAccessor = configurationAccessor;
-  }
-
   [HttpGet]
   [EndpointName($"Configuration_{nameof(GetConfiguration)}")]
   [EndpointSummary("Component Configuration")]
@@ -21,6 +14,6 @@ public class ConfigurationController : ControllerBase
   [Produces("application/json")]
   public IActionResult GetConfiguration()
   {
-    return Ok(_configurationAccessor.Configuration);
+    return Ok(configurationAccessor.Configuration);
   }
 }

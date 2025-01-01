@@ -6,17 +6,16 @@ using Oma.WndwCtrl.Core.Model.Transformations;
 
 namespace Oma.WndwCtrl.Api.IntegrationTests.Endpoints.TestController;
 
-public sealed partial class CommandDeserializationTests : ApiFixtureTestBase<MockedFlowExecutorApiFixture>
-{
-  private const string CommandRoute =
-    $"{Controllers.TestController.BaseRoute}/{Controllers.TestController.CommandRoute}";
-
-  public CommandDeserializationTests(MockedFlowExecutorApiFixture mockedFlowExecutorApiFixture) : base(
+public sealed partial class CommandDeserializationTests(
+  MockedFlowExecutorApiFixture mockedFlowExecutorApiFixture
+)
+  : ApiFixtureTestBase<MockedFlowExecutorApiFixture>(
     mockedFlowExecutorApiFixture,
     CommandRoute
   )
-  {
-  }
+{
+  private const string CommandRoute =
+    $"{Controllers.TestController.BaseRoute}/{Controllers.TestController.CommandRoute}";
 
   [Fact]
   public async Task ShouldAcceptCommandWithoutTransformation()

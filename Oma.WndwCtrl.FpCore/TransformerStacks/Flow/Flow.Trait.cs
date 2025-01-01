@@ -11,14 +11,10 @@ namespace Oma.WndwCtrl.FpCore.TransformerStacks.Flow;
   "UnusedMember.Global",
   Justification = "Won't fix: Additional functions may be required in the future."
 )]
-public class FlowT<TFlowConfiguration, A> : K<Flow<TFlowConfiguration>, A>
+public class FlowT<TFlowConfiguration, A>(ReaderT<TFlowConfiguration, EitherT<FlowError, IO>, A> executeFlow)
+  : K<Flow<TFlowConfiguration>, A>
 {
-  public FlowT(ReaderT<TFlowConfiguration, EitherT<FlowError, IO>, A> executeFlow)
-  {
-    ExecuteFlow = executeFlow;
-  }
-
-  public ReaderT<TFlowConfiguration, EitherT<FlowError, IO>, A> ExecuteFlow { get; }
+  public ReaderT<TFlowConfiguration, EitherT<FlowError, IO>, A> ExecuteFlow { get; } = executeFlow;
 
   public FlowT<TFlowConfiguration, B> Map<B>(Func<A, B> f)
   {

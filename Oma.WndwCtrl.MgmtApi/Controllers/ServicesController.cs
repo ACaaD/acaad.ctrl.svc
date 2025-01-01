@@ -8,15 +8,8 @@ namespace Oma.WndwCtrl.MgmtApi.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class ServicesController : ControllerBase
+public class ServicesController(ServiceState serviceState) : ControllerBase
 {
-  private readonly ServiceState _serviceState;
-
-  public ServicesController(ServiceState serviceState)
-  {
-    _serviceState = serviceState;
-  }
-
   [HttpGet]
   [EndpointName($"Services_{nameof(GetAll)}")]
   [EndpointSummary("Service List")]
@@ -24,7 +17,7 @@ public class ServicesController : ControllerBase
   [Produces("application/json")]
   public IActionResult GetAll()
   {
-    return Ok(_serviceState.All.Select(ServiceDescriptor.FromServiceWrapper));
+    return Ok(serviceState.All.Select(ServiceDescriptor.FromServiceWrapper));
   }
 
   [HttpGet("{serviceGuid:guid}")]
@@ -50,7 +43,7 @@ public class ServicesController : ControllerBase
   [ApiExplorerSettings(IgnoreApi = true)]
   public IActionResult GetDetail(Func<IServiceWrapper, bool> predicate)
   {
-    IServiceWrapper? service = _serviceState.All.FirstOrDefault(predicate);
+    IServiceWrapper? service = serviceState.All.FirstOrDefault(predicate);
 
     return service is null
       ? Problem("Could not locate service", statusCode: 404)
@@ -70,7 +63,7 @@ public class ServicesController : ControllerBase
   public async Task<IActionResult> StartAsync(Func<IServiceWrapper, bool> predicate)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
   {
-    IServiceWrapper? service = _serviceState.All.FirstOrDefault(predicate);
+    IServiceWrapper? service = serviceState.All.FirstOrDefault(predicate);
 
     if (service is null)
     {
@@ -92,7 +85,7 @@ public class ServicesController : ControllerBase
   [ApiExplorerSettings(IgnoreApi = true)]
   public async Task<IActionResult> StopAsync(Func<IServiceWrapper, bool> predicate)
   {
-    IServiceWrapper? service = _serviceState.All.FirstOrDefault(predicate);
+    IServiceWrapper? service = serviceState.All.FirstOrDefault(predicate);
 
     if (service is null)
     {
@@ -113,7 +106,7 @@ public class ServicesController : ControllerBase
   [EndpointSummary("Restart all services")]
   public async Task<IActionResult> RestartAllAsync()
   {
-    List<IServiceWrapper<IService>> all = _serviceState.All.ToList();
+    List<IServiceWrapper<IService>> all = serviceState.All.ToList();
 
     foreach (IServiceWrapper<IService>? service in all) await service.StopAsync();
 

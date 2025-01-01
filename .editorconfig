@@ -5,3 +5,6 @@ root = true
 # It is correct..
 # noinspection EditorConfigKeyCorrectness
 resharper_unused_member_global_highlighting = none
+
+# noinspection EditorConfigKeyCorrectness
+resharper_unused_type_global_highlighting = none
