@@ -6,5 +6,20 @@ public interface IMessageConsumer
 {
   bool IsSubscribedTo(IMessage message);
 
-  Task ConsumeAsync(IMessage message, CancellationToken cancelToken = default);
+  Task OnMessageAsync(IMessage message, CancellationToken cancelToken = default);
+
+  Task OnStartAsync(CancellationToken cancelToken = default);
+
+  Task OnExceptionAsync(
+    IMessage message,
+    Exception exception,
+    CancellationToken cancelToken = default
+  );
+
+  Task OnCompletedAsync(CancellationToken cancelToken = default);
+}
+
+public interface IMessageConsumer<TMessage> : IMessageConsumer
+  where TMessage : IMessage
+{
 }

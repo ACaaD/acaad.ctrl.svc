@@ -15,13 +15,18 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
   private readonly List<ServiceProvider> _consumerProviders = [];
   private readonly ServiceProvider _serviceProvider;
 
-  private IMessageBus _messageBus;
+  private IMessageBus? _messageBus;
 
   public MessageBusIntegrationTests()
   {
     _serviceProvider = SetUpMessageBusContainer();
     _cancelToken = TestContext.Current.CancellationToken;
   }
+
+  private IMessageBus MessageBus => _messageBus ??
+                                    throw new InvalidOperationException(
+                                      $"{nameof(IMessageBus)} is not initialized."
+                                    );
 
   public async ValueTask DisposeAsync()
   {
@@ -46,11 +51,11 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
       .Select(_ => SetUpConsumerContainer<DummyMessage>())
       .ToList();
 
-    await _messageBus.SendAsync(new DummyMessage(), _cancelToken);
+    await MessageBus.SendAsync(new DummyMessage(), _cancelToken);
 
     consumers.Should().AllSatisfy(
       c =>
-        c.Received(requiredNumberOfCalls: 1).ConsumeAsync(
+        c.Received(requiredNumberOfCalls: 1).OnMessageAsync(
           Arg.Any<IMessage>(),
           Arg.Any<CancellationToken>()
         )
@@ -65,13 +70,13 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
       .Select(_ => SetUpConsumerContainer<DummyMessage>())
       .ToList();
 
-    await _messageBus.SendAsync(new DummyMessage(), _cancelToken);
-    await _messageBus.SendAsync(new DummyMessage(), _cancelToken);
-    await _messageBus.SendAsync(new OtherMessage(), _cancelToken);
+    await MessageBus.SendAsync(new DummyMessage(), _cancelToken);
+    await MessageBus.SendAsync(new DummyMessage(), _cancelToken);
+    await MessageBus.SendAsync(new OtherMessage(), _cancelToken);
 
     consumers.Should().AllSatisfy(
       c =>
-        c.Received(requiredNumberOfCalls: 2).ConsumeAsync(
+        c.Received(requiredNumberOfCalls: 2).OnMessageAsync(
           Arg.Any<IMessage>(),
           Arg.Any<CancellationToken>()
         )
@@ -93,18 +98,18 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
   {
     ServiceCollection services = new();
 
-    IMessageConsumer messageConsumer = Substitute.For<IMessageConsumer>();
+    DummyConsumer messageConsumer = Substitute.For<DummyConsumer>();
 
     messageConsumer.IsSubscribedTo(Arg.Any<IMessage>())
       .Returns(msg => typeof(TMessage).IsAssignableFrom(msg[index: 0].GetType()));
 
-    services.AddMessageConsumer<TMessage, IMessageConsumer>();
-    services.AddSingleton(messageConsumer);
+    services.AddMessageConsumer<DummyConsumer, DummyMessage>();
+    services.AddSingleton<DummyConsumer>(messageConsumer);
 
     ServiceProvider result = services.BuildServiceProvider();
     _consumerProviders.Add(result);
 
-    IDisposable disposable = result.StartConsumers(_messageBus);
+    IDisposable disposable = result.StartConsumers(MessageBus);
     _consumerDisposables.Add(disposable);
 
     return messageConsumer;

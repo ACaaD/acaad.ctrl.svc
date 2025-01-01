@@ -7,7 +7,7 @@ public sealed class MessageBus(MessageBusState state) : IMessageBus, IDisposable
 {
   public void Dispose()
   {
-    throw new NotImplementedException();
+    state.Queue.Writer.TryComplete();
   }
 
   public void Register(string consumer, Channel<IMessage> messageChannel)

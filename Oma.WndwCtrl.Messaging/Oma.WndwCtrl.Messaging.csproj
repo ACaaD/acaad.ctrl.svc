@@ -10,4 +10,9 @@
         <ProjectReference Include="..\Oma.WndwCtrl.Abstractions\Oma.WndwCtrl.Abstractions.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Logging"/>
+        <PackageReference Include="Microsoft.Extensions.Options"/>
+    </ItemGroup>
+
 </Project>

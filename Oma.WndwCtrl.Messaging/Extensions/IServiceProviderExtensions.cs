@@ -1,5 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Threading.Channels;
 using Microsoft.Extensions.DependencyInjection;
+using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
+using Oma.WndwCtrl.Messaging.Model;
 
 namespace Oma.WndwCtrl.Messaging.Extensions;
 
@@ -11,7 +14,12 @@ public static class IServiceProviderExtensions
     CancellationToken cancelToken = default
   )
   {
+    IChannelWorker worker =
+      serviceProvider.GetRequiredKeyedService<IChannelWorker>(ServiceKeys.MessageBus);
+
     IMessageBus messageBus = serviceProvider.GetRequiredService<IMessageBus>();
+
+    _ = worker.ProcessUntilCompletedAsync(cancelToken);
 
     return messageBus;
   }
@@ -20,5 +28,21 @@ public static class IServiceProviderExtensions
     this IServiceProvider serviceProvider,
     IMessageBus messageBus,
     CancellationToken cancelToken = default
-  ) => new MemoryStream();
+  )
+  {
+    IEnumerable<ConsumerMapping> consumerMappings = serviceProvider.GetServices<ConsumerMapping>();
+
+    foreach (ConsumerMapping mapping in consumerMappings)
+    {
+      Channel<IMessage> channel =
+        serviceProvider.GetRequiredKeyedService<Channel<IMessage>>(mapping.ServiceKey);
+
+      IChannelWorker worker = serviceProvider.GetRequiredKeyedService<IChannelWorker>(mapping.ServiceKey);
+
+      messageBus.Register(mapping.ServiceKey.ToString()!, channel);
+      _ = worker.ProcessUntilCompletedAsync(cancelToken);
+    }
+
+    return new MemoryStream();
+  }
 }
