@@ -1,9 +1,12 @@
+using JetBrains.Annotations;
 using LanguageExt;
 
 namespace Oma.WndwCtrl.Abstractions.Model;
 
+[Serializable]
 public record CommandOutcome : ICommandExecutionMetadata, IOutcome
 {
+  [UsedImplicitly]
   public object? Outcome { get; set; }
 
   public Option<TimeSpan> ExecutionDuration { get; set; } = Option<TimeSpan>.None;

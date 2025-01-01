@@ -1,5 +1,3 @@
 namespace Oma.WndwCtrl.Abstractions;
 
-public interface IBackgroundService : IService
-{
-}
+public interface IBackgroundService : IService;

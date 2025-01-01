@@ -5,18 +5,11 @@ using Oma.WndwCtrl.CliOutputParser.Interfaces;
 
 namespace Oma.WndwCtrl.CliOutputParser.Tests;
 
-public class XUnitLogger : IParserLogger
+public class XUnitLogger(ITestOutputHelper output) : IParserLogger
 {
-  private readonly ITestOutputHelper _output;
-
-  public XUnitLogger(ITestOutputHelper output)
-  {
-    _output = output;
-  }
-
   public void Log(object message)
   {
-    _output.WriteLine(message.ToString()?.Replace("\r", string.Empty) ?? string.Empty);
+    output.WriteLine(message.ToString()?.Replace("\r", string.Empty) ?? string.Empty);
   }
 }
 

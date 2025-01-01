@@ -8,6 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 	ProjectSection(SolutionItems) = preProject
 		Directory.Packages.props = Directory.Packages.props
 		Directory.Build.props = Directory.Build.props
+		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oma.WndwCtrl.MgmtApi", "Oma.WndwCtrl.MgmtApi\Oma.WndwCtrl.MgmtApi.csproj", "{9A924F75-571C-44B4-803D-42B55B38304D}"

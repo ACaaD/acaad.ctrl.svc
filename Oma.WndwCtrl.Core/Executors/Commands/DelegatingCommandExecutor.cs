@@ -84,7 +84,7 @@ public class DelegatingCommandExecutor : ICommandExecutor
     using IDisposable? ls = _logger.BeginScope(cmd);
     _logger.LogTrace("Received command to execute.");
 
-    CommandState initialState = new(_logger, _commandExecutors, cmd);
+    CommandState initialState = new(_commandExecutors, cmd);
     EnvIO envIO = EnvIO.New(token: cancelToken);
 
     Either<FlowError, CommandOutcome> outcome = await _transformerStack.Invoke(initialState, envIO);

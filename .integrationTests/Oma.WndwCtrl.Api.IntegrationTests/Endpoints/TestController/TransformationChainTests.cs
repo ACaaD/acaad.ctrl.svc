@@ -6,15 +6,13 @@ using Oma.WndwCtrl.CliOutputParser.Interfaces;
 
 namespace Oma.WndwCtrl.Api.IntegrationTests.Endpoints.TestController;
 
-public sealed partial class TransformationChain : ApiFixtureTestBase<MockedCommandExecutorApiFixture>
+public sealed partial class TransformationChainTests(
+  MockedCommandExecutorApiFixture mockedCommandExecutorApiFixture
+)
+  : ApiFixtureTestBase<MockedCommandExecutorApiFixture>(mockedCommandExecutorApiFixture, CommandRoute)
 {
   private const string CommandRoute =
     $"{Controllers.TestController.BaseRoute}/{Controllers.TestController.CommandRoute}";
-
-  public TransformationChain(MockedCommandExecutorApiFixture mockedCommandExecutorApiFixture)
-    : base(mockedCommandExecutorApiFixture, CommandRoute)
-  {
-  }
 
   [Fact]
   public async Task ShouldProcessEmptyCommandAndTransformations()

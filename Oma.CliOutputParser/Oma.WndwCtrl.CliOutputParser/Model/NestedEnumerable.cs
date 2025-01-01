@@ -4,7 +4,7 @@ namespace Oma.WndwCtrl.CliOutputParser.Model;
 
 public class NestedEnumerable : IEnumerable<object>
 {
-  public NestedEnumerable()
+  private NestedEnumerable()
   {
     _enumerable = [];
   }
@@ -23,7 +23,7 @@ public class NestedEnumerable : IEnumerable<object>
 
   private List<object> _enumerable { get; init; }
 
-  public bool IsNested { get; init; }
+  public bool IsNested { get; private init; }
 
   public IEnumerable<NestedEnumerable> Children => IsNested
     ? _enumerable.OfType<NestedEnumerable>()

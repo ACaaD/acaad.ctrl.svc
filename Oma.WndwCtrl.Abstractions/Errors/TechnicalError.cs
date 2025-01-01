@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using LanguageExt;
 using LanguageExt.Common;
 
@@ -7,12 +8,16 @@ public record TechnicalError : Exceptional
 {
   private const int ErrorCodeOffset = 500_000;
 
-  public TechnicalError(string Message, int Code) : this(Message,
+  [PublicAPI]
+  public TechnicalError(string Message, int Code) : this(
+    Message,
     ErrorCodeOffset + Code,
-    new InvalidOperationException(Message))
+    new InvalidOperationException(Message)
+  )
   {
   }
 
+  [PublicAPI]
   public TechnicalError(string Message, int Code, Exception ex) : base(Message, ErrorCodeOffset + Code)
   {
     Inner = New(ex);

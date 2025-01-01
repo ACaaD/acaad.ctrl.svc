@@ -1,6 +1,6 @@
 namespace Oma.WndwCtrl.Api.IntegrationTests.Endpoints.TestController;
 
-public partial class CommandDeserialization
+public partial class CommandDeserializationTests
 {
   public static class Payloads
   {

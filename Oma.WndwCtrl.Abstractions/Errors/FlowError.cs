@@ -1,4 +1,4 @@
-using System.Diagnostics.Contracts;
+using JetBrains.Annotations;
 using LanguageExt;
 using LanguageExt.Common;
 
@@ -16,10 +16,12 @@ public record FlowError : Error
   {
   }
 
+  [PublicAPI]
   public FlowError(string message, bool isExceptional) : this(message, isExceptional, !isExceptional)
   {
   }
 
+  [PublicAPI]
   public FlowError(string message, bool isExceptional, bool isExpected)
   {
     Message = message;
@@ -40,20 +42,22 @@ public record FlowError : Error
     throw new NotImplementedException();
   }
 
-  [Pure]
+  [System.Diagnostics.Contracts.Pure]
   public static FlowError NoCommandExecutorFound(ICommand command)
   {
     return new FlowError(
       $"No transformation executor found that handles transformation type {command.GetType().FullName}.",
-      false);
+      isExceptional: false
+    );
   }
 
-  [Pure]
+  [System.Diagnostics.Contracts.Pure]
   public static FlowError NoTransformerFound(ITransformation transformation)
   {
     return new FlowError(
       $"No transformation executor found that handles transformation type {transformation.GetType().FullName}.",
-      false);
+      isExceptional: false
+    );
   }
 
   public static implicit operator FlowError(TechnicalError error)

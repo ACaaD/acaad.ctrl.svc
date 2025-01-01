@@ -1,5 +1,6 @@
 namespace Oma.WndwCtrl.Core.Model.Commands;
 
+[Serializable]
 public class DummyCommand : BaseCommand
 {
   public IEnumerable<string> Returns { get; set; } = [];

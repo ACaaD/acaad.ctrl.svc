@@ -3,9 +3,7 @@ using LanguageExt.Common;
 
 namespace Oma.WndwCtrl.CliOutputParser.Interfaces;
 
-public class ParserResult : List<object>
-{
-}
+public class ParserResult : List<object>;
 
 public interface ICliOutputParser
 {

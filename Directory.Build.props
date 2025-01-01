@@ -1,0 +1,6 @@
+<Project>
+    <!-- Does not work; Keeping the file though -->
+    <PropertyGroup Condition=" '$(Configuration)' == '' Or '$(Configuration)' == 'Debug'">
+        <EnvironmentName>Development</EnvironmentName>
+    </PropertyGroup>
+</Project>

@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using System.Text.Json;
+using JetBrains.Annotations;
 using Oma.WndwCtrl.Api.IntegrationTests.TestFramework.Interfaces;
 
 namespace Oma.WndwCtrl.Api.IntegrationTests.TestFramework;
@@ -11,7 +12,7 @@ public class ApiFixtureTestBase<TFixture> : IDisposable
   protected readonly CancellationToken _cancelToken;
   protected readonly HttpClient _httpClient;
 
-  public ApiFixtureTestBase(TFixture apiFixture, string baseRoute)
+  protected ApiFixtureTestBase(TFixture apiFixture, string baseRoute)
   {
     _baseRoute = baseRoute;
     _cancelToken = TestContext.Current.CancellationToken;
@@ -20,10 +21,11 @@ public class ApiFixtureTestBase<TFixture> : IDisposable
 
   public void Dispose()
   {
-    Dispose(true);
+    Dispose(disposing: true);
     GC.SuppressFinalize(this);
   }
 
+  [PublicAPI]
   protected virtual void Dispose(bool disposing)
   {
     if (disposing)

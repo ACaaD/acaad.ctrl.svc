@@ -1,9 +1,16 @@
+using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 using LanguageExt;
 using LanguageExt.Traits;
 using Oma.WndwCtrl.Abstractions.Errors;
 
 namespace Oma.WndwCtrl.FpCore.TransformerStacks.Flow;
 
+[SuppressMessage(
+  "ReSharper",
+  "UnusedMember.Global",
+  Justification = "Won't fix: Additional functions may be required in the future."
+)]
 public class FlowT<TFlowConfiguration, A> : K<Flow<TFlowConfiguration>, A>
 {
   public FlowT(ReaderT<TFlowConfiguration, EitherT<FlowError, IO>, A> executeFlow)
@@ -61,7 +68,7 @@ public class FlowT<TFlowConfiguration, A> : K<Flow<TFlowConfiguration>, A>
     return Flow<TFlowConfiguration>.lift(ma);
   }
 
-  // These are from card game
+  [PublicAPI]
   public FlowT<TFlowConfiguration, B> Bind<B>(Func<A, K<Flow<TFlowConfiguration>, B>> f)
   {
     return this.Kind().Bind(f).As();

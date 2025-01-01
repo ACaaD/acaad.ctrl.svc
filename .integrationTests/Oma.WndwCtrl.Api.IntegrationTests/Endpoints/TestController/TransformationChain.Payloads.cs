@@ -4,7 +4,7 @@ using Xunit.Internal;
 
 namespace Oma.WndwCtrl.Api.IntegrationTests.Endpoints.TestController;
 
-public partial class TransformationChain
+public partial class TransformationChainTests
 {
   public static class SampleCommandOutcomes
   {
@@ -36,49 +36,49 @@ public partial class TransformationChain
                                                          }
                                                          """;
 
-    internal const string PingResultOneTransformationTemplate = """
-                                                                {
-                                                                  "type": "dummy",
-                                                                  "returns": $$$INJECT_MULTILINE_ARRAY$$$,
-                                                                  "transformations": [
-                                                                    {
-                                                                      "type": "parser",
-                                                                      "statements": [
-                                                                        "Regex.Match($'time=(\\d+)ms');",
-                                                                        "Regex.YieldGroup(1);",
-                                                                        "Values.Average();"
-                                                                      ]
-                                                                    }
-                                                                  ]
-                                                                }
-                                                                """;
+    private const string PingResultOneTransformationTemplate = """
+                                                               {
+                                                                 "type": "dummy",
+                                                                 "returns": $$$INJECT_MULTILINE_ARRAY$$$,
+                                                                 "transformations": [
+                                                                   {
+                                                                     "type": "parser",
+                                                                     "statements": [
+                                                                       "Regex.Match($'time=(\\d+)ms');",
+                                                                       "Regex.YieldGroup(1);",
+                                                                       "Values.Average();"
+                                                                     ]
+                                                                   }
+                                                                 ]
+                                                               }
+                                                               """;
 
-    internal const string PingResultMultipleTransformationsTemplate = """
-                                                                      {
-                                                                        "type": "dummy",
-                                                                        "returns": $$$INJECT_MULTILINE_ARRAY$$$,
-                                                                        "transformations": [
-                                                                          {
-                                                                            "type": "parser",
-                                                                            "statements": [
-                                                                              "Regex.Match($'time=(\\d+)ms');"
-                                                                            ]
-                                                                          },
-                                                                          {
-                                                                            "type": "parser",
-                                                                            "statements": [
-                                                                              "Regex.YieldGroup(1);"
-                                                                            ]
-                                                                          },
-                                                                          {
-                                                                            "type": "parser",
-                                                                            "statements": [
-                                                                              "Values.Average();"
-                                                                            ]
-                                                                          }
-                                                                        ]
-                                                                      }
-                                                                      """;
+    private const string PingResultMultipleTransformationsTemplate = """
+                                                                     {
+                                                                       "type": "dummy",
+                                                                       "returns": $$$INJECT_MULTILINE_ARRAY$$$,
+                                                                       "transformations": [
+                                                                         {
+                                                                           "type": "parser",
+                                                                           "statements": [
+                                                                             "Regex.Match($'time=(\\d+)ms');"
+                                                                           ]
+                                                                         },
+                                                                         {
+                                                                           "type": "parser",
+                                                                           "statements": [
+                                                                             "Regex.YieldGroup(1);"
+                                                                           ]
+                                                                         },
+                                                                         {
+                                                                           "type": "parser",
+                                                                           "statements": [
+                                                                             "Values.Average();"
+                                                                           ]
+                                                                         }
+                                                                       ]
+                                                                     }
+                                                                     """;
 
     internal static string PingResultOneTransformation =>
       InjectMultilineArray(PingResultOneTransformationTemplate, SampleCommandOutcomes.Ping);

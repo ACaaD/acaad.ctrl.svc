@@ -1,5 +1,6 @@
+using JetBrains.Annotations;
+
 namespace Oma.WndwCtrl.Core.Model.Transformations;
 
-public class NoOpTransformation : BaseTransformation
-{
-}
+[UsedImplicitly]
+public class NoOpTransformation : BaseTransformation;

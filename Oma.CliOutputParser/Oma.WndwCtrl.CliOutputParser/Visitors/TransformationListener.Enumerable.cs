@@ -57,7 +57,7 @@ public partial class TransformationListener
     // If only the first item is used, then it could lead to problems in multi-nesting
     // if there is no value for the first item, but for the others (IsNested determined incorrectly)
 
-    bool isNested = result.FirstOrDefault() is NestedEnumerable nE && nE.IsNested;
+    bool isNested = result.FirstOrDefault() is NestedEnumerable { IsNested: true, };
     return NestedEnumerable.FromEnumerableInternal(result, isNested);
   }
 

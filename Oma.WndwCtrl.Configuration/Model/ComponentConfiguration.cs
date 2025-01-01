@@ -6,10 +6,12 @@ namespace Oma.WndwCtrl.Configuration.Model;
 public class ComponentConfiguration
 {
   [JsonRequired]
-  public IReadOnlyDictionary<string, Component> Components { get; set; } =
+  [JsonInclude]
+  public IReadOnlyDictionary<string, Component> Components { get; init; } =
     new Dictionary<string, Component>();
 
   [JsonPropertyName("__meta")]
   [JsonPropertyOrder(int.MaxValue)]
-  public ConfigurationMetadata Metadata { get; set; } = new();
+  [JsonInclude]
+  public ConfigurationMetadata Metadata { get; init; } = new();
 }

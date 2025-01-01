@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using JetBrains.Annotations;
 using LanguageExt;
 using Microsoft.Extensions.Logging;
 using Oma.WndwCtrl.Abstractions;
@@ -104,6 +105,12 @@ public class DelegatingTransformer : IRootTransformer
   }
 
   [ExcludeFromCodeCoverage]
+  [PublicAPI]
+  [SuppressMessage(
+    "Performance",
+    "CA1822:Mark members as static",
+    Justification = "Won't fix: Interface method"
+  )]
   public bool Handles(ITransformation transformation)
   {
     return true;

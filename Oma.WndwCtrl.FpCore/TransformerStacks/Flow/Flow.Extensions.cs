@@ -1,9 +1,15 @@
+using System.Diagnostics.CodeAnalysis;
 using LanguageExt;
 using LanguageExt.Traits;
 using Oma.WndwCtrl.Abstractions.Errors;
 
 namespace Oma.WndwCtrl.FpCore.TransformerStacks.Flow;
 
+[SuppressMessage(
+  "ReSharper",
+  "UnusedMember.Global",
+  Justification = "Won't fix: Additional functions may be required in the future."
+)]
 public static class FlowExtensions
 {
   public static FlowT<TFlowConfiguration, A> As<TFlowConfiguration, A>(this K<Flow<TFlowConfiguration>, A> ma)

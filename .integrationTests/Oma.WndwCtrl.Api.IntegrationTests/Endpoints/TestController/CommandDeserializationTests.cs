@@ -6,12 +6,12 @@ using Oma.WndwCtrl.Core.Model.Transformations;
 
 namespace Oma.WndwCtrl.Api.IntegrationTests.Endpoints.TestController;
 
-public sealed partial class CommandDeserialization : ApiFixtureTestBase<MockedFlowExecutorApiFixture>
+public sealed partial class CommandDeserializationTests : ApiFixtureTestBase<MockedFlowExecutorApiFixture>
 {
   private const string CommandRoute =
     $"{Controllers.TestController.BaseRoute}/{Controllers.TestController.CommandRoute}";
 
-  public CommandDeserialization(MockedFlowExecutorApiFixture mockedFlowExecutorApiFixture) : base(
+  public CommandDeserializationTests(MockedFlowExecutorApiFixture mockedFlowExecutorApiFixture) : base(
     mockedFlowExecutorApiFixture,
     CommandRoute
   )

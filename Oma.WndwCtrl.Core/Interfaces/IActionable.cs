@@ -1,5 +1,3 @@
 namespace Oma.WndwCtrl.Core.Interfaces;
 
-public interface IActionable
-{
-}
+public interface IActionable;

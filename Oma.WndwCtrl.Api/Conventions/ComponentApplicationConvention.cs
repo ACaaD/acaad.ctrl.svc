@@ -9,8 +9,6 @@ namespace Oma.WndwCtrl.Api.Conventions;
 public class ComponentApplicationConvention(ComponentConfigurationAccessor configurationAccessor)
   : IApplicationModelConvention
 {
-  private readonly ComponentConfigurationAccessor _configurationAccessor = configurationAccessor;
-
   private ControllerModel? _buttonBase;
   private ControllerModel? _sensorBase;
   private ControllerModel? _switchBase;
@@ -34,7 +32,7 @@ public class ComponentApplicationConvention(ComponentConfigurationAccessor confi
   {
     PopulateControllerBases(application);
 
-    foreach (KeyValuePair<string, Component> component in _configurationAccessor.Configuration.Components)
+    foreach (KeyValuePair<string, Component> component in configurationAccessor.Configuration.Components)
     {
       ControllerModel controllerModel = new(GetBaseController(component.Value))
       {

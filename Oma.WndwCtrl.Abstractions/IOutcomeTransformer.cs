@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using LanguageExt;
 using Oma.WndwCtrl.Abstractions.Errors;
 using Oma.WndwCtrl.Abstractions.Model;
@@ -32,12 +33,14 @@ public interface IOutcomeTransformer<in TTransformation> : IOutcomeTransformer
     if (transformation is not TTransformation castedTransformation)
     {
       return Left<FlowError>(
-        new ProgrammingError($"Passed command is not of type {typeof(TTransformation).Name}", 100));
+        new ProgrammingError($"Passed command is not of type {typeof(TTransformation).Name}", Code: 100)
+      );
     }
 
     return await TransformCommandOutcomeAsync(castedTransformation, transformationOutcome, cancelToken);
   }
 
+  [PublicAPI]
   Task<Either<FlowError, TransformationOutcome>> TransformCommandOutcomeAsync(
     TTransformation transformation,
     Either<FlowError, TransformationOutcome> transformationOutcome,

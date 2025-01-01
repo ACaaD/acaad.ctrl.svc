@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Oma.WndwCtrl.Abstractions;
@@ -91,6 +92,7 @@ public class WebApplicationWrapper<TAssemblyDescriptor>
       );
   }
 
+  [PublicAPI]
   protected virtual IConfigurationBuilder ConfigurationConfiguration(
     IConfigurationBuilder configurationBuilder
   )
@@ -120,36 +122,43 @@ public class WebApplicationWrapper<TAssemblyDescriptor>
     return configurationBuilder;
   }
 
+  [PublicAPI]
   protected virtual IMvcCoreBuilder PostConfigureMvc(IMvcCoreBuilder builder)
   {
     return builder;
   }
 
+  [PublicAPI]
   protected virtual MvcOptions PreConfigureMvcOptions(MvcOptions options)
   {
     return options;
   }
 
+  [PublicAPI]
   protected virtual MvcOptions PostConfigureMvcOptions(MvcOptions options)
   {
     return options;
   }
 
+  [PublicAPI]
   protected virtual JsonOptions ConfigureJsonOptions(JsonOptions jsonOptions)
   {
     return jsonOptions;
   }
 
+  [PublicAPI]
   protected virtual IServiceCollection ConfigureServices(IServiceCollection services)
   {
     return services;
   }
 
+  [PublicAPI]
   protected virtual WebApplication PostAppBuild(WebApplication app)
   {
     return app;
   }
 
+  [PublicAPI]
   protected virtual WebApplication PreAppRun(WebApplication app)
   {
     return app;

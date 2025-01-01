@@ -2,13 +2,14 @@ using System.Text.Json;
 
 namespace Oma.WndwCtrl.Abstractions.Model;
 
+[Serializable]
 public record TransformationOutcome : IOutcome
 {
   public TransformationOutcome()
   {
   }
 
-  public TransformationOutcome(bool success, string outcomeRaw)
+  protected TransformationOutcome(bool success, string outcomeRaw)
   {
     Success = success;
     OutcomeRaw = outcomeRaw;
@@ -24,6 +25,7 @@ public record TransformationOutcome : IOutcome
   public string OutcomeRaw { get; init; } = string.Empty;
 }
 
+[Serializable]
 public record TransformationOutcome<TData> : TransformationOutcome
 {
   public TransformationOutcome()

@@ -6,6 +6,4 @@ namespace Oma.WndwCtrl.Core.Model;
 [JsonDerivedType(typeof(Button), "button")]
 [JsonDerivedType(typeof(Sensor), "sensor")]
 [JsonDerivedType(typeof(Switch), "switch")]
-public abstract class Component
-{
-}
+public abstract class Component;
