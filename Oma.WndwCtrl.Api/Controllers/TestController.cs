@@ -52,7 +52,7 @@ public class TestController([FromKeyedServices(ServiceKeys.AdHocFlowExecutor)] I
           ? 500
           : 400,
         extensions: error.Inner.IsSome
-          ? new Dictionary<string, object?>()
+          ? new Dictionary<string, object?>
           {
             ["inner"] = (Error)error.Inner,
           }
@@ -85,12 +85,12 @@ public class TestController([FromKeyedServices(ServiceKeys.AdHocFlowExecutor)] I
           ? 500
           : 400,
         extensions: error.Inner.IsSome
-          ? new Dictionary<string, object?>()
+          ? new Dictionary<string, object?>
           {
-            ["inner"] = new List<Error>() { (Error)error.Inner, },
+            ["inner"] = new List<Error> { (Error)error.Inner, },
           }
           : error is ManyErrors manyErrors
-            ? new Dictionary<string, object?>()
+            ? new Dictionary<string, object?>
             {
               ["inner"] = manyErrors.Errors,
             }
@@ -107,10 +107,11 @@ public class TestController([FromKeyedServices(ServiceKeys.AdHocFlowExecutor)] I
 
     try
     {
-      List<string> toAppend = ParserLogDrain.Messages.Select(m => m
-        .Replace("\t", string.Empty)
-        .Replace("\r", string.Empty)
-        .Replace("\n", string.Empty)
+      List<string> toAppend = ParserLogDrain.Messages.Select(
+        m => m
+          .Replace("\t", string.Empty)
+          .Replace("\r", string.Empty)
+          .Replace("\n", string.Empty)
       ).ToList();
 
       for (int i = 0; i < toAppend.Count; i++)

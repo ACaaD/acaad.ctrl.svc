@@ -12,25 +12,25 @@ public class CliOutputParserImpl(IParserLogger parserLogger) : ICliOutputParser
 {
   public Either<Error, ParserResult> Parse(string transformation, string text)
   {
+    return Parse(transformation, Build);
+
     TransformationListener Build()
     {
       return new TransformationListener(parserLogger.Log, text);
     }
-
-    return Parse(transformation, Build);
   }
 
-  public Either<Error, ParserResult> Parse(string transformation, IEnumerable<object> values)
+  public Either<Error, ParserResult> Parse(string transformation, IList<object> values)
   {
+    return Parse(transformation, Build);
+
     TransformationListener Build()
     {
       return new TransformationListener(parserLogger.Log, values);
     }
-
-    return Parse(transformation, Build);
   }
 
-  private Either<Error, ParserResult> Parse(
+  private static Either<Error, ParserResult> Parse(
     string transformation,
     Func<TransformationListener> transformationListenerFactory
   )
@@ -62,12 +62,11 @@ public class CliOutputParserImpl(IParserLogger parserLogger) : ICliOutputParser
 
     if (enumeratedList.Count == 1)
     {
-      return new ParserResult() { enumeratedList.Single(), };
+      return new ParserResult { enumeratedList.Single(), };
     }
 
-    ParserResult result = new();
-
-    foreach (object? item in enumeratedList) result.Add(item);
+    ParserResult result = [];
+    result.AddRange(enumeratedList);
 
     return result;
   }

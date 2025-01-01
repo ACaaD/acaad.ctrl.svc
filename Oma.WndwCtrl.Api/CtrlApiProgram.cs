@@ -1,4 +1,3 @@
-using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Configuration.Model;
 
 namespace Oma.WndwCtrl.Api;
@@ -7,12 +6,10 @@ public class CtrlApiProgram
 {
   public async static Task Main(string[] args)
   {
-    ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
-    {
-      builder.SetMinimumLevel(LogLevel.Trace);
-    });
+    ILoggerFactory loggerFactory =
+      LoggerFactory.Create(builder => { builder.SetMinimumLevel(LogLevel.Trace); });
 
-    IApiService apiService = new CtrlApiService(
+    CtrlApiService apiService = new(
       loggerFactory.CreateLogger<CtrlApiService>(),
       await ComponentConfigurationAccessor.FromFileAsync()
     );

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using LanguageExt;
 using Microsoft.AspNetCore.Mvc;
 using Oma.WndwCtrl.Abstractions.Errors;
@@ -6,6 +7,11 @@ using Oma.WndwCtrl.Core.Model;
 
 namespace Oma.WndwCtrl.Api.Controllers.Components;
 
+[SuppressMessage(
+  "ReSharper",
+  "RouteTemplates.MethodMissingRouteParameters",
+  Justification = "Won't fix: Controller template; route parameters resolved through convention."
+)]
 public class SensorController : ComponentControllerBase<Sensor>
 {
   [HttpGet]
@@ -18,11 +24,13 @@ public class SensorController : ComponentControllerBase<Sensor>
     return flowResult.BiFold<IActionResult>(
       null!,
       Right: (_, outcome) => Ok(outcome),
-      Left: (_, error) => Problem(error.Message,
+      Left: (_, error) => Problem(
+        error.Message,
         title: $"[{error.Code}] A {error.GetType().Name} occurred.",
         statusCode: error.IsExceptional
           ? 500
-          : 400)
+          : 400
+      )
     );
   }
 }

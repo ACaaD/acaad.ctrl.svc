@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Oma.WndwCtrl.Core.Interfaces;
@@ -7,6 +8,16 @@ namespace Oma.WndwCtrl.Api.Controllers.Components;
 
 [ApiController]
 [Route("components/{componentName}")]
+[SuppressMessage(
+  "ReSharper",
+  "RouteTemplates.MethodMissingRouteParameters",
+  Justification = "Won't fix: Controller template; route parameters resolved through convention."
+)]
+[SuppressMessage(
+  "ReSharper",
+  "RouteTemplates.ControllerRouteParameterIsNotPassedToMethods",
+  Justification = "Won't fix: Controller template; route parameters resolved through convention."
+)]
 public class ComponentControllerBase<TComponent> : ControllerBase
   where TComponent : Component
 {

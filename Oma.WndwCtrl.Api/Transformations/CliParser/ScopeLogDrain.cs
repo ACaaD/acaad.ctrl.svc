@@ -8,7 +8,7 @@ public class ScopeLogDrain : IParserLogger
   private readonly Lock _lock = new();
 #endif
 
-  public List<string> Messages { get; } = new();
+  public List<string> Messages { get; } = [];
 
   public void Log(object message)
   {
@@ -17,7 +17,7 @@ public class ScopeLogDrain : IParserLogger
     Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] {message}");
     _lock.Exit();
 #endif
-    
+
     Messages.Add(message.ToString() ?? string.Empty);
   }
 }

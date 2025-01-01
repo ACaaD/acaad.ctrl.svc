@@ -11,5 +11,5 @@ public interface ICliOutputParser
 {
   Either<Error, ParserResult> Parse(string transformation, string text);
 
-  Either<Error, ParserResult> Parse(string transformation, IEnumerable<object> values);
+  Either<Error, ParserResult> Parse(string transformation, IList<object> values);
 }

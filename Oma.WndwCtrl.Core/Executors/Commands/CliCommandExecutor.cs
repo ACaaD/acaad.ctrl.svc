@@ -37,7 +37,7 @@ public class CliCommandExecutor : ICommandExecutor<CliCommand>
     string allText = await process.StandardOutput.ReadToEndAsync(cancelToken);
     string errorText = await process.StandardError.ReadToEndAsync(cancelToken);
 
-    return Right(new CommandOutcome()
+    return Right(new CommandOutcome
     {
       Success = process.ExitCode == 0,
       OutcomeRaw = process.ExitCode == 0 ? allText

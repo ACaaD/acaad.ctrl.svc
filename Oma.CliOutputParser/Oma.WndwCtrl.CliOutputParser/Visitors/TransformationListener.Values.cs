@@ -12,7 +12,7 @@ public partial class TransformationListener
 
     object? Fold(IEnumerable<object> val)
     {
-      return val.Where(v => int.TryParse(v.ToString()!, out var _))
+      return val.Where(v => int.TryParse(v.ToString()!, out int _))
         .Average(v => int.Parse(v.ToString()!));
     }
   }
@@ -27,7 +27,7 @@ public partial class TransformationListener
 
     object? Fold(IEnumerable<object> val)
     {
-      return val.Where(v => int.TryParse(v.ToString()!, out var _))
+      return val.Where(v => int.TryParse(v.ToString()!, out int _))
         .Sum(v => int.Parse(v.ToString()!));
     }
   }
@@ -42,7 +42,7 @@ public partial class TransformationListener
 
     object? Fold(IEnumerable<object> val)
     {
-      return val.Where(v => int.TryParse(v.ToString()!, out var _))
+      return val.Where(v => int.TryParse(v.ToString()!, out int _))
         .Min(v => int.Parse(v.ToString()!));
     }
   }
@@ -57,7 +57,7 @@ public partial class TransformationListener
 
     object? Fold(IEnumerable<object> val)
     {
-      return val.Where(v => int.TryParse(v.ToString()!, out var _))
+      return val.Where(v => int.TryParse(v.ToString()!, out int _))
         .Max(v => int.Parse(v.ToString()!));
     }
   }

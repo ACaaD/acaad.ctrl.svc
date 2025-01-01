@@ -89,7 +89,7 @@ public partial class TransformationChain
     private static string InjectMultilineArray(string template, string toInject)
     {
       string[] lines = toInject.Split(Environment.NewLine);
-      JsonArray array = new();
+      JsonArray array = [];
       lines.ForEach(line => array.Add(JsonValue.Create(line)));
 
       template = template.Replace("$$$INJECT_MULTILINE_ARRAY$$$", array.ToJsonString());

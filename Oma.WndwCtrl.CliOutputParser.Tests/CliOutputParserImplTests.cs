@@ -75,8 +75,8 @@ public class CliOutputParserImplTests
       Right: output =>
       {
         List<object> res = output.ToList();
-        res.Should().HaveCount(1);
-        res.First().Should().Be(8.25);
+        res.Should().HaveCount(expected: 1);
+        res.First().Should().Be(expected: 8.25);
       },
       Left: val => val.Should().BeNull()
     );
@@ -104,8 +104,8 @@ public class CliOutputParserImplTests
       Right: output =>
       {
         List<object> res = output.ToList();
-        res.Should().HaveCount(1);
-        res.First().Should().Be(4);
+        res.Should().HaveCount(expected: 1);
+        res.First().Should().Be(expected: 4);
       },
       Left: val => val.Should().BeNull()
     );
@@ -143,7 +143,7 @@ public class CliOutputParserImplTests
     transformationResult.Match(
       Right: output =>
       {
-        output.Should().HaveCount(1);
+        output.Should().HaveCount(expected: 1);
         string actual = output.First().ToString()!;
         actual.Should().Be("statistics for 151.101.64.67");
       },
@@ -169,7 +169,7 @@ public class CliOutputParserImplTests
       Right: output =>
       {
         List<object> res = output.ToList();
-        res.Should().HaveCount(1);
+        res.Should().HaveCount(expected: 1);
         res.First().Should().Be("7");
       },
       Left: val => val.Should().BeNull()
@@ -196,7 +196,7 @@ public class CliOutputParserImplTests
       Right: output =>
       {
         List<object> res = output.ToList();
-        res.Should().HaveCount(1);
+        res.Should().HaveCount(expected: 1);
         res.First().Should().Be("i");
       },
       Left: val => val.Should().BeNull()
@@ -212,9 +212,7 @@ public class CliOutputParserImplTests
   [InlineData("Last", "1")]
   public void ShouldApplyAggregateFunctions(string aggregate, object expectedValue)
   {
-    const string text = """
-                        9 8 7 6 5 4 3 2 1
-                        """;
+    const string text = "9 8 7 6 5 4 3 2 1";
 
     string transformation = $"""
                                Regex.Match($'(\d)');
@@ -229,7 +227,7 @@ public class CliOutputParserImplTests
       Right: output =>
       {
         List<object> res = output.ToList();
-        res.Should().HaveCount(1);
+        res.Should().HaveCount(expected: 1);
         res.First().Should().Be(expectedValue);
       },
       Left: val => val.Should().BeNull()

@@ -13,13 +13,13 @@ public record CommandError : FlowError, ICommandExecutionMetadata
   {
   }
 
-  protected CommandError(string message, bool isExceptional, bool isExpected) : base(message,
+  protected CommandError(string message, bool isExceptional, bool isExpected) : base(
+    message,
     isExceptional,
-    isExpected)
+    isExpected
+  )
   {
   }
-
-  public override Option<Error> Inner { get; } = Option<Error>.None;
 
   public Option<TimeSpan> ExecutionDuration { get; set; } = Option<TimeSpan>.None;
   public Option<int> ExecutedRetries { get; set; } = Option<int>.None;

@@ -6,7 +6,7 @@ public class NestedEnumerable : IEnumerable<object>
 {
   public NestedEnumerable()
   {
-    _enumerable = new List<object>();
+    _enumerable = [];
   }
 
   public NestedEnumerable(NestedEnumerable enumerable, bool isNested) : this()

@@ -17,13 +17,13 @@ public class CtrlApiService(
 
   public Task ForceStopAsync(CancellationToken cancelToken)
   {
-    if (Application is null)
+    if (Application is not null)
     {
-      _logger.LogWarning("Force stop called without app running.");
-      return Task.CompletedTask;
+      return Application.StopAsync(cancelToken);
     }
 
-    return Application.StopAsync(cancelToken);
+    _logger.LogWarning("Force stop called without app running.");
+    return Task.CompletedTask;
   }
 
   protected override MvcOptions PreConfigureMvcOptions(MvcOptions options)

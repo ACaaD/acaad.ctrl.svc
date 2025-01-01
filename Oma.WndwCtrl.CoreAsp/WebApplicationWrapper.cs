@@ -106,8 +106,6 @@ public class WebApplicationWrapper<TAssemblyDescriptor>
 
     configurationBuilder.SetFileProvider(compositeFileProvider);
 
-    IList<IConfigurationSource> s = configurationBuilder.Sources;
-
     configurationBuilder.AddJsonFile($"{serviceName}.config.json", optional: true, reloadOnChange: false);
 
     if (Environment.IsDevelopment())

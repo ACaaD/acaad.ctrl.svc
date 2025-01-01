@@ -50,7 +50,8 @@ public class DelegatingTransformer : IRootTransformer
     // TODO: Presumably the order is incorrect here and the fold must be applied first, then the lift.
     // -> Write AUTs
     from eitherChained in
-      allT.Fold<Seq, ITransformation, FlowT<TransformationConfiguration, TransformationOutcome>>(outcome,
+      allT.Fold<Seq, ITransformation, FlowT<TransformationConfiguration, TransformationOutcome>>(
+        outcome,
         t =>
         {
           return lastEither =>
@@ -62,7 +63,8 @@ public class DelegatingTransformer : IRootTransformer
 
             return res;
           };
-        })
+        }
+      )
     select eitherChained
   ).As();
 
@@ -130,8 +132,9 @@ public class DelegatingTransformer : IRootTransformer
   {
     return (
       from unwrapped in outcome
-      from ioRes in Flow<TransformationConfiguration>.liftAsync(async envIO =>
-        await transformer.TransformCommandOutcomeAsync(transformation, unwrapped, envIO.Token)
+      from ioRes in Flow<TransformationConfiguration>.liftAsync(
+        async envIO =>
+          await transformer.TransformCommandOutcomeAsync(transformation, unwrapped, envIO.Token)
       )
       from result in Flow<TransformationConfiguration>.lift(ioRes)
       select result
