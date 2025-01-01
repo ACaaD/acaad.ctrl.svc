@@ -6,5 +6,5 @@ include:
   - name: CheckDependencyLicenses
 dotnet:
   solution: Oma.WndwCtrl.sln
-bootstrap: 
-  - curl -fsSL https://dot.net/v1/dotnet-install.sh | bash -s -- --version
+bootstrap: |+
+  curl -fsSL https://dot.net/v1/dotnet-install.sh | bash -s -- --version
