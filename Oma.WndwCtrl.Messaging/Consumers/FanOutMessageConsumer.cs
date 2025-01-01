@@ -1,10 +1,13 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Channels;
+using Microsoft.Extensions.Logging;
 using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 using Oma.WndwCtrl.Messaging.Bus;
 
 namespace Oma.WndwCtrl.Messaging.Consumers;
 
-internal class FanOutMessageConsumer(MessageBusState messageBusState) : IMessageConsumer<IMessage>
+internal class FanOutMessageConsumer(ILogger<FanOutMessageConsumer> logger, MessageBusState messageBusState)
+  : IMessageConsumer<IMessage>
 {
   public bool IsSubscribedTo(IMessage message) => true;
 
@@ -17,14 +20,16 @@ internal class FanOutMessageConsumer(MessageBusState messageBusState) : IMessage
     );
   }
 
-  public Task OnStartAsync(CancellationToken cancelToken = default) => Task.CompletedTask;
-
-  // TODO Error handling
+  [ExcludeFromCodeCoverage]
   public Task OnExceptionAsync(
     IMessage message,
     Exception exception,
     CancellationToken cancelToken = default
-  ) => throw new NotImplementedException();
+  )
+  {
+    logger.LogError(exception, "An unexpected error occured processing a message.");
+    return Task.CompletedTask;
+  }
 
   public Task OnCompletedAsync(CancellationToken cancelToken = default)
   {

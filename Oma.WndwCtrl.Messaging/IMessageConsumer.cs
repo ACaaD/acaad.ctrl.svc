@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 
 namespace Oma.WndwCtrl.Messaging;
@@ -8,6 +9,7 @@ public interface IMessageConsumer
 
   Task OnMessageAsync(IMessage message, CancellationToken cancelToken = default);
 
+  [ExcludeFromCodeCoverage]
   Task OnStartAsync(CancellationToken cancelToken = default) => Task.CompletedTask;
 
   Task OnExceptionAsync(
@@ -16,12 +18,17 @@ public interface IMessageConsumer
     CancellationToken cancelToken = default
   );
 
+  [ExcludeFromCodeCoverage]
   Task OnCompletedAsync(CancellationToken cancelToken = default) => Task.CompletedTask;
+
+  [ExcludeFromCodeCoverage]
+  Task OnCancelledAsync(Exception? ex, CancellationToken cancelToken = default) => Task.CompletedTask;
 }
 
 public interface IMessageConsumer<in TMessage> : IMessageConsumer
   where TMessage : IMessage
 {
+  [ExcludeFromCodeCoverage]
   async Task IMessageConsumer.OnMessageAsync(IMessage message, CancellationToken cancelToken)
   {
     if (message is not TMessage msg)

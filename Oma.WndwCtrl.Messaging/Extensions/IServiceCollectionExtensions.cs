@@ -9,29 +9,12 @@ using Oma.WndwCtrl.Messaging.Model;
 
 namespace Oma.WndwCtrl.Messaging.Extensions;
 
-public sealed record WorkerMapping
-{
-  public Type ConsumerType { get; init; }
-
-  public Type MessageType { get; init; }
-}
-
-public sealed record ConsumerMapping
-{
-  public object ServiceKey { get; init; }
-}
-
-public sealed record ChannelSettings
-{
-  public ushort Concurrency { get; init; } = 16;
-}
-
 [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "Extension methods")]
 public static class IServiceCollectionExtensions
 {
-  private static Type ChannelType = typeof(Channel<IMessage>);
+  private static readonly Type ChannelType = typeof(Channel<IMessage>);
 
-  public static IServiceCollection AddWorker<TConsumer, TMessage>(
+  internal static IServiceCollection AddWorker<TConsumer, TMessage>(
     this IServiceCollection services,
     object serviceKey,
     ServiceLifetime serviceLifetime = ServiceLifetime.Singleton,
@@ -42,11 +25,7 @@ public static class IServiceCollectionExtensions
   {
     services.TryAddSingleton<ChannelWorkerFactory>();
 
-    WorkerMapping mapping = new()
-    {
-      ConsumerType = typeof(TConsumer),
-      MessageType = typeof(TMessage),
-    };
+    WorkerMapping mapping = new(typeof(TConsumer), typeof(TMessage));
 
     services.AddKeyedSingleton(serviceKey, mapping)
       .AddKeyedSingleton(serviceKey, new ChannelSettings());
@@ -115,11 +94,6 @@ public static class IServiceCollectionExtensions
     return services
       .AddLogging()
       .AddWorker<TConsumer, TMessage>(serviceKey, serviceLifetime, registerConsumer)
-      .AddSingleton(
-        new ConsumerMapping()
-        {
-          ServiceKey = serviceKey,
-        }
-      );
+      .AddSingleton(new ConsumerMapping(serviceKey));
   }
 }

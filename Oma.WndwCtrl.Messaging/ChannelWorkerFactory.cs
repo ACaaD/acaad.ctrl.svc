@@ -1,12 +1,11 @@
 using System.Threading.Channels;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
-using Oma.WndwCtrl.Messaging.Extensions;
+using Oma.WndwCtrl.Messaging.Model;
 
 namespace Oma.WndwCtrl.Messaging;
 
-public class ChannelWorkerFactory(IServiceProvider serviceProvider, ILogger<ChannelWorkerFactory> logger)
+public class ChannelWorkerFactory(IServiceProvider serviceProvider)
 {
   public IChannelWorker CreateChannelWorker(object serviceKey)
   {
