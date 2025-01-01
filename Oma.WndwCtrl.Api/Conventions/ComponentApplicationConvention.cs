@@ -11,9 +11,24 @@ public class ComponentApplicationConvention(ComponentConfigurationAccessor confi
 {
   private readonly ComponentConfigurationAccessor _configurationAccessor = configurationAccessor;
 
-  [NotNull] private ControllerModel? _buttonBase;
-  [NotNull] private ControllerModel? _sensorBase;
-  [NotNull] private ControllerModel? _switchBase;
+  private ControllerModel? _buttonBase;
+  private ControllerModel? _sensorBase;
+  private ControllerModel? _switchBase;
+
+  private ControllerModel ButtonBase => _buttonBase ??
+                                        throw new InvalidOperationException(
+                                          $"{nameof(ButtonBase)} is not initialized."
+                                        );
+
+  private ControllerModel SensorBase => _sensorBase ??
+                                        throw new InvalidOperationException(
+                                          $"{nameof(SensorBase)} is not initialized."
+                                        );
+
+  private ControllerModel SwitchBase => _switchBase ??
+                                        throw new InvalidOperationException(
+                                          $"{nameof(SwitchBase)} is not initialized."
+                                        );
 
   public void Apply(ApplicationModel application)
   {
@@ -49,11 +64,12 @@ public class ComponentApplicationConvention(ComponentConfigurationAccessor confi
   {
     return component switch
     {
-      Button => _buttonBase,
-      Sensor => _sensorBase,
-      Switch => _switchBase,
+      Button => ButtonBase,
+      Sensor => SensorBase,
+      Switch => SwitchBase,
       var _ => throw new InvalidOperationException(
-        $"Component type {component.GetType().FullName} not supported."),
+        $"Component type {component.GetType().FullName} not supported."
+      ),
     };
   }
 
@@ -82,8 +98,8 @@ public class ComponentApplicationConvention(ComponentConfigurationAccessor confi
 
   private void ClearBaseControllers(ApplicationModel application)
   {
-    application.Controllers.Remove(_buttonBase);
-    application.Controllers.Remove(_sensorBase);
-    application.Controllers.Remove(_switchBase);
+    application.Controllers.Remove(ButtonBase);
+    application.Controllers.Remove(SensorBase);
+    application.Controllers.Remove(SwitchBase);
   }
 }
