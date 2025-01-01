@@ -6,6 +6,8 @@ using Oma.WndwCtrl.CliOutputParser;
 using Oma.WndwCtrl.CliOutputParser.Interfaces;
 using Oma.WndwCtrl.Configuration.Extensions;
 using Oma.WndwCtrl.Core.Extensions;
+using Oma.WndwCtrl.Core.Interfaces;
+using Oma.WndwCtrl.Core.Model;
 
 namespace Oma.WndwCtrl.Api.Extensions;
 
@@ -16,6 +18,9 @@ public static class IServiceCollectionExtensions
   {
     services.AddConfiguration()
       .AddCommandExecutors()
+      .AddScoped<IFlowExecutor>(
+        sp => sp.GetRequiredKeyedService<IFlowExecutor>(ServiceKeys.AdHocFlowExecutor)
+      )
       .TryAddSingleton<IApiService, CtrlApiService>();
 
     // We actually want to override the parser to access it from the request scope

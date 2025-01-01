@@ -29,7 +29,7 @@ public static class JsonExtensions
         UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization,
       };
 
-      IEnumerable<Type>? types = AssembliesToSearch.GetTypes()
+      IEnumerable<Type> types = AssembliesToSearch.GetTypes()
         .Where(t => t is { IsClass: true, IsAbstract: false, } && t.IsAssignableTo(baseType));
 
       foreach (Type t in types)

@@ -58,7 +58,7 @@ public class CliOutputParserImpl(IParserLogger parserLogger) : ICliOutputParser
     ParseTreeWalker walker = new();
     walker.Walk(listener, tree);
 
-    List<object>? enumeratedList = listener.CurrentValues.ToList();
+    List<object> enumeratedList = listener.CurrentValues.ToList();
 
     if (enumeratedList.Count == 1)
     {

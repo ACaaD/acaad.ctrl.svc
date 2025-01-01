@@ -25,12 +25,12 @@ public class DelegatingCommandExecutorTests
     ILogger<DelegatingCommandExecutor>? loggerMock = Substitute.For<ILogger<DelegatingCommandExecutor>>();
     _executorMock = Substitute.For<ICommandExecutor>();
 
-    CommandOutcome? outcome = new()
+    CommandOutcome outcome = new()
     {
       OutcomeRaw = _rawOutcome,
     };
 
-    _executorMock.Handles(Arg.Any<ICommand>()).Returns(true);
+    _executorMock.Handles(Arg.Any<ICommand>()).Returns(returnThis: true);
 
     _executorMock.ExecuteAsync(Arg.Any<ICommand>(), Arg.Any<CancellationToken>())
       .Returns(Right(outcome));
@@ -45,7 +45,7 @@ public class DelegatingCommandExecutorTests
   [Fact]
   public async Task ShouldSuccessfullyExecute()
   {
-    Either<FlowError, CommandOutcome>? result = await _instance.ExecuteAsync(_commandMock, _cancelToken);
+    Either<FlowError, CommandOutcome> result = await _instance.ExecuteAsync(_commandMock, _cancelToken);
 
     result.IsRight.Should().BeTrue();
 
@@ -58,23 +58,25 @@ public class DelegatingCommandExecutorTests
   [Fact]
   public async Task ShouldFailIfNoExecutorIsFound()
   {
-    _executorMock.Handles(Arg.Any<ICommand>()).Returns(false);
+    _executorMock.Handles(Arg.Any<ICommand>()).Returns(returnThis: false);
 
-    Either<FlowError, CommandOutcome>? result = await _instance.ExecuteAsync(_commandMock, _cancelToken);
+    Either<FlowError, CommandOutcome> result = await _instance.ExecuteAsync(_commandMock, _cancelToken);
 
     result.IsLeft.Should().BeTrue();
+
+    // TODO:
     // result.Match(_ => { }, err => err.Message.Should().Contain("programming"));
   }
 
   [Fact]
   public async Task ShouldFailIfExecutorFails()
   {
-    TechnicalError? simulatedError = new("Simulated sub-command executor error", 1337);
+    TechnicalError simulatedError = new("Simulated sub-command executor error", Code: 1337);
 
     _executorMock.ExecuteAsync(Arg.Any<ICommand>(), Arg.Any<CancellationToken>())
       .Returns(Left<FlowError>(simulatedError));
 
-    Either<FlowError, CommandOutcome>? result = await _instance.ExecuteAsync(_commandMock, _cancelToken);
+    Either<FlowError, CommandOutcome> result = await _instance.ExecuteAsync(_commandMock, _cancelToken);
 
     result.IsLeft.Should().BeTrue();
     result.Match(_ => { }, err => err.Should().BeOfType<FlowError>());
@@ -83,9 +85,9 @@ public class DelegatingCommandExecutorTests
   [Fact]
   public async Task ShouldPopulateMetadataOnError()
   {
-    _executorMock.Handles(Arg.Any<ICommand>()).Returns(false);
+    _executorMock.Handles(Arg.Any<ICommand>()).Returns(returnThis: false);
 
-    Either<FlowError, CommandOutcome>? result = await _instance.ExecuteAsync(_commandMock, _cancelToken);
+    Either<FlowError, CommandOutcome> result = await _instance.ExecuteAsync(_commandMock, _cancelToken);
 
     result.IsLeft.Should().BeTrue();
 

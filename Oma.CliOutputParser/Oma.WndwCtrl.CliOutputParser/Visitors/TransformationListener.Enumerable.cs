@@ -24,7 +24,7 @@ public partial class TransformationListener
   {
     if (nestedList.IsNested)
     {
-      IEnumerable<NestedEnumerable>? children = nestedList.Children
+      IEnumerable<NestedEnumerable> children = nestedList.Children
         .Select(l => new NestedEnumerable(UnfoldItemsRecursive(l, unfold), true));
 
       return new NestedEnumerable(children, true);
@@ -33,7 +33,7 @@ public partial class TransformationListener
     IEnumerable<IEnumerable<object>> unfoldInter = unfold(nestedList);
     IEnumerable<NestedEnumerable> select = unfoldInter.Select(NestedEnumerable.ForChild);
 
-    NestedEnumerable? unfoldResult = new(select, true);
+    NestedEnumerable unfoldResult = new(select, true);
 
     return unfoldResult;
   }
@@ -45,7 +45,7 @@ public partial class TransformationListener
   {
     if (nestedList.IsNested)
     {
-      List<object>? result = nestedList.Children.Select(l => FoldItemsRecursive(l, fold))
+      List<object> result = nestedList.Children.Select(l => FoldItemsRecursive(l, fold))
         .Where(obj => obj is not null)
         .Select(obj => obj!)
         .ToList();
@@ -69,7 +69,7 @@ public partial class TransformationListener
     }
     else
     {
-      List<object>? newList = new();
+      List<object> newList = new();
 
       if (result is not null)
       {

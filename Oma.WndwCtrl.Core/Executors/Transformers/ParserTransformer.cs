@@ -41,7 +41,7 @@ public class ParserTransformer(ICliOutputParser cliOutputParser) : IOutcomeTrans
       Left: err => err
     ).BiBind<FlowError, TransformationOutcome>(
       err => err,
-      parseResult => new TransformationOutcome<ParserResult>(parseResult, true)
+      parseResult => new TransformationOutcome<ParserResult>(parseResult, success: true)
     );
 
     return Task.FromResult(result);

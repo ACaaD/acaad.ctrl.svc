@@ -17,6 +17,7 @@ public class ScopeLogDrain : IParserLogger
     Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] {message}");
     _lock.Exit();
 #endif
+    
     Messages.Add(message.ToString() ?? string.Empty);
   }
 }

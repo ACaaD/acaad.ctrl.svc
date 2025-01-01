@@ -3,6 +3,7 @@ using Oma.WndwCtrl.Abstractions.Model;
 
 namespace Oma.WndwCtrl.MgmtApi.Model.Api;
 
+[Serializable]
 public record ServiceDescriptor
 {
   public string Name { get; init; } = string.Empty;

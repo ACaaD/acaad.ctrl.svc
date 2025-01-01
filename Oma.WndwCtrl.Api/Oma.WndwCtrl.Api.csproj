@@ -21,4 +21,9 @@
         <Folder Include="Actions\"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Nonr Include="CtrlApiService.config.json"/>
+        <None Include="CtrlApiService.config.development.json"/>
+    </ItemGroup>
+
 </Project>

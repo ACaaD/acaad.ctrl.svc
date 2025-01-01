@@ -4,7 +4,7 @@ using Oma.WndwCtrl.Abstractions.Errors;
 
 namespace Oma.WndwCtrl.FpCore.TransformerStacks.Flow;
 
-public partial class Flow<TFlowConfiguration> :
+public class Flow<TFlowConfiguration> :
   Monad<Flow<TFlowConfiguration>>,
   Foldable<Flow<TFlowConfiguration>>
 {

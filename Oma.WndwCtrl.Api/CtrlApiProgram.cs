@@ -7,7 +7,10 @@ public class CtrlApiProgram
 {
   public async static Task Main(string[] args)
   {
-    ILoggerFactory loggerFactory = LoggerFactory.Create(builder => { });
+    ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+    {
+      builder.SetMinimumLevel(LogLevel.Trace);
+    });
 
     IApiService apiService = new CtrlApiService(
       loggerFactory.CreateLogger<CtrlApiService>(),

@@ -1,0 +1,10 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning",
+      "Oma.WndwCtrl.Core": "Debug",
+      "Oma.WndwCtrl.Core.Executors": "Trace"
+    }
+  }
+}

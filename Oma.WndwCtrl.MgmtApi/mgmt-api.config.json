@@ -1,9 +1,0 @@
-{
-  "Kestrel": {
-    "Endpoints": {
-      "ManagementApi": {
-        "Url": "http://localhost:8443"
-      }
-    }
-  }
-}

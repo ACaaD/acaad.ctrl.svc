@@ -31,10 +31,10 @@ public sealed partial class TransformationChain : ApiFixtureTestBase<MockedComma
   public async Task ShouldProcessPingResultInOneTransformation()
   {
     string payload = Payloads.PingResultOneTransformation;
-    using HttpRequestMessage httpRequestMessage = ConstructCommandHttpRequestMessage(payload, true);
+    using HttpRequestMessage httpRequestMessage = ConstructCommandHttpRequestMessage(payload, isJson: true);
     using HttpResponseMessage httpResponse = await _httpClient.SendAsync(httpRequestMessage, _cancelToken);
 
-    double expected = 7.5;
+    const double expected = 7.5;
 
     httpResponse.Should().Be200Ok().And.Satisfy<TransformationOutcome<ParserResult>>(
       response => { AssertParserResultOneNumber(response, expected); }
@@ -45,10 +45,10 @@ public sealed partial class TransformationChain : ApiFixtureTestBase<MockedComma
   public async Task ShouldProcessPingResultInMultipleTransformations()
   {
     string payload = Payloads.PingResultMultipleTransformations;
-    using HttpRequestMessage httpRequestMessage = ConstructCommandHttpRequestMessage(payload, true);
+    using HttpRequestMessage httpRequestMessage = ConstructCommandHttpRequestMessage(payload, isJson: true);
     using HttpResponseMessage httpResponse = await _httpClient.SendAsync(httpRequestMessage, _cancelToken);
 
-    double expected = 7.5;
+    const double expected = 7.5;
 
     httpResponse.Should().Be200Ok().And.Satisfy<TransformationOutcome<ParserResult>>(
       response => { AssertParserResultOneNumber(response, expected); }

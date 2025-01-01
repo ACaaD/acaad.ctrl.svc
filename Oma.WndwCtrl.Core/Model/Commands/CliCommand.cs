@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Oma.WndwCtrl.Core.Model.Commands;
 
+[Serializable]
 public class CliCommand : BaseCommand
 {
   [JsonRequired]

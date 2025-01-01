@@ -24,7 +24,7 @@ public class DummyCommandExecutor : ICommandExecutor<DummyCommand>
     }
     else
     {
-      result = Right<CommandOutcome>(new CommandOutcome
+      result = Right(new CommandOutcome
       {
         OutcomeRaw = message,
       });

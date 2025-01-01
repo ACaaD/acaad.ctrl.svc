@@ -104,7 +104,7 @@ public partial class TransformationListener
 
     object? Fold(IEnumerable<object> val)
     {
-      List<object>? itemList = val.ToList();
+      List<object> itemList = val.ToList();
 
       return index > itemList.Count - 1
         ? null

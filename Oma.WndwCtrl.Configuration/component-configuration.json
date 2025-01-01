@@ -6,7 +6,16 @@
         "type": "cli",
         "fileName": "ping",
         "arguments": "xkcd.com",
-        "transformation": []
+        "transformations": [
+          {
+            "type": "parser",
+            "statements": [
+              "Regex.Match($'time=(\\d+)ms');",
+              "Values.Index(1);",
+              "Values.Average();"
+            ]
+          }
+        ]
       }
     },
     "failing-sensor": {
@@ -15,7 +24,7 @@
         "type": "cli",
         "fileName": "doesnt-exist",
         "arguments": "N/A",
-        "transformation": []
+        "transformations": []
       }
     },
     "invalid-parameters": {
@@ -24,7 +33,7 @@
         "type": "cli",
         "fileName": "ping",
         "arguments": "--this-should-not-work",
-        "transformation": []
+        "transformations": []
       }
     }
   }

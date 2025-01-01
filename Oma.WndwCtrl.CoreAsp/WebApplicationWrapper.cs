@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.FileProviders;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Core.Extensions;
 using Oma.WndwCtrl.CoreAsp.Conventions;
@@ -11,34 +12,50 @@ namespace Oma.WndwCtrl.CoreAsp;
 public class WebApplicationWrapper<TAssemblyDescriptor>
   where TAssemblyDescriptor : class
 {
+  private IWebHostEnvironment? _environment;
   protected WebApplication? Application { get; private set; }
+
+  protected IWebHostEnvironment Environment
+  {
+    get => _environment ?? throw new InvalidOperationException($"{nameof(Environment)} is not populated.");
+    private set => _environment = value;
+  }
 
   public async Task StartAsync(CancellationToken cancelToken = default, params string[] args)
   {
+#if DEBUG
+    System.Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+#endif
+
     if (Application is not null)
     {
       throw new InvalidOperationException("Application is already running.");
     }
 
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+    Environment = builder.Environment;
 
     ConfigurationConfiguration(builder.Configuration);
 
     IMvcCoreBuilder mvcBuilder = builder.Services
-      .AddMvcCore(opts =>
-      {
-        PreConfigureMvcOptions(opts);
+      .AddMvcCore(
+        opts =>
+        {
+          PreConfigureMvcOptions(opts);
 
-        opts.Conventions.Add(new ContainingAssemblyApplicationModelConvention<TAssemblyDescriptor>());
+          opts.Conventions.Add(new ContainingAssemblyApplicationModelConvention<TAssemblyDescriptor>());
 
-        PostConfigureMvcOptions(opts);
-      })
+          PostConfigureMvcOptions(opts);
+        }
+      )
       .AddApiExplorer()
-      .AddJsonOptions(opts =>
-      {
-        ModifyJsonSerializerOptions(opts.JsonSerializerOptions);
-        ConfigureJsonOptions(opts);
-      });
+      .AddJsonOptions(
+        opts =>
+        {
+          ModifyJsonSerializerOptions(opts.JsonSerializerOptions);
+          ConfigureJsonOptions(opts);
+        }
+      );
 
     PostConfigureMvc(mvcBuilder);
 
@@ -62,11 +79,15 @@ public class WebApplicationWrapper<TAssemblyDescriptor>
   public static void ModifyJsonSerializerOptions(JsonSerializerOptions jsonSerializerOptions)
   {
     jsonSerializerOptions.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
-      .WithAddedModifier(JsonExtensions.GetPolymorphismModifierFor<ICommand>(
-        t => t.Name.Replace("Command", string.Empty))
+      .WithAddedModifier(
+        JsonExtensions.GetPolymorphismModifierFor<ICommand>(
+          t => t.Name.Replace("Command", string.Empty)
+        )
       )
-      .WithAddedModifier(JsonExtensions.GetPolymorphismModifierFor<ITransformation>(
-        t => t.Name.Replace("Transformation", string.Empty))
+      .WithAddedModifier(
+        JsonExtensions.GetPolymorphismModifierFor<ITransformation>(
+          t => t.Name.Replace("Transformation", string.Empty)
+        )
       );
   }
 
@@ -74,6 +95,30 @@ public class WebApplicationWrapper<TAssemblyDescriptor>
     IConfigurationBuilder configurationBuilder
   )
   {
+    string serviceName = typeof(TAssemblyDescriptor).Name;
+
+    IFileProvider standardFileProvider = configurationBuilder.GetFileProvider();
+
+    CompositeFileProvider compositeFileProvider = new(
+      standardFileProvider,
+      new PhysicalFileProvider(AppDomain.CurrentDomain.BaseDirectory)
+    );
+
+    configurationBuilder.SetFileProvider(compositeFileProvider);
+
+    IList<IConfigurationSource> s = configurationBuilder.Sources;
+
+    configurationBuilder.AddJsonFile($"{serviceName}.config.json", optional: true, reloadOnChange: false);
+
+    if (Environment.IsDevelopment())
+    {
+      configurationBuilder.AddJsonFile(
+        $"{serviceName}.config.development.json",
+        optional: true,
+        reloadOnChange: false
+      );
+    }
+
     return configurationBuilder;
   }
 

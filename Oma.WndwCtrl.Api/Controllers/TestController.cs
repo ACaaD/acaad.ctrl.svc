@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.AspNetCore.Mvc;
@@ -20,8 +21,11 @@ public class TestController([FromKeyedServices(ServiceKeys.AdHocFlowExecutor)] I
   public const string BaseRoute = "ctrl/test";
   public const string CommandRoute = "command";
 
-  [FromServices] public required ICliOutputParser CliOutputParser { get; init; }
-  [FromServices] public required ScopeLogDrain ParserLogDrain { get; init; }
+  [FromServices] [UsedImplicitly]
+  public required ICliOutputParser CliOutputParser { get; init; }
+
+  [FromServices] [UsedImplicitly]
+  public required ScopeLogDrain ParserLogDrain { get; init; }
 
   [HttpPost(CommandRoute)]
   [EndpointName($"Test_{nameof(TestCommandAsync)}")]
@@ -64,7 +68,7 @@ public class TestController([FromKeyedServices(ServiceKeys.AdHocFlowExecutor)] I
   [Produces("application/json")]
   public IActionResult TestTransformationCliParserAsync([FromBody] TransformationTestRequest request)
   {
-    Either<Error, ParserResult>? transformResult = CliOutputParser.Parse(
+    Either<Error, ParserResult> transformResult = CliOutputParser.Parse(
       string.Join(Environment.NewLine, request.Transformation),
       string.Join(string.Empty, request.TestText)
     );
@@ -103,7 +107,7 @@ public class TestController([FromKeyedServices(ServiceKeys.AdHocFlowExecutor)] I
 
     try
     {
-      List<string>? toAppend = ParserLogDrain.Messages.Select(m => m
+      List<string> toAppend = ParserLogDrain.Messages.Select(m => m
         .Replace("\t", string.Empty)
         .Replace("\r", string.Empty)
         .Replace("\n", string.Empty)

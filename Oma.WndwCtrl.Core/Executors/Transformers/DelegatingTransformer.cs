@@ -90,7 +90,7 @@ public class DelegatingTransformer : IRootTransformer
     using IDisposable? ls = _logger.BeginScope(commandOutcome);
     _logger.LogTrace("Received command outcome to transform.");
 
-    TransformationConfiguration initialConfiguration = new(_logger, _transformers, command, commandOutcome);
+    TransformationConfiguration initialConfiguration = new(_transformers, command, commandOutcome);
     EnvIO envIO = EnvIO.New(token: cancelToken);
 
     Either<FlowError, TransformationOutcome> outcome =

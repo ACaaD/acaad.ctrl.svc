@@ -6,7 +6,8 @@ namespace Oma.WndwCtrl.Configuration.Model;
 public class ComponentConfiguration
 {
   [JsonRequired]
-  public Dictionary<string, Component> Components { get; set; } = new();
+  public IReadOnlyDictionary<string, Component> Components { get; set; } =
+    new Dictionary<string, Component>();
 
   [JsonPropertyName("__meta")]
   [JsonPropertyOrder(int.MaxValue)]

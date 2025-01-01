@@ -63,7 +63,7 @@ public sealed record ServiceWrapper<TService> : IDisposable, IServiceWrapper<TSe
           CompletionTask = Service.WaitForShutdownAsync(CancellationTokenSource.Token);
         },
         cancelToken)
-      .ConfigureAwait(false);
+      .ConfigureAwait(continueOnCapturedContext: false);
 
     return StartTask;
   }
@@ -75,7 +75,7 @@ public sealed record ServiceWrapper<TService> : IDisposable, IServiceWrapper<TSe
       return;
     }
 
-    TimeSpan stopTimeout = TimeSpan.FromSeconds(5);
+    TimeSpan stopTimeout = TimeSpan.FromSeconds(seconds: 5);
 
     CancellationTokenSource ctsForceCancelAfter =
       CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
@@ -110,7 +110,7 @@ public sealed record ServiceWrapper<TService> : IDisposable, IServiceWrapper<TSe
 
   public Task WaitForShutdownAsync(CancellationToken cancelToken = default)
   {
-    return Service?.WaitForShutdownAsync(cancelToken) ?? Task.CompletedTask;
+    return Service.WaitForShutdownAsync(cancelToken);
   }
 
   public Task ForceStopAsync(CancellationToken cancelToken = default)
@@ -118,9 +118,9 @@ public sealed record ServiceWrapper<TService> : IDisposable, IServiceWrapper<TSe
     return Service.ForceStopAsync(cancelToken);
   }
 
-  [MemberNotNullWhen(true, nameof(CancellationTokenSource))]
-  [MemberNotNullWhen(true, nameof(StartTask))]
-  [MemberNotNullWhen(true, nameof(CompletionTask))]
+  [MemberNotNullWhen(returnValue: true, nameof(CancellationTokenSource))]
+  [MemberNotNullWhen(returnValue: true, nameof(StartTask))]
+  [MemberNotNullWhen(returnValue: true, nameof(CompletionTask))]
   private bool IsRunning()
   {
     return Status == ServiceStatus.Running && CancellationTokenSource is not null &&

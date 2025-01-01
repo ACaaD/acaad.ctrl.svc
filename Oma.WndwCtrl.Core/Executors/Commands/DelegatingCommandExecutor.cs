@@ -27,6 +27,8 @@ public class DelegatingCommandExecutor : ICommandExecutor
     _logger = logger;
     _commandExecutors = commandExecutors;
 
+    Stopwatch swBuildStack = Stopwatch.StartNew();
+
     Expression<Func<CommandState, EnvIO, ValueTask<Either<FlowError, CommandOutcome>>>> expression
       = (cfg, io) => OverallFlow.ExecuteFlow
         .Run(cfg)
@@ -34,6 +36,8 @@ public class DelegatingCommandExecutor : ICommandExecutor
         .RunAsync(io);
 
     _transformerStack = expression.Compile();
+
+    _logger.LogTrace("Build transformer stack in {elapsed}.", swBuildStack.Measure());
   }
 
   private static FlowT<CommandState, CommandOutcome> OverallFlow => (
@@ -97,8 +101,9 @@ public class DelegatingCommandExecutor : ICommandExecutor
   {
     return (
       from _ in Flow<CommandState>.asks2(state => state.Command)
-      from ioRes in Flow<CommandState>.liftAsync(async envIO =>
-        await executor.ExecuteAsync(cmd, envIO.Token)
+      from ioRes in Flow<CommandState>.liftAsync(
+        async envIO =>
+          await executor.ExecuteAsync(cmd, envIO.Token)
       )
       from result in Flow<CommandState>.lift(ioRes)
       select result

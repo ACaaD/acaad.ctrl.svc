@@ -11,9 +11,9 @@ public class ComponentApplicationConvention(ComponentConfigurationAccessor confi
 {
   private readonly ComponentConfigurationAccessor _configurationAccessor = configurationAccessor;
 
-  [NotNull] private ControllerModel? _buttonBase = null;
-  [NotNull] private ControllerModel? _sensorBase = null;
-  [NotNull] private ControllerModel? _switchBase = null;
+  [NotNull] private ControllerModel? _buttonBase;
+  [NotNull] private ControllerModel? _sensorBase;
+  [NotNull] private ControllerModel? _switchBase;
 
   public void Apply(ApplicationModel application)
   {
@@ -82,8 +82,8 @@ public class ComponentApplicationConvention(ComponentConfigurationAccessor confi
 
   private void ClearBaseControllers(ApplicationModel application)
   {
-    application.Controllers.Remove(_buttonBase!);
-    application.Controllers.Remove(_sensorBase!);
-    application.Controllers.Remove(_switchBase!);
+    application.Controllers.Remove(_buttonBase);
+    application.Controllers.Remove(_sensorBase);
+    application.Controllers.Remove(_switchBase);
   }
 }

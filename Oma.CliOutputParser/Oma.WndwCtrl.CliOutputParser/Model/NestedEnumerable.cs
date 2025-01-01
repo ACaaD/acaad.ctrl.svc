@@ -68,10 +68,10 @@ public class NestedEnumerable : IEnumerable<object>
 
   public static NestedEnumerable FromEnumerable(IEnumerable<object> enumerable)
   {
-    List<object>? enumerated = enumerable.ToList();
+    List<object> enumerated = enumerable.ToList();
     bool isNestedCalc = enumerated.Any(item => item is IEnumerable and not IEnumerable<char>);
 
-    NestedEnumerable? res = new()
+    NestedEnumerable res = new()
     {
       _enumerable = enumerated.ToList(),
       IsNested = isNestedCalc,

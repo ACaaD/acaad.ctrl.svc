@@ -2,6 +2,7 @@ using Oma.WndwCtrl.Abstractions;
 
 namespace Oma.WndwCtrl.Core.Model.Commands;
 
+[Serializable]
 public class BaseCommand : ICommand
 {
   public int Retries { get; set; }
