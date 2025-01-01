@@ -24,13 +24,15 @@ public static class IServiceProviderExtensions
     return messageBus;
   }
 
-  public static IDisposable StartConsumers(
+  public static Task StartConsumersAsync(
     this IServiceProvider serviceProvider,
     IMessageBus messageBus,
     CancellationToken cancelToken = default
   )
   {
     IEnumerable<ConsumerMapping> consumerMappings = serviceProvider.GetServices<ConsumerMapping>();
+
+    List<Task> consumerTasks = [];
 
     foreach (ConsumerMapping mapping in consumerMappings)
     {
@@ -40,9 +42,9 @@ public static class IServiceProviderExtensions
       IChannelWorker worker = serviceProvider.GetRequiredKeyedService<IChannelWorker>(mapping.ServiceKey);
 
       messageBus.Register(mapping.ServiceKey.ToString()!, channel);
-      _ = worker.ProcessUntilCompletedAsync(cancelToken);
+      consumerTasks.Add(worker.ProcessUntilCompletedAsync(cancelToken));
     }
 
-    return new MemoryStream();
+    return Task.WhenAll(consumerTasks);
   }
 }

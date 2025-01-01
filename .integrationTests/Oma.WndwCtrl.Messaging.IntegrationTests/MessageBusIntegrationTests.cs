@@ -10,10 +10,11 @@ namespace Oma.WndwCtrl.Messaging.IntegrationTests;
 public sealed class MessageBusIntegrationTests : IAsyncLifetime
 {
   private readonly CancellationToken _cancelToken;
-  private readonly List<IDisposable> _consumerDisposables = [];
 
   private readonly List<ServiceProvider> _consumerProviders = [];
   private readonly ServiceProvider _serviceProvider;
+
+  private Task? _consumerTask;
 
   private IMessageBus? _messageBus;
 
@@ -31,7 +32,6 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
   public async ValueTask DisposeAsync()
   {
     (_messageBus as IDisposable)?.Dispose();
-    _consumerDisposables.ForEach(cd => cd.Dispose());
 
     await _serviceProvider.DisposeAsync();
     await Task.WhenAll(_consumerProviders.Select(x => x.DisposeAsync().AsTask()));
@@ -52,6 +52,8 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
       .ToList();
 
     await MessageBus.SendAsync(new DummyMessage(), _cancelToken);
+    MessageBus.Complete();
+    await WaitForConsumerCompletion();
 
     consumers.Should().AllSatisfy(
       c =>
@@ -60,6 +62,11 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
           Arg.Any<CancellationToken>()
         )
     );
+  }
+
+  private async Task WaitForConsumerCompletion()
+  {
+    await (_consumerTask ?? Task.CompletedTask);
   }
 
   [Fact]
@@ -73,6 +80,9 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
     await MessageBus.SendAsync(new DummyMessage(), _cancelToken);
     await MessageBus.SendAsync(new DummyMessage(), _cancelToken);
     await MessageBus.SendAsync(new OtherMessage(), _cancelToken);
+    MessageBus.Complete();
+
+    await WaitForConsumerCompletion();
 
     consumers.Should().AllSatisfy(
       c =>
@@ -80,6 +90,36 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
           Arg.Any<DummyMessage>(),
           Arg.Any<CancellationToken>()
         )
+    );
+  }
+
+  [Fact]
+  public async Task ShouldRouteMessagesByType()
+  {
+    ServiceCollection services = new();
+    IMessageConsumer dummyC = AddConsumerToContainer<DummyMessage>(services);
+    IMessageConsumer otherC = AddConsumerToContainer<OtherMessage>(services);
+
+    ServiceProvider provider = services.BuildServiceProvider();
+    _consumerTask = provider.StartConsumersAsync(MessageBus, _cancelToken);
+
+    await MessageBus.SendAsync(new DummyMessage(), _cancelToken);
+    await MessageBus.SendAsync(new DummyMessage(), _cancelToken);
+    await MessageBus.SendAsync(new OtherMessage(), _cancelToken);
+    await MessageBus.SendAsync(new OtherMessage(), _cancelToken);
+    await MessageBus.SendAsync(new DummyMessage(), _cancelToken);
+    MessageBus.Complete();
+
+    await WaitForConsumerCompletion();
+
+    await dummyC.Received(requiredNumberOfCalls: 3).OnMessageAsync(
+      Arg.Any<DummyMessage>(),
+      Arg.Any<CancellationToken>()
+    );
+
+    await otherC.Received(requiredNumberOfCalls: 2).OnMessageAsync(
+      Arg.Any<OtherMessage>(),
+      Arg.Any<CancellationToken>()
     );
   }
 
@@ -98,18 +138,25 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
   {
     ServiceCollection services = new();
 
+    IMessageConsumer messageConsumer = AddConsumerToContainer<TMessage>(services);
+
+    ServiceProvider result = services.BuildServiceProvider();
+    _consumerProviders.Add(result);
+
+    _consumerTask = result.StartConsumersAsync(MessageBus, _cancelToken);
+
+    return messageConsumer;
+  }
+
+  private IMessageConsumer AddConsumerToContainer<TMessage>(ServiceCollection services)
+    where TMessage : IMessage
+  {
     IMessageConsumer<TMessage> messageConsumer = Substitute.For<IMessageConsumer<TMessage>>();
 
     messageConsumer.IsSubscribedTo(Arg.Any<TMessage>()).Returns(returnThis: true);
 
     services.AddMessageConsumer<IMessageConsumer<TMessage>, TMessage>(registerConsumer: false);
     services.AddSingleton(messageConsumer);
-
-    ServiceProvider result = services.BuildServiceProvider();
-    _consumerProviders.Add(result);
-
-    IDisposable disposable = result.StartConsumers(MessageBus);
-    _consumerDisposables.Add(disposable);
 
     return messageConsumer;
   }

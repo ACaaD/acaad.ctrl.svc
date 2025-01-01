@@ -1,3 +1,4 @@
+using System.Threading.Channels;
 using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 using Oma.WndwCtrl.Messaging.Bus;
 
@@ -18,14 +19,16 @@ internal class FanOutMessageConsumer(MessageBusState messageBusState) : IMessage
 
   public Task OnStartAsync(CancellationToken cancelToken = default) => Task.CompletedTask;
 
-  // TODO
+  // TODO Error handling
   public Task OnExceptionAsync(
     IMessage message,
     Exception exception,
     CancellationToken cancelToken = default
   ) => throw new NotImplementedException();
 
-  public Task OnCompletedAsync(CancellationToken cancelToken = default) =>
-    // TODO: Complete consumer queues
-    Task.CompletedTask;
+  public Task OnCompletedAsync(CancellationToken cancelToken = default)
+  {
+    foreach (Channel<IMessage> channel in messageBusState.ActiveChannels) channel.Writer.Complete();
+    return Task.CompletedTask;
+  }
 }

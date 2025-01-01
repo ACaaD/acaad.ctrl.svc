@@ -9,4 +9,6 @@ public interface IMessageBus
   void Unregister(string consumer);
 
   Task SendAsync(IMessage message, CancellationToken cancelToken = default);
+
+  void Complete();
 }
