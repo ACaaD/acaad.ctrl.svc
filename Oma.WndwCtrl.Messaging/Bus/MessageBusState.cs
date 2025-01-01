@@ -15,10 +15,13 @@ public class MessageBusState([FromKeyedServices(ServiceKeys.MessageBus)] Channel
 
   public IEnumerable<Channel<IMessage>> ActiveChannels => _activeChannels.Values;
 
-  public Channel<IMessage> Add(string channelName, Channel<IMessage> channel) =>
-    _activeChannels.TryAdd(channelName, channel)
-      ? channel
-      : throw new InvalidOperationException($"Channel {channelName} already exists");
+  public void Add(string channelName, Channel<IMessage> channel)
+  {
+    if (!_activeChannels.TryAdd(channelName, channel))
+    {
+      throw new InvalidOperationException($"Channel {channelName} already exists");
+    }
+  }
 
   public Option<Channel<IMessage>> TryRemove(string channelName) =>
     _activeChannels.TryRemove(channelName, out Channel<IMessage>? channel)

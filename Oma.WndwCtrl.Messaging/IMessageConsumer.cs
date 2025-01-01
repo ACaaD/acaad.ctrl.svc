@@ -1,8 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 
 namespace Oma.WndwCtrl.Messaging;
 
+[PublicAPI]
 public interface IMessageConsumer
 {
   bool IsSubscribedTo(IMessage message);

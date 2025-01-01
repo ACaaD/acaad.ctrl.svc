@@ -157,7 +157,7 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
     IMessageConsumer consumer = SetUpConsumerContainer<DummyMessage>();
 
     consumer.OnMessageAsync(Arg.Any<DummyMessage>(), Arg.Any<CancellationToken>())
-      .Returns(_ => throw new InvalidOperationException("Some temporary error"), x => Task.CompletedTask);
+      .Returns(_ => throw new InvalidOperationException("Some temporary error"), _ => Task.CompletedTask);
 
     for (int i = 0; i < 5; i++)
       await MessageBus.SendAsync(new DummyMessage(), _cancelToken);
@@ -192,6 +192,21 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
   }
 
   [Fact(Timeout = 2_000)]
+  public async Task ShouldRecoverFromIncorrectStartHandling()
+  {
+    CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken);
+    IMessageConsumer consumer = SetUpConsumerContainer<DummyMessage>(cancelToken: cts.Token);
+
+    consumer.OnStartAsync(Arg.Any<CancellationToken>())
+      .Returns(_ => throw new InvalidOperationException("Some temporary error"));
+
+    await cts.CancelAsync();
+    Func<Task> callback = async () => await WaitForConsumerCompletion();
+
+    await callback.Should().NotThrowAsync();
+  }
+
+  [Fact(Timeout = 2_000)]
   public async Task ShouldRecoverFromIncorrectCompletionHandling()
   {
     IMessageConsumer consumer = SetUpConsumerContainer<DummyMessage>();
@@ -211,7 +226,7 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
     IMessageConsumer consumer = SetUpConsumerContainer<DummyMessage>();
 
     consumer.OnMessageAsync(Arg.Any<DummyMessage>(), Arg.Any<CancellationToken>())
-      .Returns(_ => throw new InvalidOperationException("Some temporary error"), x => Task.CompletedTask);
+      .Returns(_ => throw new InvalidOperationException("Some temporary error"), _ => Task.CompletedTask);
 
     consumer.OnExceptionAsync(Arg.Any<IMessage>(), Arg.Any<Exception>(), Arg.Any<CancellationToken>())
       .Returns(_ => throw new InvalidOperationException("Some temporary error"));
@@ -239,7 +254,7 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
     await callback.Should().NotThrowAsync();
   }
 
-  private ServiceProvider SetUpMessageBusContainer()
+  private static ServiceProvider SetUpMessageBusContainer()
   {
     ServiceCollection services = new();
 
@@ -267,7 +282,7 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
     return messageConsumer;
   }
 
-  private IMessageConsumer AddConsumerToContainer<TMessage>(
+  private static IMessageConsumer AddConsumerToContainer<TMessage>(
     ServiceCollection services,
     string? consumerName = null
   )

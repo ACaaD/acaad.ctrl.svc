@@ -1,11 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Channels;
+using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 using Oma.WndwCtrl.Messaging.Bus;
 
 namespace Oma.WndwCtrl.Messaging.Consumers;
 
+[UsedImplicitly]
 internal class FanOutMessageConsumer(ILogger<FanOutMessageConsumer> logger, MessageBusState messageBusState)
   : IMessageConsumer<IMessage>
 {

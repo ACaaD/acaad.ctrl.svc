@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Channels;
+using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
@@ -14,7 +15,7 @@ public static class IServiceCollectionExtensions
 {
   private static readonly Type ChannelType = typeof(Channel<IMessage>);
 
-  internal static IServiceCollection AddWorker<TConsumer, TMessage>(
+  private static IServiceCollection AddWorker<TConsumer, TMessage>(
     this IServiceCollection services,
     object serviceKey,
     ServiceLifetime serviceLifetime = ServiceLifetime.Singleton,
@@ -33,6 +34,11 @@ public static class IServiceCollectionExtensions
     ServiceDescriptor channelDescriptor = ServiceDescriptor.DescribeKeyed(
       ChannelType,
       serviceKey,
+      [SuppressMessage(
+        "ReSharper",
+        "UnusedParameter.Local",
+        Justification = "Won't fix; Must match expected type."
+      )]
       (_1, _2) => Channel.CreateUnbounded<IMessage>(),
       serviceLifetime
     );
@@ -59,20 +65,23 @@ public static class IServiceCollectionExtensions
 
     services.Add(interfaceDescriptor);
 
-    if (registerConsumer)
+    if (!registerConsumer)
     {
-      ServiceDescriptor consumerDescriptor = ServiceDescriptor.Describe(
-        typeof(TConsumer),
-        typeof(TConsumer),
-        serviceLifetime
-      );
-
-      services.Add(consumerDescriptor);
+      return services;
     }
+
+    ServiceDescriptor consumerDescriptor = ServiceDescriptor.Describe(
+      typeof(TConsumer),
+      typeof(TConsumer),
+      serviceLifetime
+    );
+
+    services.Add(consumerDescriptor);
 
     return services;
   }
 
+  [PublicAPI]
   public static IServiceCollection AddMessageBus(this IServiceCollection services)
     => services
       .AddLogging()
@@ -80,6 +89,7 @@ public static class IServiceCollectionExtensions
       .AddSingleton<MessageBusState>()
       .AddWorker<FanOutMessageConsumer, IMessage>(ServiceKeys.MessageBus);
 
+  [PublicAPI]
   public static IServiceCollection AddMessageConsumer<TConsumer, TMessage>(
     this IServiceCollection services,
     object? serviceKey = null,

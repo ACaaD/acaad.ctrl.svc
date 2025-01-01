@@ -37,6 +37,8 @@ internal abstract class ChannelWorker(ILogger logger, IMessageConsumer consumer)
 
     try
     {
+      await OnStartAsync(cancelToken);
+
       await Task.WhenAll(
         Enumerable.Range(start: 0, _settings?.Concurrency ?? 16)
           .Select(_ => ProcessMessagesAsync(_loopCts.Token))
@@ -80,6 +82,18 @@ internal abstract class ChannelWorker(ILogger logger, IMessageConsumer consumer)
     catch (Exception ex)
     {
       logger.LogError(ex, "An error occurred during exception handling.");
+    }
+  }
+
+  private async Task OnStartAsync(CancellationToken cancelToken = default)
+  {
+    try
+    {
+      await consumer.OnStartAsync(cancelToken);
+    }
+    catch (Exception exInner)
+    {
+      logger.LogError(exInner, "An error occurred during channel worker start.");
     }
   }
 
@@ -150,11 +164,11 @@ internal sealed class ChannelWorker<TConsumer, TMessage>(ILogger<TConsumer> logg
       }
       catch (ChannelClosedException ex)
       {
-        logger.LogDebug(ex, $"Channel was closed.");
+        logger.LogDebug(ex, "Channel was closed.");
       }
       catch (OperationCanceledException ex)
       {
-        logger.LogDebug(ex, $"Operation was cancelled.");
+        logger.LogDebug(ex, "Operation was cancelled.");
       }
       catch (Exception ex)
       {
