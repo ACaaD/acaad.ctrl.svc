@@ -32,6 +32,12 @@ public record FlowError : Error
         // TODO
         throw new NotImplementedException();
     }
+    
+    [Pure]
+    public static FlowError NoCommandExecutorFound(ICommand command) =>
+        new FlowError(
+            $"No transformation executor found that handles transformation type {command.GetType().FullName}.",
+            isExceptional: false);
 
     [Pure]
     public static FlowError NoTransformerFound(ITransformation transformation) =>

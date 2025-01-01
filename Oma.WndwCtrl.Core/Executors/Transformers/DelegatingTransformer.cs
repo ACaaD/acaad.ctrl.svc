@@ -39,7 +39,7 @@ public class DelegatingTransformer : IRootTransformer
         
         _transformerStack = expression.Compile();
         
-        _logger.LogInformation("Build transformer stack in {elapsed}.", swBuildStack.Measure());
+        _logger.LogTrace("Build transformer stack in {elapsed}.", swBuildStack.Measure());
     }
     
     private static FlowT<TransformationConfiguration, TransformationOutcome> OverallFlow => 
@@ -119,13 +119,12 @@ public class DelegatingTransformer : IRootTransformer
         _logger.LogTrace("Received command outcome to transform.");
         
         TransformationConfiguration initialConfiguration = new(_logger, _transformers, command, commandOutcome);
-        
         EnvIO envIO = EnvIO.New(token: cancelToken);
         
-        var outcomeWithState = await _transformerStack.Invoke(initialConfiguration, envIO);
+        var outcome = await _transformerStack.Invoke(initialConfiguration, envIO);
         
-        _logger.LogInformation("Finished command in {elapsed} (Success={isSuccess})", swExec.Measure(), outcomeWithState);
+        _logger.LogDebug("Finished command in {elapsed} (Success={isSuccess})", swExec.Measure(), outcome);
 
-        return outcomeWithState;
+        return outcome;
     }
 }

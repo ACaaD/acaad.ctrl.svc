@@ -6,7 +6,7 @@ namespace Oma.WndwCtrl.Abstractions.Model;
 public record CommandState
 {
     public ILogger Logger;
-    public IEnumerable<ICommandExecutor> CommandExecutors;
+    public Seq<ICommandExecutor> CommandExecutors;
     
     public ICommand Command { get; }
     
@@ -18,7 +18,7 @@ public record CommandState
     public CommandState(ILogger logger, IEnumerable<ICommandExecutor> commandExecutors, ICommand command)
     {
         Logger = logger;
-        CommandExecutors = commandExecutors;
+        CommandExecutors = new Seq<ICommandExecutor>(commandExecutors);
         Command = command;
     }
 }
