@@ -56,7 +56,7 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
     consumers.Should().AllSatisfy(
       c =>
         c.Received(requiredNumberOfCalls: 1).OnMessageAsync(
-          Arg.Any<IMessage>(),
+          Arg.Any<DummyMessage>(),
           Arg.Any<CancellationToken>()
         )
     );
@@ -77,7 +77,7 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
     consumers.Should().AllSatisfy(
       c =>
         c.Received(requiredNumberOfCalls: 2).OnMessageAsync(
-          Arg.Any<IMessage>(),
+          Arg.Any<DummyMessage>(),
           Arg.Any<CancellationToken>()
         )
     );
@@ -98,13 +98,12 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
   {
     ServiceCollection services = new();
 
-    DummyConsumer messageConsumer = Substitute.For<DummyConsumer>();
+    IMessageConsumer<TMessage> messageConsumer = Substitute.For<IMessageConsumer<TMessage>>();
 
-    messageConsumer.IsSubscribedTo(Arg.Any<IMessage>())
-      .Returns(msg => typeof(TMessage).IsAssignableFrom(msg[index: 0].GetType()));
+    messageConsumer.IsSubscribedTo(Arg.Any<TMessage>()).Returns(returnThis: true);
 
-    services.AddMessageConsumer<DummyConsumer, DummyMessage>();
-    services.AddSingleton<DummyConsumer>(messageConsumer);
+    services.AddMessageConsumer<IMessageConsumer<TMessage>, TMessage>(registerConsumer: false);
+    services.AddSingleton(messageConsumer);
 
     ServiceProvider result = services.BuildServiceProvider();
     _consumerProviders.Add(result);

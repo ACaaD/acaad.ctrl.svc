@@ -109,14 +109,20 @@ internal sealed class ChannelWorker<TConsumer, TMessage>(ILogger<TConsumer> logg
 
         if (message is not TMessage)
         {
-          logger.LogWarning(
-            "Received a message expecting type {expected}, but received: {actual}.",
+          logger.LogTrace(
+            "Received a message expecting type {expected}, but received: {actual}. Dropping message.",
             typeof(TMessage),
             message.GetType().FullName
           );
+
+          return;
         }
 
-        await _consumer.OnMessageAsync(message, cancelToken).ConfigureAwait(continueOnCapturedContext: false);
+        if (_consumer.IsSubscribedTo(message))
+        {
+          await _consumer.OnMessageAsync(message, cancelToken)
+            .ConfigureAwait(continueOnCapturedContext: false);
+        }
       }
       catch (ChannelClosedException ex)
       {

@@ -34,7 +34,8 @@ public static class IServiceCollectionExtensions
   public static IServiceCollection AddWorker<TConsumer, TMessage>(
     this IServiceCollection services,
     object serviceKey,
-    ServiceLifetime serviceLifetime = ServiceLifetime.Singleton
+    ServiceLifetime serviceLifetime = ServiceLifetime.Singleton,
+    bool registerConsumer = true
   )
     where TConsumer : IMessageConsumer<TMessage>
     where TMessage : IMessage
@@ -79,13 +80,16 @@ public static class IServiceCollectionExtensions
 
     services.Add(interfaceDescriptor);
 
-    ServiceDescriptor consumerDescriptor = ServiceDescriptor.Describe(
-      typeof(TConsumer),
-      typeof(TConsumer),
-      serviceLifetime
-    );
+    if (registerConsumer)
+    {
+      ServiceDescriptor consumerDescriptor = ServiceDescriptor.Describe(
+        typeof(TConsumer),
+        typeof(TConsumer),
+        serviceLifetime
+      );
 
-    services.Add(consumerDescriptor);
+      services.Add(consumerDescriptor);
+    }
 
     return services;
   }
@@ -100,7 +104,8 @@ public static class IServiceCollectionExtensions
   public static IServiceCollection AddMessageConsumer<TConsumer, TMessage>(
     this IServiceCollection services,
     object? serviceKey = null,
-    ServiceLifetime serviceLifetime = ServiceLifetime.Singleton
+    ServiceLifetime serviceLifetime = ServiceLifetime.Singleton,
+    bool registerConsumer = true
   )
     where TMessage : IMessage
     where TConsumer : class, IMessageConsumer<TMessage>
@@ -109,7 +114,7 @@ public static class IServiceCollectionExtensions
 
     return services
       .AddLogging()
-      .AddWorker<TConsumer, TMessage>(serviceKey, serviceLifetime)
+      .AddWorker<TConsumer, TMessage>(serviceKey, serviceLifetime, registerConsumer)
       .AddSingleton(
         new ConsumerMapping()
         {
