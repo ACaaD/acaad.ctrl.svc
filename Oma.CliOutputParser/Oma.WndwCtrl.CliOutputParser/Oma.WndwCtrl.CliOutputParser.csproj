@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Oma.WndwCtrl.Abstractions\Oma.WndwCtrl.Abstractions.csproj" />
-      <ProjectReference Include="..\Oma.WndwCtrl.CliOutputParser.Grammar\Oma.WndwCtrl.CliOutputParser.Grammar.csproj" />
+        <ProjectReference Include="..\..\Oma.WndwCtrl.Abstractions\Oma.WndwCtrl.Abstractions.csproj"/>
+        <ProjectReference Include="..\Oma.WndwCtrl.CliOutputParser.Grammar\Oma.WndwCtrl.CliOutputParser.Grammar.csproj"/>
     </ItemGroup>
 
 </Project>

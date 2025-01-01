@@ -8,11 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="coverlet.collector" />
-        <PackageReference Include="FluentAssertions" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" />
-        <PackageReference Include="xunit.v3" />
-        <PackageReference Include="xunit.runner.visualstudio" />
+        <PackageReference Include="coverlet.collector"/>
+        <PackageReference Include="FluentAssertions"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
+        <PackageReference Include="xunit.v3"/>
+        <PackageReference Include="xunit.runner.visualstudio"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Oma.CliOutputParser\Oma.WndwCtrl.CliOutputParser\Oma.WndwCtrl.CliOutputParser.csproj" />
+        <ProjectReference Include="..\Oma.CliOutputParser\Oma.WndwCtrl.CliOutputParser\Oma.WndwCtrl.CliOutputParser.csproj"/>
     </ItemGroup>
 
 </Project>

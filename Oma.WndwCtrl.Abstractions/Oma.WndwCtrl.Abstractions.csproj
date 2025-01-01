@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="LanguageExt.Core" />
-      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+        <PackageReference Include="LanguageExt.Core"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"/>
     </ItemGroup>
 
 </Project>

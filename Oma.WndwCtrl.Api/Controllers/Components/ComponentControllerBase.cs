@@ -7,13 +7,17 @@ namespace Oma.WndwCtrl.Api.Controllers.Components;
 [ApiController]
 [Route("components/{componentName}")]
 public class ComponentControllerBase<TComponent> : ControllerBase
-    where TComponent : Component
+  where TComponent : Component
 {
-    [FromServices] public required AdHocFlowExecutor FlowExecutor { get; init; }
-    
-    protected TComponent Component => (ControllerContext.ActionDescriptor.Properties[nameof(Component)] as TComponent)!;
+  [FromServices] public required AdHocFlowExecutor FlowExecutor { get; init; }
 
-    [HttpGet("config")]
-    [EndpointSummary("Component Details")]
-    public IActionResult GetDetails() => Ok(Component);
+  protected TComponent Component =>
+    (ControllerContext.ActionDescriptor.Properties[nameof(Component)] as TComponent)!;
+
+  [HttpGet("config")]
+  [EndpointSummary("Component Details")]
+  public IActionResult GetDetails()
+  {
+    return Ok(Component);
+  }
 }

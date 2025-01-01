@@ -8,18 +8,18 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
-        <PackageReference Include="Scalar.AspNetCore" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
+        <PackageReference Include="Scalar.AspNetCore"/>
     </ItemGroup>
-    
+
     <ItemGroup>
-      <ProjectReference Include="..\Oma.WndwCtrl.Abstractions\Oma.WndwCtrl.Abstractions.csproj" />
-      <ProjectReference Include="..\Oma.WndwCtrl.Api\Oma.WndwCtrl.Api.csproj" />
-      <ProjectReference Include="..\Oma.WndwCtrl.CoreAsp\Oma.WndwCtrl.CoreAsp.csproj" />
+        <ProjectReference Include="..\Oma.WndwCtrl.Abstractions\Oma.WndwCtrl.Abstractions.csproj"/>
+        <ProjectReference Include="..\Oma.WndwCtrl.Api\Oma.WndwCtrl.Api.csproj"/>
+        <ProjectReference Include="..\Oma.WndwCtrl.CoreAsp\Oma.WndwCtrl.CoreAsp.csproj"/>
     </ItemGroup>
-    
+
     <ItemGroup>
-      <None Include="mgmt-api.config.json" />
+        <None Include="mgmt-api.config.json"/>
     </ItemGroup>
 
 </Project>

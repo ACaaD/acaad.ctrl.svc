@@ -6,10 +6,13 @@ namespace Oma.WndwCtrl.Api.Controllers;
 [Route("ctrl/[controller]")]
 public class HealthCheckController : ControllerBase
 {
-    [HttpGet]
-    [EndpointName($"HealthCheck_{nameof(Test)}")]
-    [EndpointSummary("Health check")]
-    [EndpointDescription("Dummy endpoint, always returns OK")]
-    [Produces("application/json")]
-    public IActionResult Test() => Ok();
+  [HttpGet]
+  [EndpointName($"HealthCheck_{nameof(Test)}")]
+  [EndpointSummary("Health check")]
+  [EndpointDescription("Dummy endpoint, always returns OK")]
+  [Produces("application/json")]
+  public IActionResult Test()
+  {
+    return Ok();
+  }
 }

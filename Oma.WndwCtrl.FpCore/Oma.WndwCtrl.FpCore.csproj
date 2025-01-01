@@ -7,11 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="LanguageExt.Core" />
+        <PackageReference Include="LanguageExt.Core"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Oma.WndwCtrl.Abstractions\Oma.WndwCtrl.Abstractions.csproj" />
+        <ProjectReference Include="..\Oma.WndwCtrl.Abstractions\Oma.WndwCtrl.Abstractions.csproj"/>
     </ItemGroup>
 
 </Project>

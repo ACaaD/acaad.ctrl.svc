@@ -12,19 +12,19 @@ namespace Oma.WndwCtrl.Api.Extensions;
 [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "Extension methods")]
 public static class IServiceCollectionExtensions
 {
-    public static IServiceCollection AddComponentApi(this IServiceCollection services)
-    {
-        services.AddConfiguration()
-            .AddCommandExecutors()
-            .TryAddSingleton<IApiService, CtrlApiService>();
-        
-        // We actually want to override the parser to access it from the request scope
-        services.Replace(ServiceDescriptor.Scoped<ICliOutputParser, CliOutputParserImpl>());
-        
-        services
-            .AddScoped<ScopeLogDrain>()
-            .AddScoped<IParserLogger>(sp => sp.GetRequiredService<ScopeLogDrain>());
-        
-        return services;
-    }
+  public static IServiceCollection AddComponentApi(this IServiceCollection services)
+  {
+    services.AddConfiguration()
+      .AddCommandExecutors()
+      .TryAddSingleton<IApiService, CtrlApiService>();
+
+    // We actually want to override the parser to access it from the request scope
+    services.Replace(ServiceDescriptor.Scoped<ICliOutputParser, CliOutputParserImpl>());
+
+    services
+      .AddScoped<ScopeLogDrain>()
+      .AddScoped<IParserLogger>(sp => sp.GetRequiredService<ScopeLogDrain>());
+
+    return services;
+  }
 }

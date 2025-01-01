@@ -4,117 +4,126 @@ using Oma.WndwCtrl.Abstractions.Model;
 
 namespace Oma.WndwCtrl.MgmtApi.Model;
 
-
 public sealed record ServiceWrapper<TService> : IDisposable, IServiceWrapper<TService>
-    where TService : class, IService
+  where TService : class, IService
 {
-    private readonly ILogger<ServiceWrapper<TService>> _logger;
+  private readonly ILogger<ServiceWrapper<TService>> _logger;
 
-    public ServiceWrapper(TService service, ILogger<ServiceWrapper<TService>> logger)
+  public ServiceWrapper(TService service, ILogger<ServiceWrapper<TService>> logger)
+  {
+    _logger = logger;
+    Service = service;
+    ServiceGuid = Guid.NewGuid();
+  }
+
+  private CancellationTokenSource? CancellationTokenSource { get; set; }
+
+  private Task? StartTask { get; set; }
+  private Task? CompletionTask { get; set; }
+
+  public void Dispose()
+  {
+    CancellationTokenSource?.Dispose();
+    CancellationTokenSource = null;
+  }
+
+  public TService Service { get; }
+
+  public Guid ServiceGuid { get; }
+  public DateTime? StartedAt { get; private set; }
+  public ServiceStatus Status { get; private set; }
+
+  public Task StartAsync(CancellationToken cancelToken = default, params string[] args)
+  {
+    if (IsRunning())
     {
-        _logger = logger;
-        Service = service;
-        ServiceGuid = Guid.NewGuid();
+      return StartTask;
     }
 
-    public TService Service { get; }
+    CancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
 
-    public Guid ServiceGuid { get; }
-    public DateTime? StartedAt { get; private set; }
-    public ServiceStatus Status { get; private set; }
+    Status = ServiceStatus.Starting;
 
-    private CancellationTokenSource? CancellationTokenSource { get; set; }
-    
-    private Task? StartTask { get; set; }
-    private Task? CompletionTask { get; set; }
-    
-    public Task StartAsync(CancellationToken cancelToken = default, params string[] args)
-    {
-        if (IsRunning())
+    StartTask = Service.StartAsync(CancellationTokenSource.Token, args);
+
+    StartTask
+      .ContinueWith(t =>
         {
-            return StartTask;
-        }
-        
-        CancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
-        
-        Status = ServiceStatus.Starting;
-        
-        StartTask = Service.StartAsync(CancellationTokenSource.Token, args: args);
+          if (t.IsFaulted)
+          {
+            _logger.LogError(t.Exception, "Could not start service.");
 
-        StartTask
-            .ContinueWith(t =>
-            {
-                if (t.IsFaulted)
-                {
-                    _logger.LogError(t.Exception, "Could not start service.");
-                    
-                    Status = ServiceStatus.Crashed;
-                    return;
-                }
-
-                StartedAt = DateTime.UtcNow;
-                Status = ServiceStatus.Running;
-
-                CompletionTask = Service.WaitForShutdownAsync(CancellationTokenSource.Token);
-            },
-            cancelToken)
-            .ConfigureAwait(false);
-        
-        return StartTask;
-    }
-    
-    public async Task StopAsync(CancellationToken cancelToken = default)
-    {
-        if (!IsRunning())
-        {
+            Status = ServiceStatus.Crashed;
             return;
-        }
-        
-        TimeSpan stopTimeout = TimeSpan.FromSeconds(5);
-        
-        CancellationTokenSource ctsForceCancelAfter = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
-        ctsForceCancelAfter.CancelAfter(stopTimeout);
+          }
 
-        try
-        {
-            Status = ServiceStatus.Stopping;
-            await CancellationTokenSource.CancelAsync();
+          StartedAt = DateTime.UtcNow;
+          Status = ServiceStatus.Running;
 
-            await Task.WhenAny(
-                CompletionTask ?? Task.CompletedTask,
-                Task.Delay(stopTimeout, ctsForceCancelAfter.Token)
-            );
-            
-            ctsForceCancelAfter.Token.ThrowIfCancellationRequested();
-        }
-        catch (OperationCanceledException)
-        {
-            await ForceStopAsync(cancelToken);
-        }
-        finally
-        {
-            CancellationTokenSource.Dispose();
-            Status = ServiceStatus.Stopped;
+          CompletionTask = Service.WaitForShutdownAsync(CancellationTokenSource.Token);
+        },
+        cancelToken)
+      .ConfigureAwait(false);
 
-            CancellationTokenSource = null;
-            CompletionTask = null;
-        }
-    }
-    
-    public Task WaitForShutdownAsync(CancellationToken cancelToken = default)
-        => Service?.WaitForShutdownAsync(cancelToken) ?? Task.CompletedTask;
+    return StartTask;
+  }
 
-    public Task ForceStopAsync(CancellationToken cancelToken = default) => Service.ForceStopAsync(cancelToken);
-
-    [MemberNotNullWhen(true, nameof(CancellationTokenSource))]
-    [MemberNotNullWhen(true, nameof(StartTask))]
-    [MemberNotNullWhen(true, nameof(CompletionTask))]
-    private bool IsRunning()
-        => Status == ServiceStatus.Running && CancellationTokenSource is not null && StartTask is not null && CompletionTask is not null;
-    
-    public void Dispose()
+  public async Task StopAsync(CancellationToken cancelToken = default)
+  {
+    if (!IsRunning())
     {
-        CancellationTokenSource?.Dispose();
-        CancellationTokenSource = null;
+      return;
     }
+
+    TimeSpan stopTimeout = TimeSpan.FromSeconds(5);
+
+    CancellationTokenSource ctsForceCancelAfter =
+      CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
+
+    ctsForceCancelAfter.CancelAfter(stopTimeout);
+
+    try
+    {
+      Status = ServiceStatus.Stopping;
+      await CancellationTokenSource.CancelAsync();
+
+      await Task.WhenAny(
+        CompletionTask ?? Task.CompletedTask,
+        Task.Delay(stopTimeout, ctsForceCancelAfter.Token)
+      );
+
+      ctsForceCancelAfter.Token.ThrowIfCancellationRequested();
+    }
+    catch (OperationCanceledException)
+    {
+      await ForceStopAsync(cancelToken);
+    }
+    finally
+    {
+      CancellationTokenSource.Dispose();
+      Status = ServiceStatus.Stopped;
+
+      CancellationTokenSource = null;
+      CompletionTask = null;
+    }
+  }
+
+  public Task WaitForShutdownAsync(CancellationToken cancelToken = default)
+  {
+    return Service?.WaitForShutdownAsync(cancelToken) ?? Task.CompletedTask;
+  }
+
+  public Task ForceStopAsync(CancellationToken cancelToken = default)
+  {
+    return Service.ForceStopAsync(cancelToken);
+  }
+
+  [MemberNotNullWhen(true, nameof(CancellationTokenSource))]
+  [MemberNotNullWhen(true, nameof(StartTask))]
+  [MemberNotNullWhen(true, nameof(CompletionTask))]
+  private bool IsRunning()
+  {
+    return Status == ServiceStatus.Running && CancellationTokenSource is not null &&
+           StartTask is not null && CompletionTask is not null;
+  }
 }

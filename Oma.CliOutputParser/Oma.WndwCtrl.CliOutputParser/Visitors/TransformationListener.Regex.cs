@@ -4,59 +4,56 @@ namespace Oma.WndwCtrl.CliOutputParser.Visitors;
 
 public partial class TransformationListener
 {
-    public override void ExitRegexMatch(Grammar.CliOutputParser.RegexMatchContext context)
+  public override void ExitRegexMatch(Grammar.CliOutputParser.RegexMatchContext context)
+  {
+    string pattern = context.REGEX_LITERAL().GetText().Trim('$').Trim('\'');
+    Regex r = new(pattern, RegexOptions.Multiline);
+
+    CurrentValues = UnfoldItemsRecursive(CurrentValues, Unfold);
+
+    base.EnterRegexMatch(context);
+    return;
+
+    IEnumerable<IEnumerable<object>> Unfold(IEnumerable<object> val)
     {
-        string pattern = context.REGEX_LITERAL().GetText().Trim('$').Trim('\'');
-        Regex r = new(pattern, RegexOptions.Multiline);
+      IEnumerable<IEnumerable<string>> result = [];
 
-        CurrentValues = UnfoldItemsRecursive(CurrentValues, Unfold);
+      foreach (object items in val)
+      {
+        MatchCollection matches = r.Matches(items.ToString()!);
 
-        base.EnterRegexMatch(context);
-        return;
-
-        IEnumerable<IEnumerable<object>> Unfold(IEnumerable<object> val)
+        foreach (Match match in matches)
         {
-            IEnumerable<IEnumerable<string>> result = [];
+          List<string> innerResult = [];
 
-            foreach (object items in val)
-            {
-                MatchCollection matches = r.Matches(items.ToString()!);
+          foreach (Group group in match.Groups) innerResult.Add(group.ToString());
 
-                foreach (Match match in matches)
-                {
-                    List<string> innerResult = [];
-
-                    foreach (Group group in match.Groups)
-                    {
-                        innerResult.Add(group.ToString());
-                    }
-
-                    result = result.Concat<IEnumerable<string>>([innerResult.Select(l => l).AsEnumerable()]);
-                }
-            }
-
-            var res = result.AsEnumerable();
-            return res;
+          result = result.Concat<IEnumerable<string>>([innerResult.Select(l => l).AsEnumerable(),]);
         }
-    }
+      }
 
-    public override void ExitRegexYield(Grammar.CliOutputParser.RegexYieldContext context)
+      IEnumerable<IEnumerable<string>>? res = result.AsEnumerable();
+      return res;
+    }
+  }
+
+  public override void ExitRegexYield(Grammar.CliOutputParser.RegexYieldContext context)
+  {
+    int index = int.Parse(context.INT().GetText());
+
+    object? result = FoldItemsRecursive(CurrentValues, Fold);
+    StoreFoldResult(result);
+
+    base.ExitRegexYield(context);
+    return;
+
+    object? Fold(IEnumerable<object> val)
     {
-        int index = int.Parse(context.INT().GetText());
+      List<object>? itemList = val.ToList();
 
-        object? result = FoldItemsRecursive(CurrentValues, Fold);
-        StoreFoldResult(result);
-
-        base.ExitRegexYield(context);
-        return;
-
-        object? Fold(IEnumerable<object> val)
-        {
-            var itemList = val.ToList();
-
-            return index > itemList.Count - 1
-                ? null
-                : itemList[index];
-        }
+      return index > itemList.Count - 1
+        ? null
+        : itemList[index];
     }
+  }
 }

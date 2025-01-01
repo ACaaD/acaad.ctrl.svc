@@ -7,18 +7,18 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Oma.WndwCtrl.Abstractions\Oma.WndwCtrl.Abstractions.csproj" />
-      <ProjectReference Include="..\Oma.WndwCtrl.Core\Oma.WndwCtrl.Core.csproj" />
+        <ProjectReference Include="..\Oma.WndwCtrl.Abstractions\Oma.WndwCtrl.Abstractions.csproj"/>
+        <ProjectReference Include="..\Oma.WndwCtrl.Core\Oma.WndwCtrl.Core.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="component-configuration.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+        <None Update="component-configuration.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>

@@ -8,12 +8,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="coverlet.collector" />
-        <PackageReference Include="FluentAssertions" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" />
-        <PackageReference Include="NSubstitute" />
-        <PackageReference Include="xunit.v3" />
-        <PackageReference Include="xunit.runner.visualstudio" />
+        <PackageReference Include="coverlet.collector"/>
+        <PackageReference Include="FluentAssertions"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
+        <PackageReference Include="NSubstitute"/>
+        <PackageReference Include="xunit.v3"/>
+        <PackageReference Include="xunit.runner.visualstudio"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -21,7 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Oma.WndwCtrl.Core\Oma.WndwCtrl.Core.csproj" />
+        <ProjectReference Include="..\..\Oma.WndwCtrl.Core\Oma.WndwCtrl.Core.csproj"/>
     </ItemGroup>
 
 </Project>

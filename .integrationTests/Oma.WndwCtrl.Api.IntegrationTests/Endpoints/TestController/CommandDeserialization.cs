@@ -1,9 +1,4 @@
-using System.Net.Http.Json;
-using System.Text.Json;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Model;
 using Oma.WndwCtrl.Api.IntegrationTests.TestFramework;
 using Oma.WndwCtrl.Core.Model.Commands;
@@ -13,52 +8,57 @@ namespace Oma.WndwCtrl.Api.IntegrationTests.Endpoints.TestController;
 
 public sealed partial class CommandDeserialization : ApiFixtureTestBase<MockedFlowExecutorApiFixture>
 {
-    private const string CommandRoute = $"{Controllers.TestController.BaseRoute}/{Controllers.TestController.CommandRoute}";
-    
-    public CommandDeserialization(MockedFlowExecutorApiFixture mockedFlowExecutorApiFixture) : base(
-        mockedFlowExecutorApiFixture,
-        CommandRoute
-    )
-    {
-    }
+  private const string CommandRoute =
+    $"{Controllers.TestController.BaseRoute}/{Controllers.TestController.CommandRoute}";
 
-    [Fact]
-    public async Task ShouldAcceptCommandWithoutTransformation()
-    {
-        using HttpRequestMessage httpRequestMessage = ConstructCommandHttpRequestMessage(Payloads.NoOpCommand);
-        using HttpResponseMessage httpResponse = await _httpClient.SendAsync(httpRequestMessage, _cancelToken);
+  public CommandDeserialization(MockedFlowExecutorApiFixture mockedFlowExecutorApiFixture) : base(
+    mockedFlowExecutorApiFixture,
+    CommandRoute
+  )
+  {
+  }
 
-        httpResponse.Should().Be200Ok();
-    }
+  [Fact]
+  public async Task ShouldAcceptCommandWithoutTransformation()
+  {
+    using HttpRequestMessage httpRequestMessage = ConstructCommandHttpRequestMessage(Payloads.NoOpCommand);
+    using HttpResponseMessage httpResponse = await _httpClient.SendAsync(httpRequestMessage, _cancelToken);
 
-    [Fact]
-    public async Task ShouldAcceptSingleParserTransformation()
-    {
-        using HttpRequestMessage httpRequestMessage = ConstructCommandHttpRequestMessage(Payloads.ParserTransformationCommand);
-        using HttpResponseMessage httpResponse = await _httpClient.SendAsync(httpRequestMessage, _cancelToken);
+    httpResponse.Should().Be200Ok();
+  }
 
-        httpResponse.Should().Be200Ok().And
-            .Satisfy<TransformationOutcome<BaseCommand>>(response =>
-            {
-                response.Success.Should().BeTrue();
-                response.Outcome.Should().NotBeNull();
-                response.Outcome!.Retries.Should().Be(1);
-                response.Outcome!.Transformations.Should().HaveCount(1);
-                response.Outcome!.Transformations.First().Should().BeOfType<ParserTransformation>();
-            });
-    }
-    
-    [Theory]
-    [InlineData(true)]
-    [InlineData(1337)]
-    [InlineData(1337.0f)]
-    [InlineData(1337.0d)]
-    [InlineData("some-plain-string")]
-    public async Task ShouldRejectInvalidPayloadsWith400(object payload, bool isJson = false)
-    {
-        using HttpRequestMessage httpRequestMessage = ConstructCommandHttpRequestMessage(payload.ToString()!, isJson);
-        using HttpResponseMessage httpResponse = await _httpClient.SendAsync(httpRequestMessage, _cancelToken);
+  [Fact]
+  public async Task ShouldAcceptSingleParserTransformation()
+  {
+    using HttpRequestMessage httpRequestMessage =
+      ConstructCommandHttpRequestMessage(Payloads.ParserTransformationCommand);
 
-        httpResponse.Should().Be400BadRequest();
-    }
+    using HttpResponseMessage httpResponse = await _httpClient.SendAsync(httpRequestMessage, _cancelToken);
+
+    httpResponse.Should().Be200Ok().And
+      .Satisfy<TransformationOutcome<BaseCommand>>(response =>
+      {
+        response.Success.Should().BeTrue();
+        response.Outcome.Should().NotBeNull();
+        response.Outcome!.Retries.Should().Be(1);
+        response.Outcome!.Transformations.Should().HaveCount(1);
+        response.Outcome!.Transformations.First().Should().BeOfType<ParserTransformation>();
+      });
+  }
+
+  [Theory]
+  [InlineData(true)]
+  [InlineData(1337)]
+  [InlineData(1337.0f)]
+  [InlineData(1337.0d)]
+  [InlineData("some-plain-string")]
+  public async Task ShouldRejectInvalidPayloadsWith400(object payload, bool isJson = false)
+  {
+    using HttpRequestMessage httpRequestMessage =
+      ConstructCommandHttpRequestMessage(payload.ToString()!, isJson);
+
+    using HttpResponseMessage httpResponse = await _httpClient.SendAsync(httpRequestMessage, _cancelToken);
+
+    httpResponse.Should().Be400BadRequest();
+  }
 }
