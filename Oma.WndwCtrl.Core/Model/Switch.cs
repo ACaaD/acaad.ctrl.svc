@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Core.Interfaces;
-using Oma.WndwCtrl.Core.Model.Commands;
 
 namespace Oma.WndwCtrl.Core.Model;
 

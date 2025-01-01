@@ -1,6 +1,7 @@
 namespace Oma.WndwCtrl.Core.Model.Transformations;
 
+[Serializable]
 public class ParserTransformation : BaseTransformation
 {
-    public List<string> Statements { get; init; } = new();
+    public IReadOnlyList<string> Statements { get; init; } = [];
 }

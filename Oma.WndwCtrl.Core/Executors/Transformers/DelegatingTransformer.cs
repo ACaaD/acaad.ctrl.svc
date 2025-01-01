@@ -44,8 +44,8 @@ public class DelegatingTransformer : IRootTransformer
     
     private static FlowT<TransformationConfiguration, TransformationOutcome> OverallFlow => 
     (
-        from outcome in initialOutcome
-        from allT in transformations
+        from outcome in InitialOutcome
+        from allT in Transformations
         
         // TODO: Presumably the order is incorrect here and the fold must be applied first, then the lift.
         // -> Write AUTs
@@ -69,9 +69,7 @@ public class DelegatingTransformer : IRootTransformer
     private static FlowT<TransformationConfiguration, IOutcomeTransformer> FindApplicableTransformer(
         ITransformation transformation
     ) => (
-        from _ in Flow<TransformationConfiguration>.asks2(state => state.Command)
-        
-        from allTransformers in config.Map(cfg => cfg.OutcomeTransformers)
+        from allTransformers in Config.Map(cfg => cfg.OutcomeTransformers)
         
         from found in Flow<TransformationConfiguration>.lift(
            allTransformers.Find(t => t.Handles(transformation))
@@ -81,17 +79,17 @@ public class DelegatingTransformer : IRootTransformer
         select found
     ).As();
     
-    private static FlowT<TransformationConfiguration, TransformationConfiguration> config =>
+    private static FlowT<TransformationConfiguration, TransformationConfiguration> Config =>
         new (ReaderT.ask<EitherT<FlowError, IO>, TransformationConfiguration>());
     
-    private static FlowT<TransformationConfiguration, Seq<ITransformation>> transformations =>
-        config.Map(cfg => cfg.Command)
+    private static FlowT<TransformationConfiguration, Seq<ITransformation>> Transformations =>
+        Config.Map(cfg => cfg.Command)
             .Map(command => command.Transformations)
             .Map(t => new Seq<ITransformation>(t))
             .As(); // TODO: Figure out why this is needed here.
 
-    private static FlowT<TransformationConfiguration, Either<FlowError, TransformationOutcome>> initialOutcome =>
-        config.Map(cfg => cfg.InitialOutcome).As();
+    private static FlowT<TransformationConfiguration, Either<FlowError, TransformationOutcome>> InitialOutcome =>
+        Config.Map(cfg => cfg.InitialOutcome).As();
     
     // TODO: Is passing the FlowT here correct?
     private static FlowT<TransformationConfiguration, TransformationOutcome> ExecuteTransformerIO(
