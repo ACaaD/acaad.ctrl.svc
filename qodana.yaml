@@ -7,4 +7,5 @@ include:
 dotnet:
   solution: Oma.WndwCtrl.sln
 bootstrap: |+
+  set -eu
   curl -fsSL https://dot.net/v1/dotnet-install.sh | bash -s -- --version
