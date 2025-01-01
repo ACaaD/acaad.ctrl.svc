@@ -10,20 +10,14 @@ namespace Oma.WndwCtrl.Messaging.IntegrationTests;
 
 public sealed class MessageBusIntegrationTests : IAsyncLifetime
 {
-  private readonly CancellationToken _cancelToken;
+  private readonly CancellationToken _cancelToken = TestContext.Current.CancellationToken;
 
   private readonly List<ServiceProvider> _consumerProviders = [];
-  private readonly ServiceProvider _serviceProvider;
+  private readonly ServiceProvider _serviceProvider = SetUpMessageBusContainer();
 
   private Task? _consumerTask;
 
   private IMessageBus? _messageBus;
-
-  public MessageBusIntegrationTests()
-  {
-    _serviceProvider = SetUpMessageBusContainer();
-    _cancelToken = TestContext.Current.CancellationToken;
-  }
 
   private IMessageBus MessageBus => _messageBus ??
                                     throw new InvalidOperationException(
