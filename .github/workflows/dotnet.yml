@@ -12,7 +12,10 @@ on:
 jobs: 
   build:
     name: 'Build & Analyze'
-    permissions: write-all  
+    permissions:
+      contents: write
+      pull-requests: write
+      checks: write
     runs-on: ubuntu-latest
 
     steps:
@@ -31,10 +34,15 @@ jobs:
       uses: JetBrains/ReSharper-InspectCode@v0.8
       with:
         solution: 'Oma.WndwCtrl.sln'
-    - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v4.5.0
+    - name: 'Qodana Scan'
+      uses: JetBrains/qodana-action@v2024.3
       with:
-        name: 'Upload Code Inspection Result'
-        path: 'results.sarif.json'
-        if-no-files-found: error
-        retention-days: 7
+        pr-mode: false
+        args: --solution,Oma.WndwCtrl.sln
+      env:
+        QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_915168824 }}
+        QODANA_ENDPOINT: 'https://qodana.cloud'
+    - name: 'Upload Qodana Results'
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
