@@ -1,6 +1,6 @@
 root = true
 
-[*Tests.cs]
+[{*Tests.cs,*.Payloads.cs}]
 
 # It is correct..
 # noinspection EditorConfigKeyCorrectness
