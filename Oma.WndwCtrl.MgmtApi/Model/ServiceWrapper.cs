@@ -110,22 +110,14 @@ public sealed record ServiceWrapper<TService> : IDisposable, IServiceWrapper<TSe
     }
   }
 
-  public Task WaitForShutdownAsync(CancellationToken cancelToken = default)
-  {
-    return Service.WaitForShutdownAsync(cancelToken);
-  }
+  public Task WaitForShutdownAsync(CancellationToken cancelToken = default) =>
+    Service.WaitForShutdownAsync(cancelToken);
 
-  public Task ForceStopAsync(CancellationToken cancelToken = default)
-  {
-    return Service.ForceStopAsync(cancelToken);
-  }
+  public Task ForceStopAsync(CancellationToken cancelToken = default) => Service.ForceStopAsync(cancelToken);
 
   [MemberNotNullWhen(returnValue: true, nameof(CancellationTokenSource))]
   [MemberNotNullWhen(returnValue: true, nameof(StartTask))]
   [MemberNotNullWhen(returnValue: true, nameof(CompletionTask))]
-  private bool IsRunning()
-  {
-    return Status == ServiceStatus.Running && CancellationTokenSource is not null &&
-           StartTask is not null && CompletionTask is not null;
-  }
+  private bool IsRunning() => Status == ServiceStatus.Running && CancellationTokenSource is not null &&
+                              StartTask is not null && CompletionTask is not null;
 }

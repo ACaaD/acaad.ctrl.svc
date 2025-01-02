@@ -19,10 +19,7 @@ public interface IOutcomeTransformer
 
 public interface IOutcomeTransformer<in TTransformation> : IOutcomeTransformer
 {
-  bool IOutcomeTransformer.Handles(ITransformation transformation)
-  {
-    return transformation is TTransformation;
-  }
+  bool IOutcomeTransformer.Handles(ITransformation transformation) => transformation is TTransformation;
 
   async Task<Either<FlowError, TransformationOutcome>> IOutcomeTransformer.TransformCommandOutcomeAsync(
     ITransformation transformation,

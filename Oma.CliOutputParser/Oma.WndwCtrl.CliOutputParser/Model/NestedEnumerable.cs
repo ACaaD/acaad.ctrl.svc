@@ -29,42 +29,28 @@ public class NestedEnumerable : IEnumerable<object>
     ? _enumerable.OfType<NestedEnumerable>()
     : throw new InvalidOperationException("Children was accessed but enum is not nested.");
 
-  public IEnumerator<object> GetEnumerator()
-  {
-    return _enumerable.GetEnumerator();
-  }
+  public IEnumerator<object> GetEnumerator() => _enumerable.GetEnumerator();
 
-  IEnumerator IEnumerable.GetEnumerator()
-  {
-    return GetEnumerator();
-  }
+  IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-  public static NestedEnumerable FromString(string input)
+  public static NestedEnumerable FromString(string input) => new()
   {
-    return new NestedEnumerable
-    {
-      _enumerable = [input,],
-      IsNested = false,
-    };
-  }
+    _enumerable = [input,],
+    IsNested = false,
+  };
 
-  public static NestedEnumerable ForChild(IEnumerable<object> child)
+  public static NestedEnumerable ForChild(IEnumerable<object> child) => new()
   {
-    return new NestedEnumerable
-    {
-      _enumerable = child.ToList(),
-      IsNested = false,
-    };
-  }
+    _enumerable = child.ToList(),
+    IsNested = false,
+  };
 
-  internal static NestedEnumerable FromEnumerableInternal(IEnumerable<object> enumerable, bool isNested)
-  {
-    return new NestedEnumerable
+  internal static NestedEnumerable FromEnumerableInternal(IEnumerable<object> enumerable, bool isNested) =>
+    new()
     {
       _enumerable = enumerable.ToList(),
       IsNested = isNested,
     };
-  }
 
   public static NestedEnumerable FromEnumerable(IEnumerable<object> enumerable)
   {

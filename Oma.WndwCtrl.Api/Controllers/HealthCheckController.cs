@@ -11,8 +11,5 @@ public class HealthCheckController : ControllerBase
   [EndpointSummary("Health check")]
   [EndpointDescription("Dummy endpoint, always returns OK")]
   [Produces("application/json")]
-  public IActionResult Test()
-  {
-    return Ok();
-  }
+  public IActionResult Test() => Ok();
 }

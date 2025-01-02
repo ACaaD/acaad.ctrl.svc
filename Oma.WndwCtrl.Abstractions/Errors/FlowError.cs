@@ -29,32 +29,21 @@ public record FlowError(string Message, bool IsExceptional, bool IsExpected) : E
 
   public override Option<Error> Inner { get; } = Option<Error>.None;
 
-  public override ErrorException ToErrorException()
-  {
+  public override ErrorException ToErrorException() => throw
     // TODO
-    throw new NotImplementedException();
-  }
+    new NotImplementedException();
 
   [System.Diagnostics.Contracts.Pure]
-  public static FlowError NoCommandExecutorFound(ICommand command)
-  {
-    return new FlowError(
-      $"No transformation executor found that handles transformation type {command.GetType().FullName}.",
-      isExceptional: false
-    );
-  }
+  public static FlowError NoCommandExecutorFound(ICommand command) => new(
+    $"No transformation executor found that handles transformation type {command.GetType().FullName}.",
+    isExceptional: false
+  );
 
   [System.Diagnostics.Contracts.Pure]
-  public static FlowError NoTransformerFound(ITransformation transformation)
-  {
-    return new FlowError(
-      $"No transformation executor found that handles transformation type {transformation.GetType().FullName}.",
-      isExceptional: false
-    );
-  }
+  public static FlowError NoTransformerFound(ITransformation transformation) => new(
+    $"No transformation executor found that handles transformation type {transformation.GetType().FullName}.",
+    isExceptional: false
+  );
 
-  public static implicit operator FlowError(TechnicalError error)
-  {
-    return new FlowError(error);
-  }
+  public static implicit operator FlowError(TechnicalError error) => new(error);
 }

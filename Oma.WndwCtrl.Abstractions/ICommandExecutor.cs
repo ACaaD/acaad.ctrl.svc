@@ -19,10 +19,7 @@ public interface ICommandExecutor
 
 public interface ICommandExecutor<in TCommand> : ICommandExecutor
 {
-  bool ICommandExecutor.Handles(ICommand command)
-  {
-    return command is TCommand;
-  }
+  bool ICommandExecutor.Handles(ICommand command) => command is TCommand;
 
   async Task<Either<FlowError, CommandOutcome>> ICommandExecutor.ExecuteAsync(
     ICommand command,

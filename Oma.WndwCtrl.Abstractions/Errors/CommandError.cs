@@ -29,8 +29,5 @@ public record CommandError : FlowError, ICommandExecutionMetadata
   [PublicAPI]
   public Option<int> ExecutedRetries { get; } = Option<int>.None;
 
-  public static implicit operator CommandError(TechnicalError error)
-  {
-    return new CommandError(error);
-  }
+  public static implicit operator CommandError(TechnicalError error) => new(error);
 }

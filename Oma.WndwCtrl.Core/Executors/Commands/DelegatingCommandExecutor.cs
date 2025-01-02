@@ -69,10 +69,7 @@ public class DelegatingCommandExecutor : ICommandExecutor
   ).As();
 
   [ExcludeFromCodeCoverage]
-  public bool Handles(ICommand command)
-  {
-    return true;
-  }
+  public bool Handles(ICommand command) => true;
 
   public async Task<Either<FlowError, CommandOutcome>> ExecuteAsync(
     ICommand cmd,

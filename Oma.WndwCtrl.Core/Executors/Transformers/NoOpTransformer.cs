@@ -12,8 +12,5 @@ public class NoOpTransformer : IOutcomeTransformer<NoOpTransformation>
     NoOpTransformation transformation,
     Either<FlowError, TransformationOutcome> transformationOutcome,
     CancellationToken cancelToken = default
-  )
-  {
-    return Task.FromResult(transformationOutcome);
-  }
+  ) => Task.FromResult(transformationOutcome);
 }

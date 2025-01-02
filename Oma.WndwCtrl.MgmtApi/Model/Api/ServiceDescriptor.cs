@@ -11,14 +11,11 @@ public record ServiceDescriptor
   public DateTime? StartedAt { get; init; }
   public ServiceStatus Status { get; init; }
 
-  public static ServiceDescriptor FromServiceWrapper(IServiceWrapper serviceWrapper)
+  public static ServiceDescriptor FromServiceWrapper(IServiceWrapper serviceWrapper) => new()
   {
-    return new ServiceDescriptor
-    {
-      Name = serviceWrapper.Name,
-      StartedAt = serviceWrapper.StartedAt,
-      Status = serviceWrapper.Status,
-      ServiceGuid = serviceWrapper.ServiceGuid,
-    };
-  }
+    Name = serviceWrapper.Name,
+    StartedAt = serviceWrapper.StartedAt,
+    Status = serviceWrapper.Status,
+    ServiceGuid = serviceWrapper.ServiceGuid,
+  };
 }

@@ -29,8 +29,5 @@ public class ComponentControllerBase<TComponent> : ControllerBase
 
   [HttpGet("config")]
   [EndpointSummary("Component Details")]
-  public IActionResult GetDetails()
-  {
-    return Ok(Component);
-  }
+  public IActionResult GetDetails() => Ok(Component);
 }

@@ -12,8 +12,5 @@ public class ConfigurationController(ComponentConfigurationAccessor configuratio
   [EndpointSummary("Component Configuration")]
   [EndpointDescription("Returns the currently loaded (active) component configuration")]
   [Produces("application/json")]
-  public IActionResult GetConfiguration()
-  {
-    return Ok(configurationAccessor.Configuration);
-  }
+  public IActionResult GetConfiguration() => Ok(configurationAccessor.Configuration);
 }

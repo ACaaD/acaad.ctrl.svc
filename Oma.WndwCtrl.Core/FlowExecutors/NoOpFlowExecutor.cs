@@ -13,17 +13,14 @@ public class NoOpFlowExecutor : IFlowExecutor
   public Task<Either<FlowError, TransformationOutcome>> ExecuteAsync(
     ICommand command,
     CancellationToken cancelToken = default
-  )
-  {
-    return Task.FromResult<Either<FlowError, TransformationOutcome>>(
-      Right<TransformationOutcome>(
-        new TransformationOutcome<ICommand>(command)
-        {
-          Success = true,
-          OutcomeRaw = JsonSerializer.Serialize(command),
-          Outcome = command,
-        }
-      )
-    );
-  }
+  ) => Task.FromResult<Either<FlowError, TransformationOutcome>>(
+    Right<TransformationOutcome>(
+      new TransformationOutcome<ICommand>(command)
+      {
+        Success = true,
+        OutcomeRaw = JsonSerializer.Serialize(command),
+        Outcome = command,
+      }
+    )
+  );
 }

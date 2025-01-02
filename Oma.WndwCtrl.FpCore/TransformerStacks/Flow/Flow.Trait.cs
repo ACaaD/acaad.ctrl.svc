@@ -16,15 +16,9 @@ public class FlowT<TFlowConfiguration, A>(ReaderT<TFlowConfiguration, EitherT<Fl
 {
   public ReaderT<TFlowConfiguration, EitherT<FlowError, IO>, A> ExecuteFlow { get; } = executeFlow;
 
-  public FlowT<TFlowConfiguration, B> Map<B>(Func<A, B> f)
-  {
-    return this.Kind().Map(f).As();
-  }
+  public FlowT<TFlowConfiguration, B> Map<B>(Func<A, B> f) => this.Kind().Map(f).As();
 
-  public FlowT<TFlowConfiguration, B> Select<B>(Func<A, B> f)
-  {
-    return this.Kind().Map(f).As();
-  }
+  public FlowT<TFlowConfiguration, B> Select<B>(Func<A, B> f) => this.Kind().Map(f).As();
 
   public FlowT<TFlowConfiguration, C> SelectMany<B, C>(
     Func<A, K<Flow<TFlowConfiguration>, B>> bind,
@@ -49,26 +43,18 @@ public class FlowT<TFlowConfiguration, A>(ReaderT<TFlowConfiguration, EitherT<Fl
     return Map(a => project(a, bind(a).Value));
   }
 
-  public static implicit operator FlowT<TFlowConfiguration, A>(Pure<A> ma)
-  {
-    return Flow<TFlowConfiguration>.Pure(ma.Value).As();
-  }
+  public static implicit operator FlowT<TFlowConfiguration, A>(Pure<A> ma) =>
+    Flow<TFlowConfiguration>.Pure(ma.Value).As();
 
-  public static implicit operator FlowT<TFlowConfiguration, A>(IO<A> ma)
-  {
-    return Flow<TFlowConfiguration>.liftIO(ma);
-  }
+  public static implicit operator FlowT<TFlowConfiguration, A>(IO<A> ma) =>
+    Flow<TFlowConfiguration>.liftIO(ma);
 
-  public static implicit operator FlowT<TFlowConfiguration, A>(Either<FlowError, A> ma)
-  {
-    return Flow<TFlowConfiguration>.lift(ma);
-  }
+  public static implicit operator FlowT<TFlowConfiguration, A>(Either<FlowError, A> ma) =>
+    Flow<TFlowConfiguration>.lift(ma);
 
   [PublicAPI]
-  public FlowT<TFlowConfiguration, B> Bind<B>(Func<A, K<Flow<TFlowConfiguration>, B>> f)
-  {
-    return this.Kind().Bind(f).As();
-  }
+  public FlowT<TFlowConfiguration, B> Bind<B>(Func<A, K<Flow<TFlowConfiguration>, B>> f) =>
+    this.Kind().Bind(f).As();
 
   public static FlowT<TFlowConfiguration, A> operator >> (
     FlowT<TFlowConfiguration, A> ma,

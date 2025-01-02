@@ -14,8 +14,5 @@ public class CliCommand : BaseCommand
 
   public string? Arguments { get; set; }
 
-  public override string ToString()
-  {
-    return $"CLI: {FileName} {Arguments}";
-  }
+  public override string ToString() => $"CLI: {FileName} {Arguments}";
 }
