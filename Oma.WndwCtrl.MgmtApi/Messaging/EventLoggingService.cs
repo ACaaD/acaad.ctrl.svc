@@ -1,11 +1,12 @@
 using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 using Oma.WndwCtrl.CoreAsp;
 using Oma.WndwCtrl.Messaging;
+using Oma.WndwCtrl.Messaging.Bus;
 using Oma.WndwCtrl.Messaging.Extensions;
 
 namespace Oma.WndwCtrl.MgmtApi.Messaging;
 
-public class EventLoggingService(ILogger<EventLoggingService> logger, Lazy<IMessageBus> messageBusLazy)
+public class EventLoggingService(ILogger<EventLoggingService> logger, MessageBusAccessor messageBusAccessor)
   : BackgroundServiceWrapper<EventLoggingService>, IMessageConsumer<IMessage>
 {
   public bool IsSubscribedTo(IMessage message) => true;
@@ -29,8 +30,7 @@ public class EventLoggingService(ILogger<EventLoggingService> logger, Lazy<IMess
 
   protected override IHost PostHostRun(IHost host, CancellationToken cancelToken = default)
   {
-    IMessageBus messageBus = messageBusLazy.Value;
-    ServiceProvider.StartConsumersAsync(messageBus, cancelToken);
+    ServiceProvider.StartConsumersAsync(messageBusAccessor.MessageBus, cancelToken);
     return base.PostHostRun(host, cancelToken);
   }
 }

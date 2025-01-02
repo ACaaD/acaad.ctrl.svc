@@ -1,6 +1,7 @@
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Api.Extensions;
 using Oma.WndwCtrl.CoreAsp;
+using Oma.WndwCtrl.Messaging.Bus;
 using Oma.WndwCtrl.MgmtApi.Extensions;
 using Oma.WndwCtrl.MgmtApi.Messaging;
 using Oma.WndwCtrl.MgmtApi.Model;
@@ -16,6 +17,7 @@ public class MgmtApiService : WebApplicationWrapper<MgmtApiService>, IApiService
       .AddSingleton<ServiceState>()
       .AddComponentApi()
       .AddHostedService<ServiceWorker>()
+      .AddSingleton<MessageBusAccessor>()
       .AddBackgroundService<MessageBusService>()
       .AddBackgroundService<EventLoggingService>();
 

@@ -1,5 +1,5 @@
-using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 using Oma.WndwCtrl.Configuration.Model;
+using Oma.WndwCtrl.Messaging.Bus;
 
 namespace Oma.WndwCtrl.Api;
 
@@ -10,12 +10,12 @@ public class CtrlApiProgram
     ILoggerFactory loggerFactory =
       LoggerFactory.Create(builder => { builder.SetMinimumLevel(LogLevel.Trace); });
 
-    Lazy<IMessageBus> _ = new();
+    MessageBusAccessor messageBusAccessor = new();
 
     CtrlApiService apiService = new(
       loggerFactory.CreateLogger<CtrlApiService>(),
       await ComponentConfigurationAccessor.FromFileAsync(),
-      _
+      messageBusAccessor // TODO: This will crash in stand alone
     );
 
     await apiService.StartAsync(CancellationToken.None, args);

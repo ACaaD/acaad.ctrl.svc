@@ -2,29 +2,39 @@ using System.Diagnostics.CodeAnalysis;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 using Oma.WndwCtrl.CoreAsp;
+using Oma.WndwCtrl.Messaging.Bus;
 using Oma.WndwCtrl.Messaging.Extensions;
 
 namespace Oma.WndwCtrl.MgmtApi.Messaging;
 
-public class MessageBusService : BackgroundServiceWrapper<MessageBusService>, IBackgroundService
+public class MessageBusService(MessageBusAccessor messageBusAccessor)
+  : BackgroundServiceWrapper<MessageBusService>, IBackgroundService
 {
-  private IMessageBus? _messageBus;
-
   private IMessageBus MessageBus =>
-    _messageBus ?? throw new InvalidOperationException("MessageBus not initialized.");
+    messageBusAccessor.MessageBus ?? throw new InvalidOperationException("MessageBus not initialized.");
 
   [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
   public static IEnumerable<ServiceDescriptor> Exposes =>
   [
-    // TODO: Make transient to force the factory method to be called all the time? 
-    ServiceDescriptor.Transient<Lazy<IMessageBus>>(
+    ServiceDescriptor.Transient<Lazy<IMessageBus?>>(
       _ =>
       {
-        return new Lazy<IMessageBus>(
+        return new Lazy<IMessageBus?>(
           () =>
           {
-            IServiceProvider sp = BackgroundServiceWrapper<MessageBusService>.ServiceProvider;
-            return sp.GetRequiredService<IMessageBus>();
+            try
+            {
+              IServiceProvider sp = BackgroundServiceWrapper<MessageBusService>.ServiceProvider;
+              return sp.GetRequiredService<IMessageBus>();
+            }
+            catch (ObjectDisposedException)
+            {
+              return null;
+            }
+            catch (Exception ex)
+            {
+              return null;
+            }
           }
         );
       }
@@ -40,7 +50,7 @@ public class MessageBusService : BackgroundServiceWrapper<MessageBusService>, IB
   protected override IHost PostHostRun(IHost host, CancellationToken cancelToken = default)
   {
     base.PostHostRun(host, cancelToken);
-    _messageBus = ServiceProvider.StartMessageBus(cancelToken);
+    messageBusAccessor.MessageBus = ServiceProvider.StartMessageBus(cancelToken);
     return host;
   }
 }

@@ -15,10 +15,7 @@ public class ServicesController(ServiceState serviceState) : ControllerBase
   [EndpointSummary("Service List")]
   [EndpointDescription("Lists all registered services")]
   [Produces("application/json")]
-  public IActionResult GetAll()
-  {
-    return Ok(serviceState.All.Select(ServiceDescriptor.FromServiceWrapper));
-  }
+  public IActionResult GetAll() => Ok(serviceState.All.Select(ServiceDescriptor.FromServiceWrapper));
 
   [HttpGet("{serviceGuid:guid}")]
   [EndpointName($"Services_{nameof(GetByGuid)}")]
@@ -100,6 +97,14 @@ public class ServicesController(ServiceState serviceState) : ControllerBase
     await service.StopAsync(HttpContext.RequestAborted);
 
     return Ok();
+  }
+
+  [HttpPost("{serviceName}/restart")]
+  [EndpointSummary("Restart Service by Name")]
+  public async Task<IActionResult> RestartByNameAsync([FromRoute] string serviceName)
+  {
+    await StopAsync(sw => sw.Name == serviceName);
+    return await StartAsync(sw => sw.Name == serviceName);
   }
 
   [HttpPost("restart")]

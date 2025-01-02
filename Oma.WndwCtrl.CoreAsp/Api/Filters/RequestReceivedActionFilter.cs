@@ -26,10 +26,8 @@ public class RequestReceivedActionFilter : IAsyncActionFilter
 {
   public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
   {
-    Lazy<IMessageBus> messageBusLazy =
-      context.HttpContext.RequestServices.GetRequiredService<Lazy<IMessageBus>>();
-
-    IMessageBus messageBus = messageBusLazy.Value;
+    IMessageBusWriter messageBus =
+      context.HttpContext.RequestServices.GetRequiredService<IMessageBusWriter>();
 
     RequestReceivedMessage requestReceivedMessage = new(
       context.HttpContext.TraceIdentifier,

@@ -7,6 +7,7 @@ using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Core.Extensions;
 using Oma.WndwCtrl.CoreAsp.Api.Filters;
 using Oma.WndwCtrl.CoreAsp.Conventions;
+using Oma.WndwCtrl.Messaging.Extensions;
 using Scalar.AspNetCore;
 
 namespace Oma.WndwCtrl.CoreAsp;
@@ -182,7 +183,8 @@ public class WebApplicationWrapper<TAssemblyDescriptor> : IApiService
   protected virtual JsonOptions ConfigureJsonOptions(JsonOptions jsonOptions) => jsonOptions;
 
   [PublicAPI]
-  protected virtual IServiceCollection ConfigureServices(IServiceCollection services) => services;
+  protected virtual IServiceCollection ConfigureServices(IServiceCollection services) =>
+    services.AddMessageWriter();
 
   [PublicAPI]
   protected virtual WebApplication PostAppBuild(WebApplication app) => app;

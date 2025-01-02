@@ -106,4 +106,12 @@ public static class IServiceCollectionExtensions
       .AddWorker<TConsumer, TMessage>(serviceKey, serviceLifetime, registerConsumer)
       .AddSingleton(new ConsumerMapping(serviceKey));
   }
+
+  [PublicAPI]
+  public static IServiceCollection AddMessageWriter(this IServiceCollection services) =>
+    // Just the default implementation. Somewhat stupid if the message bus is used as a library.
+    services.AddTransient<Lazy<IMessageBus?>>(
+        sp => new Lazy<IMessageBus?>(sp.GetRequiredService<IMessageBus>)
+      )
+      .AddTransient<IMessageBusWriter, MessageBusWriter>();
 }
