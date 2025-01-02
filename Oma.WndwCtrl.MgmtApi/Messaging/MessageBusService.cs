@@ -16,6 +16,7 @@ public class MessageBusService(MessageBusAccessor messageBusAccessor)
   [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
   public static IEnumerable<ServiceDescriptor> Exposes =>
   [
+    ServiceDescriptor.Singleton(new MessageBusAccessor()),
     ServiceDescriptor.Transient<Lazy<IMessageBus?>>(
       _ =>
       {
