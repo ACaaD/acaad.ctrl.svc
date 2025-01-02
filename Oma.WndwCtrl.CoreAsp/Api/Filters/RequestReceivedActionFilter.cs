@@ -5,14 +5,21 @@ using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 
 namespace Oma.WndwCtrl.CoreAsp.Api.Filters;
 
-public record RequestReceivedMessage(string correlationId) : IMessage
+public record RequestReceivedMessage(string correlationId, string path, string method) : IMessage
 {
   public string Topic => "Event";
 }
 
-public record RequestProcessedMessage(string correlationId, TimeSpan duration) : IMessage
+public record RequestProcessedMessage : RequestReceivedMessage
 {
-  public string Topic => "Event";
+  public RequestProcessedMessage(RequestReceivedMessage receivedMessage, TimeSpan duration) : base(
+    receivedMessage
+  )
+  {
+    Duration = duration;
+  }
+
+  public TimeSpan Duration { get; }
 }
 
 public class RequestReceivedActionFilter : IAsyncActionFilter
@@ -24,13 +31,19 @@ public class RequestReceivedActionFilter : IAsyncActionFilter
 
     IMessageBus messageBus = messageBusLazy.Value;
 
-    await messageBus.SendAsync(new RequestReceivedMessage(context.HttpContext.TraceIdentifier));
+    RequestReceivedMessage requestReceivedMessage = new(
+      context.HttpContext.TraceIdentifier,
+      context.HttpContext.Request.Path,
+      context.HttpContext.Request.Method
+    );
+
+    await messageBus.SendAsync(requestReceivedMessage);
 
     Stopwatch sw = Stopwatch.StartNew();
     await next();
 
     await messageBus.SendAsync(
-      new RequestProcessedMessage(context.HttpContext.TraceIdentifier, sw.Measure())
+      new RequestProcessedMessage(requestReceivedMessage, sw.Measure())
     );
   }
 }

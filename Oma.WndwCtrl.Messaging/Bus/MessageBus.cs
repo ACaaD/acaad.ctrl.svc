@@ -22,12 +22,8 @@ public sealed class MessageBus(MessageBusState state) : IMessageBus, IDisposable
     );
   }
 
-  public async Task SendAsync(IMessage message, CancellationToken cancelToken = default)
-  {
-    await state.Queue
-      .Writer.WriteAsync(message, cancelToken)
-      .ConfigureAwait(continueOnCapturedContext: false);
-  }
+  public async Task SendAsync(IMessage message, CancellationToken cancelToken = default) =>
+    state.Queue.Writer.TryWrite(message);
 
   public void Complete()
   {

@@ -17,7 +17,7 @@ public class MessageBusService : BackgroundServiceWrapper<MessageBusService>, IB
   public static IEnumerable<ServiceDescriptor> Exposes =>
   [
     // TODO: Make transient to force the factory method to be called all the time? 
-    ServiceDescriptor.Singleton<Lazy<IMessageBus>>(
+    ServiceDescriptor.Transient<Lazy<IMessageBus>>(
       _ =>
       {
         return new Lazy<IMessageBus>(
