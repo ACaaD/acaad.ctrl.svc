@@ -1,7 +1,6 @@
 using System.Threading.Channels;
-using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 
-namespace Oma.WndwCtrl.Messaging;
+namespace Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 
 public interface IMessageBus
 {

@@ -111,10 +111,7 @@ public class DelegatingTransformer : IRootTransformer
     "CA1822:Mark members as static",
     Justification = "Won't fix: Interface method"
   )]
-  public bool Handles(ITransformation transformation)
-  {
-    return true;
-  }
+  public bool Handles(ITransformation transformation) => true;
 
   private static FlowT<TransformationConfiguration, IOutcomeTransformer> FindApplicableTransformer(
     ITransformation transformation

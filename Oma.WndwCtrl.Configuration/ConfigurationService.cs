@@ -3,7 +3,9 @@ using Oma.WndwCtrl.Configuration.Model;
 
 namespace Oma.WndwCtrl.Configuration;
 
-public class ConfigurationService(ComponentConfigurationAccessor componentConfigurationAccessor)
+public class ConfigurationService(
+  ComponentConfigurationAccessor componentConfigurationAccessor
+)
   : IBackgroundService
 {
   public async Task StartAsync(CancellationToken cancelToken = default, params string[] arg)
@@ -13,13 +15,7 @@ public class ConfigurationService(ComponentConfigurationAccessor componentConfig
       (await ComponentConfigurationAccessor.FromFileAsync(cancelToken)).Configuration;
   }
 
-  public Task ForceStopAsync(CancellationToken cancelToken = default)
-  {
-    return Task.CompletedTask;
-  }
+  public Task ForceStopAsync(CancellationToken cancelToken = default) => Task.CompletedTask;
 
-  public Task WaitForShutdownAsync(CancellationToken cancelToken = default)
-  {
-    return Task.CompletedTask;
-  }
+  public Task WaitForShutdownAsync(CancellationToken cancelToken = default) => Task.CompletedTask;
 }

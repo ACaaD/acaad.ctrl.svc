@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Oma.WndwCtrl.Abstractions;
+using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 using Oma.WndwCtrl.Api.Conventions;
 using Oma.WndwCtrl.Api.Extensions;
 using Oma.WndwCtrl.Configuration.Model;
@@ -9,11 +10,14 @@ namespace Oma.WndwCtrl.Api;
 
 public class CtrlApiService(
   ILogger<CtrlApiService> logger,
-  ComponentConfigurationAccessor configurationAccessor
+  ComponentConfigurationAccessor configurationAccessor,
+  Lazy<IMessageBus> messageBusLazy
 )
   : WebApplicationWrapper<CtrlApiService>, IApiService
 {
   private readonly ILogger _logger = logger;
+
+  public static object Exposes { get; }
 
   public Task ForceStopAsync(CancellationToken cancelToken)
   {
@@ -32,11 +36,9 @@ public class CtrlApiService(
     return base.PreConfigureMvcOptions(options);
   }
 
-  protected override IServiceCollection ConfigureServices(IServiceCollection services)
-  {
-    return base
-      .ConfigureServices(services)
-      .AddComponentApi()
-      .AddSingleton(configurationAccessor);
-  }
+  protected override IServiceCollection ConfigureServices(IServiceCollection services) => base
+    .ConfigureServices(services)
+    .AddComponentApi()
+    .AddSingleton(configurationAccessor)
+    .AddSingleton(messageBusLazy);
 }

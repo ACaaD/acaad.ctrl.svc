@@ -15,13 +15,10 @@ public sealed class MockedCommandExecutorApiFixture : WebApplicationFactory<Ctrl
 {
   public MockedCommandExecutorApiFixture()
   {
-    WebApplicationWrapper<object>.ModifyJsonSerializerOptions(SystemTextJsonSerializerConfig.Options);
+    WebApplicationWrapper<IApiService>.ModifyJsonSerializerOptions(SystemTextJsonSerializerConfig.Options);
   }
 
-  public ValueTask InitializeAsync()
-  {
-    return ValueTask.CompletedTask;
-  }
+  public ValueTask InitializeAsync() => ValueTask.CompletedTask;
 
   protected override void ConfigureWebHost(IWebHostBuilder builder)
   {

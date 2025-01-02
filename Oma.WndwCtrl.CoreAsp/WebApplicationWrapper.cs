@@ -5,21 +5,36 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Core.Extensions;
+using Oma.WndwCtrl.CoreAsp.Api.Filters;
 using Oma.WndwCtrl.CoreAsp.Conventions;
 using Scalar.AspNetCore;
 
 namespace Oma.WndwCtrl.CoreAsp;
 
-public class WebApplicationWrapper<TAssemblyDescriptor>
-  where TAssemblyDescriptor : class
+public class WebApplicationWrapper<TAssemblyDescriptor> : IApiService
+  where TAssemblyDescriptor : class, IApiService
 {
+  private static IServiceProvider? _serviceProvider;
+
   private IWebHostEnvironment? _environment;
+
+  protected static IServiceProvider ServiceProvider => _serviceProvider
+                                                       ?? throw new InvalidOperationException(
+                                                         "The WebApplicationWrapper has not been initialized properly."
+                                                       );
+
   protected WebApplication? Application { get; private set; }
 
   protected IWebHostEnvironment Environment
   {
     get => _environment ?? throw new InvalidOperationException($"{nameof(Environment)} is not populated.");
     private set => _environment = value;
+  }
+
+  static IServiceProvider IService.ServiceProvider
+  {
+    get => _serviceProvider;
+    set => _serviceProvider = value;
   }
 
   public async Task StartAsync(CancellationToken cancelToken = default, params string[] args)
@@ -46,6 +61,8 @@ public class WebApplicationWrapper<TAssemblyDescriptor>
 
           opts.Conventions.Add(new ContainingAssemblyApplicationModelConvention<TAssemblyDescriptor>());
 
+          opts.Filters.Add<RequestReceivedActionFilter>();
+
           PostConfigureMvcOptions(opts);
         }
       )
@@ -66,6 +83,8 @@ public class WebApplicationWrapper<TAssemblyDescriptor>
 
     Application = PostAppBuild(builder.Build());
 
+    TAssemblyDescriptor.ServiceProvider = Application.Services;
+
     Application.MapControllers();
     Application.MapOpenApi();
     Application.MapScalarApiReference();
@@ -75,6 +94,34 @@ public class WebApplicationWrapper<TAssemblyDescriptor>
 #endif
 
     await PreAppRun(Application).StartAsync(cancelToken);
+    PostAppRun(Application, cancelToken);
+  }
+
+  public async Task WaitForShutdownAsync(CancellationToken cancelToken = default)
+  {
+    if (Application is not null)
+    {
+      try
+      {
+        await Application.WaitForShutdownAsync(cancelToken);
+      }
+      finally
+      {
+        await Application.DisposeAsync();
+        Application = null;
+      }
+    }
+  }
+
+  [PublicAPI]
+  public Task ForceStopAsync(CancellationToken cancelToken)
+  {
+    if (Application is not null)
+    {
+      return Application.StopAsync(cancelToken);
+    }
+
+    return Task.CompletedTask;
   }
 
   public static void ModifyJsonSerializerOptions(JsonSerializerOptions jsonSerializerOptions)
@@ -123,60 +170,27 @@ public class WebApplicationWrapper<TAssemblyDescriptor>
   }
 
   [PublicAPI]
-  protected virtual IMvcCoreBuilder PostConfigureMvc(IMvcCoreBuilder builder)
-  {
-    return builder;
-  }
+  protected virtual IMvcCoreBuilder PostConfigureMvc(IMvcCoreBuilder builder) => builder;
 
   [PublicAPI]
-  protected virtual MvcOptions PreConfigureMvcOptions(MvcOptions options)
-  {
-    return options;
-  }
+  protected virtual MvcOptions PreConfigureMvcOptions(MvcOptions options) => options;
 
   [PublicAPI]
-  protected virtual MvcOptions PostConfigureMvcOptions(MvcOptions options)
-  {
-    return options;
-  }
+  protected virtual MvcOptions PostConfigureMvcOptions(MvcOptions options) => options;
 
   [PublicAPI]
-  protected virtual JsonOptions ConfigureJsonOptions(JsonOptions jsonOptions)
-  {
-    return jsonOptions;
-  }
+  protected virtual JsonOptions ConfigureJsonOptions(JsonOptions jsonOptions) => jsonOptions;
 
   [PublicAPI]
-  protected virtual IServiceCollection ConfigureServices(IServiceCollection services)
-  {
-    return services;
-  }
+  protected virtual IServiceCollection ConfigureServices(IServiceCollection services) => services;
 
   [PublicAPI]
-  protected virtual WebApplication PostAppBuild(WebApplication app)
-  {
-    return app;
-  }
+  protected virtual WebApplication PostAppBuild(WebApplication app) => app;
 
   [PublicAPI]
-  protected virtual WebApplication PreAppRun(WebApplication app)
-  {
-    return app;
-  }
+  protected virtual WebApplication PreAppRun(WebApplication app) => app;
 
-  public async Task WaitForShutdownAsync(CancellationToken cancelToken = default)
-  {
-    if (Application is not null)
-    {
-      try
-      {
-        await Application.WaitForShutdownAsync(cancelToken);
-      }
-      finally
-      {
-        await Application.DisposeAsync();
-        Application = null;
-      }
-    }
-  }
+  [PublicAPI]
+  protected virtual WebApplication PostAppRun(WebApplication app, CancellationToken cancelToken = default) =>
+    app;
 }

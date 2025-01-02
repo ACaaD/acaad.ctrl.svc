@@ -1,17 +1,24 @@
+using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Api.Extensions;
 using Oma.WndwCtrl.CoreAsp;
+using Oma.WndwCtrl.MgmtApi.Extensions;
+using Oma.WndwCtrl.MgmtApi.Messaging;
 using Oma.WndwCtrl.MgmtApi.Model;
 using Oma.WndwCtrl.MgmtApi.Workers;
 
 namespace Oma.WndwCtrl.MgmtApi;
 
-public class MgmtApiService : WebApplicationWrapper<MgmtApiService>
+public class MgmtApiService : WebApplicationWrapper<MgmtApiService>, IApiService
 {
   protected override IServiceCollection ConfigureServices(IServiceCollection services)
   {
-    return base.ConfigureServices(services)
+    IServiceCollection result = base.ConfigureServices(services)
       .AddSingleton<ServiceState>()
       .AddComponentApi()
-      .AddHostedService<ServiceWorker>();
+      .AddHostedService<ServiceWorker>()
+      .AddBackgroundService<MessageBusService>()
+      .AddBackgroundService<EventLoggingService>();
+
+    return result;
   }
 }
