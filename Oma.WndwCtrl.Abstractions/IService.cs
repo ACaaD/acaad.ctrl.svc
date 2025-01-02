@@ -1,7 +1,9 @@
+using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Oma.WndwCtrl.Abstractions;
 
+[PublicAPI]
 public interface IService
 {
   virtual static IEnumerable<ServiceDescriptor> Exposes { get; } = [];

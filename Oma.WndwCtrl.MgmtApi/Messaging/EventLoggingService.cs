@@ -30,7 +30,11 @@ public class EventLoggingService(ILogger<EventLoggingService> logger, MessageBus
 
   protected override IHost PostHostRun(IHost host, CancellationToken cancelToken = default)
   {
-    ServiceProvider.StartConsumersAsync(messageBusAccessor.MessageBus, cancelToken);
+    ServiceProvider.StartConsumersAsync(
+      messageBusAccessor.MessageBus ?? throw new InvalidOperationException("MessageBus is not populated."),
+      cancelToken
+    );
+
     return base.PostHostRun(host, cancelToken);
   }
 }

@@ -1,4 +1,3 @@
-using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Api.Extensions;
 using Oma.WndwCtrl.CoreAsp;
 using Oma.WndwCtrl.MgmtApi.Extensions;
@@ -8,7 +7,7 @@ using Oma.WndwCtrl.MgmtApi.Workers;
 
 namespace Oma.WndwCtrl.MgmtApi;
 
-public class MgmtApiService : WebApplicationWrapper<MgmtApiService>, IApiService
+public class MgmtApiService : WebApplicationWrapper<MgmtApiService>
 {
   protected override IServiceCollection ConfigureServices(IServiceCollection services)
   {

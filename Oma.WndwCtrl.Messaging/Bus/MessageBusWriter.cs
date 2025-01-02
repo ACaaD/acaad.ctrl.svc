@@ -6,11 +6,18 @@ public class MessageBusWriter(Lazy<IMessageBus?> messageBusLazy) : IMessageBusWr
 {
   public async Task SendAsync(IMessage message, CancellationToken cancelToken = default)
   {
-    IMessageBus? messageBus = messageBusLazy.Value;
-
-    if (messageBus is not null)
+    try
     {
-      await messageBus.SendAsync(message, cancelToken);
+      IMessageBus? messageBus = messageBusLazy.Value;
+
+      if (messageBus is not null)
+      {
+        await messageBus.SendAsync(message, cancelToken);
+      }
+    }
+    catch (Exception)
+    {
+      // TODO: Fix me. For now ok, but in general this is a terrible idea.
     }
   }
 }

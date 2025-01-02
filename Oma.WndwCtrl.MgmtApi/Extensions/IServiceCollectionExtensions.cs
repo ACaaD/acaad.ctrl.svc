@@ -1,9 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 using Oma.WndwCtrl.Abstractions;
 
 namespace Oma.WndwCtrl.MgmtApi.Extensions;
 
 [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "Extension methods")]
+[PublicAPI]
 public static class IServiceCollectionExtensions
 {
   public static IServiceCollection AddApiService<TService>(this IServiceCollection services)

@@ -4,5 +4,5 @@ namespace Oma.WndwCtrl.Messaging.Bus;
 
 public record MessageBusAccessor
 {
-  public IMessageBus MessageBus { get; set; }
+  public IMessageBus? MessageBus { get; set; }
 }

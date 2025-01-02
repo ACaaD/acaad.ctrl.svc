@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using Oma.WndwCtrl.Abstractions;
 
@@ -6,6 +7,11 @@ namespace Oma.WndwCtrl.CoreAsp;
 public class BackgroundServiceWrapper<TAssemblyDescriptor> : IBackgroundService
   where TAssemblyDescriptor : class, IBackgroundService
 {
+  [SuppressMessage(
+    "ReSharper",
+    "StaticMemberInGenericType",
+    Justification = "Exactly the intended behaviour."
+  )]
   private static IServiceProvider? _serviceProvider;
 
   protected static IServiceProvider ServiceProvider => _serviceProvider
@@ -13,6 +19,7 @@ public class BackgroundServiceWrapper<TAssemblyDescriptor> : IBackgroundService
                                                          "The WebApplicationWrapper has not been initialized properly."
                                                        );
 
+  [PublicAPI]
   protected IHost? Host { get; private set; }
 
   public async Task StartAsync(CancellationToken cancelToken = default, params string[] args)
@@ -22,7 +29,7 @@ public class BackgroundServiceWrapper<TAssemblyDescriptor> : IBackgroundService
 #endif
 
     HostBuilder hostBuilder = new();
-    hostBuilder.ConfigureServices((ctx, services) => ConfigureServices(services));
+    hostBuilder.ConfigureServices((_, services) => ConfigureServices(services));
 
     Host = hostBuilder.Build();
 
@@ -32,15 +39,9 @@ public class BackgroundServiceWrapper<TAssemblyDescriptor> : IBackgroundService
     PostHostRun(Host, cancelToken);
   }
 
-  public Task ForceStopAsync(CancellationToken cancelToken = default)
-  {
-    if (Host is not null)
-    {
-      return Host.StopAsync(cancelToken);
-    }
-
-    return Task.CompletedTask;
-  }
+  public Task ForceStopAsync(CancellationToken cancelToken = default) => Host is not null
+    ? Host.StopAsync(cancelToken)
+    : Task.CompletedTask;
 
   public async Task WaitForShutdownAsync(CancellationToken cancelToken = default)
   {
@@ -60,7 +61,7 @@ public class BackgroundServiceWrapper<TAssemblyDescriptor> : IBackgroundService
 
   static IServiceProvider IService.ServiceProvider
   {
-    get => _serviceProvider;
+    get => ServiceProvider;
     set => _serviceProvider = value;
   }
 

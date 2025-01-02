@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using JetBrains.Annotations;
@@ -15,15 +16,22 @@ namespace Oma.WndwCtrl.CoreAsp;
 public class WebApplicationWrapper<TAssemblyDescriptor> : IApiService
   where TAssemblyDescriptor : class, IApiService
 {
+  [SuppressMessage(
+    "ReSharper",
+    "StaticMemberInGenericType",
+    Justification = "Exactly the intended behaviour."
+  )]
   private static IServiceProvider? _serviceProvider;
 
   private IWebHostEnvironment? _environment;
 
+  [PublicAPI]
   protected static IServiceProvider ServiceProvider => _serviceProvider
                                                        ?? throw new InvalidOperationException(
                                                          "The WebApplicationWrapper has not been initialized properly."
                                                        );
 
+  [PublicAPI]
   protected WebApplication? Application { get; private set; }
 
   protected IWebHostEnvironment Environment
@@ -34,7 +42,7 @@ public class WebApplicationWrapper<TAssemblyDescriptor> : IApiService
 
   static IServiceProvider IService.ServiceProvider
   {
-    get => _serviceProvider;
+    get => ServiceProvider;
     set => _serviceProvider = value;
   }
 
@@ -115,15 +123,9 @@ public class WebApplicationWrapper<TAssemblyDescriptor> : IApiService
   }
 
   [PublicAPI]
-  public Task ForceStopAsync(CancellationToken cancelToken)
-  {
-    if (Application is not null)
-    {
-      return Application.StopAsync(cancelToken);
-    }
-
-    return Task.CompletedTask;
-  }
+  public Task ForceStopAsync(CancellationToken cancelToken) => Application is not null
+    ? Application.StopAsync(cancelToken)
+    : Task.CompletedTask;
 
   public static void ModifyJsonSerializerOptions(JsonSerializerOptions jsonSerializerOptions)
   {

@@ -10,9 +10,6 @@ namespace Oma.WndwCtrl.MgmtApi.Messaging;
 public class MessageBusService(MessageBusAccessor messageBusAccessor)
   : BackgroundServiceWrapper<MessageBusService>, IBackgroundService
 {
-  private IMessageBus MessageBus =>
-    messageBusAccessor.MessageBus ?? throw new InvalidOperationException("MessageBus not initialized.");
-
   [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
   public static IEnumerable<ServiceDescriptor> Exposes =>
   [
@@ -32,7 +29,7 @@ public class MessageBusService(MessageBusAccessor messageBusAccessor)
             {
               return null;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
               return null;
             }
