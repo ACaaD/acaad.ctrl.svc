@@ -16,6 +16,10 @@
             ]
           }
         ]
+      },
+      "trigger": {
+        "type": "rate",
+        "expression": "5 seconds"
       }
     },
     "failing-sensor": {

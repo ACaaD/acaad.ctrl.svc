@@ -30,7 +30,7 @@ public class BackgroundServiceWrapper<TAssemblyDescriptor> : IBackgroundService
 
     HostBuilder hostBuilder = new();
     hostBuilder.ConfigureServices((_, services) => ConfigureServices(services));
-
+    
     Host = hostBuilder.Build();
 
     TAssemblyDescriptor.ServiceProvider = Host.Services;

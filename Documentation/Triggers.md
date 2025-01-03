@@ -38,7 +38,7 @@ of now, in UTC!).
     // [..]
     "trigger": {
       "type": "rate",
-      "expression": "rate(5 minutes)"
+      "expression": "5 minutes"
     }
 }
 ```
