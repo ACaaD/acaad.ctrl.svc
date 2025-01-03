@@ -8,12 +8,13 @@ using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Core.Extensions;
 using Oma.WndwCtrl.CoreAsp.Api.Filters;
 using Oma.WndwCtrl.CoreAsp.Conventions;
+using Oma.WndwCtrl.Messaging.Bus;
 using Oma.WndwCtrl.Messaging.Extensions;
 using Scalar.AspNetCore;
 
 namespace Oma.WndwCtrl.CoreAsp;
 
-public class WebApplicationWrapper<TAssemblyDescriptor> : IApiService
+public class WebApplicationWrapper<TAssemblyDescriptor>(MessageBusAccessor? messageBusAccessor) : IApiService
   where TAssemblyDescriptor : class, IApiService
 {
   [SuppressMessage(
@@ -88,6 +89,11 @@ public class WebApplicationWrapper<TAssemblyDescriptor> : IApiService
 
     builder.Services.AddOpenApi();
 
+    if (messageBusAccessor is not null)
+    {
+      builder.Services.UseMessageBus(messageBusAccessor);
+    }
+
     ConfigureServices(builder.Services);
 
     Application = PostAppBuild(builder.Build());
@@ -138,6 +144,11 @@ public class WebApplicationWrapper<TAssemblyDescriptor> : IApiService
       .WithAddedModifier(
         JsonExtensions.GetPolymorphismModifierFor<ITransformation>(
           t => t.Name.Replace("Transformation", string.Empty)
+        )
+      )
+      .WithAddedModifier(
+        JsonExtensions.GetPolymorphismModifierFor<ITrigger>(
+          t => t.Name.Replace("Trigger", string.Empty)
         )
       );
   }

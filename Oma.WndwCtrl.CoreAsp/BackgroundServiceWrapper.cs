@@ -4,7 +4,7 @@ using Oma.WndwCtrl.Abstractions;
 
 namespace Oma.WndwCtrl.CoreAsp;
 
-public class BackgroundServiceWrapper<TAssemblyDescriptor> : IBackgroundService
+public class BackgroundServiceWrapper<TAssemblyDescriptor>(IConfiguration configuration) : IBackgroundService
   where TAssemblyDescriptor : class, IBackgroundService
 {
   [SuppressMessage(
@@ -29,8 +29,21 @@ public class BackgroundServiceWrapper<TAssemblyDescriptor> : IBackgroundService
 #endif
 
     HostBuilder hostBuilder = new();
+
+    hostBuilder.ConfigureHostConfiguration(builder => builder.AddConfiguration(configuration));
+
+    hostBuilder.ConfigureLogging(
+      (ctx, logging) =>
+      {
+        logging.SetMinimumLevel(LogLevel.Trace);
+        logging.AddConsole();
+
+        logging.AddConfiguration(configuration.GetSection("Logging"));
+      }
+    );
+
     hostBuilder.ConfigureServices((_, services) => ConfigureServices(services));
-    
+
     Host = hostBuilder.Build();
 
     TAssemblyDescriptor.ServiceProvider = Host.Services;

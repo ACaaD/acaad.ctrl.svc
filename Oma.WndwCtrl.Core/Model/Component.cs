@@ -7,7 +7,8 @@ namespace Oma.WndwCtrl.Core.Model;
 [JsonDerivedType(typeof(Button), "button")]
 [JsonDerivedType(typeof(Sensor), "sensor")]
 [JsonDerivedType(typeof(Switch), "switch")]
-public abstract class Component : IHasTriggers
+public abstract class Component : IComponent, IHasTriggers
 {
+  public string Name { get; set; } = string.Empty;
   public IEnumerable<ITrigger> Triggers { get; init; } = [];
 }

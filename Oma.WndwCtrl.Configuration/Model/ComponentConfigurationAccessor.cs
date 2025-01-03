@@ -1,7 +1,8 @@
 using System.Text.Json;
-using System.Text.Json.Serialization.Metadata;
+using LanguageExt;
 using Oma.WndwCtrl.Abstractions;
-using Oma.WndwCtrl.Core.Extensions;
+using Oma.WndwCtrl.Core.Model;
+using Oma.WndwCtrl.CoreAsp;
 
 namespace Oma.WndwCtrl.Configuration.Model;
 
@@ -10,20 +11,25 @@ public class ComponentConfigurationAccessor
   private static readonly JsonSerializerOptions JsonOptions = new()
   {
     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-    TypeInfoResolver = new DefaultJsonTypeInfoResolver()
-      .WithAddedModifier(
-        JsonExtensions.GetPolymorphismModifierFor<ICommand>(
-          t => t.Name.Replace("Command", string.Empty)
-        )
-      )
-      .WithAddedModifier(
-        JsonExtensions.GetPolymorphismModifierFor<ITransformation>(
-          t => t.Name.Replace("Transformation", string.Empty)
-        )
-      ),
   };
 
+  static ComponentConfigurationAccessor()
+  {
+    WebApplicationWrapper<IApiService>.ModifyJsonSerializerOptions(JsonOptions);
+  }
+
   public ComponentConfiguration Configuration { get; set; } = new();
+
+  public Option<Component> FindComponentByTrigger(ITrigger trigger)
+  {
+    foreach (Component component in Configuration.Components.Values)
+      if (component.Triggers.Any(t => t.UniqueIdentifier == trigger.UniqueIdentifier))
+      {
+        return Option<Component>.Some(component);
+      }
+
+    return Option<Component>.None;
+  }
 
   public async static Task<ComponentConfigurationAccessor> FromFileAsync(
     CancellationToken cancelToken = default
@@ -42,9 +48,17 @@ public class ComponentConfigurationAccessor
       throw new InvalidOperationException("Could not load component configuration.");
     }
 
+    PostProcessConfiguration(configuration);
+
     return new ComponentConfigurationAccessor
     {
       Configuration = configuration,
     };
+  }
+
+  private static void PostProcessConfiguration(ComponentConfiguration componentConfiguration)
+  {
+    foreach (KeyValuePair<string, Component> component in componentConfiguration.Components)
+      component.Value.Name = component.Key;
   }
 }

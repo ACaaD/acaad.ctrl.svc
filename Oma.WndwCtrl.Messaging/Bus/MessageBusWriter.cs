@@ -1,8 +1,10 @@
+using Microsoft.Extensions.Logging;
 using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 
 namespace Oma.WndwCtrl.Messaging.Bus;
 
-public class MessageBusWriter(Lazy<IMessageBus?> messageBusLazy) : IMessageBusWriter
+public class MessageBusWriter(Lazy<IMessageBus?> messageBusLazy, ILogger<MessageBusWriter> logger)
+  : IMessageBusWriter
 {
   public async Task SendAsync(IMessage message, CancellationToken cancelToken = default)
   {
@@ -15,8 +17,9 @@ public class MessageBusWriter(Lazy<IMessageBus?> messageBusLazy) : IMessageBusWr
         await messageBus.SendAsync(message, cancelToken);
       }
     }
-    catch (Exception)
+    catch (Exception ex)
     {
+      logger.LogError(ex, "MessageBus could not be retrieved.");
       // TODO: Fix me. For now ok, but in general this is a terrible idea.
     }
   }

@@ -17,5 +17,6 @@ public class ComponentConfiguration : IHasTriggers
   public ConfigurationMetadata Metadata { get; init; } = new();
 
   [JsonIgnore]
-  public IEnumerable<ITrigger> Triggers => throw new NotImplementedException();
+  public IEnumerable<ITrigger> Triggers => Components
+    .SelectMany(component => component.Value.Triggers);
 }

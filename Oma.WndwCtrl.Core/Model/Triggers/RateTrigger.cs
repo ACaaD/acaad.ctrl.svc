@@ -7,4 +7,6 @@ public record RateTrigger : BaseTrigger, ISchedulableTrigger
 {
   [JsonRequired]
   public string Expression { get; init; } = string.Empty;
+
+  public override string ToString() => $"Rate({Expression})";
 }

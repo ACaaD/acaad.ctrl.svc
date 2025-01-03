@@ -7,8 +7,8 @@ using Oma.WndwCtrl.Messaging.Extensions;
 
 namespace Oma.WndwCtrl.MgmtApi.Messaging;
 
-public class MessageBusService(MessageBusAccessor messageBusAccessor)
-  : BackgroundServiceWrapper<MessageBusService>, IBackgroundService
+public class MessageBusService(IConfiguration configuration, MessageBusAccessor messageBusAccessor)
+  : BackgroundServiceWrapper<MessageBusService>(configuration), IBackgroundService
 {
   [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
   public static IEnumerable<ServiceDescriptor> Exposes =>

@@ -6,8 +6,12 @@ using Oma.WndwCtrl.Messaging.Extensions;
 
 namespace Oma.WndwCtrl.MgmtApi.Messaging;
 
-public class EventLoggingService(ILogger<EventLoggingService> logger, MessageBusAccessor messageBusAccessor)
-  : BackgroundServiceWrapper<EventLoggingService>, IMessageConsumer<IMessage>
+public class EventLoggingService(
+  IConfiguration configuration,
+  ILogger<EventLoggingService> logger,
+  MessageBusAccessor messageBusAccessor
+)
+  : BackgroundServiceWrapper<EventLoggingService>(configuration), IMessageConsumer<IMessage>
 {
   public bool IsSubscribedTo(IMessage message) => true;
 

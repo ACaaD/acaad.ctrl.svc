@@ -1,10 +1,15 @@
 using System.Diagnostics;
+using LanguageExt;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Extensions;
 using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 using Oma.WndwCtrl.Abstractions.Messaging.Model;
+using Oma.WndwCtrl.Configuration.Model;
+using Oma.WndwCtrl.Core.Model;
 using Oma.WndwCtrl.Scheduling.Interfaces;
 using Oma.WndwCtrl.Scheduling.Model;
 
@@ -13,8 +18,11 @@ namespace Oma.WndwCtrl.Scheduling.Services;
 public sealed class SchedulingHostedService(
   ILogger<SchedulingHostedService> logger,
   IJobList jobList,
+  [FromKeyedServices(ServiceKeys.RootJobFactory)]
+  IJobFactory jobFactory,
   IOptions<SchedulingSettings> settingsOptions,
-  IMessageBusWriter messageBusWriter
+  IMessageBusWriter messageBusWriter,
+  ComponentConfigurationAccessor componentConfigurationAccessor
 )
   : IHostedService, IAsyncDisposable
 {
@@ -49,13 +57,16 @@ public sealed class SchedulingHostedService(
   {
     DateTime referenceDate = DateTime.UtcNow;
 
+    IEnumerable<Job> jobsFromConfig = GenerateJobsFromConfiguration();
+
     logger.LogInformation("Starting scheduling service with reference date {refDate}.", referenceDate);
-    int count = await jobList.LoadAsync(referenceDate, cancellationToken);
+    int count = await jobList.MergeJobsAsync(jobsFromConfig, cancellationToken);
     logger.LogInformation("Found {count} jobs to schedule (Provider={type}).", count, jobList.Name);
 
     SchedulingSettings settings = settingsOptions.Value;
-    _timer = new PeriodicTimer(settings.CheckInterval);
+
     logger.LogInformation("Creating periodic timer with check interval {interval}.", settings.CheckInterval);
+    _timer = new PeriodicTimer(settings.CheckInterval);
 
     _ = ProcessJobsAsync();
     logger.LogInformation("Started job processing at {now}.", DateTime.UtcNow);
@@ -66,6 +77,18 @@ public sealed class SchedulingHostedService(
     logger.LogInformation("Stopping scheduling service.");
     _timer?.Dispose();
     await jobList.StoreAsync(cancellationToken);
+  }
+
+  private IEnumerable<Job> GenerateJobsFromConfiguration()
+  {
+    DateTime referenceDate = DateTime.UtcNow;
+
+    IEnumerable<Job> jobsFromConfig =
+      componentConfigurationAccessor.Configuration.Triggers.OfType<ISchedulableTrigger>().Select(
+        t => jobFactory.CreateJob(referenceDate, t)
+      ).Somes();
+
+    return jobsFromConfig;
   }
 
   private async Task ProcessJobsAsync()
@@ -107,8 +130,14 @@ public sealed class SchedulingHostedService(
 
   private async Task ProcessJobAsync(Job job, CancellationToken cancelToken = default)
   {
-    ScheduledEvent message = new(job);
-    logger.LogTrace("Identified job {job} for processing. Queuing event {event}.", job, message);
+    ScheduledEvent message = new(job); // TODO: Fill component name (somehow?)
+
+    logger.LogDebug(
+      "Job identified for processing. [Trigger={type}, ScheduleDelay={delay}, LastExecution={lastExecution}]",
+      job.Trigger,
+      DateTime.UtcNow - job.ScheduledAt,
+      job.Previous.Map(prev => prev.ScheduledAt)
+    );
 
     await messageBusWriter.SendAsync(message, cancelToken);
   }

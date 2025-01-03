@@ -114,4 +114,12 @@ public static class IServiceCollectionExtensions
         sp => new Lazy<IMessageBus?>(sp.GetRequiredService<IMessageBus>)
       )
       .AddTransient<IMessageBusWriter, MessageBusWriter>();
+
+  public static IServiceCollection UseMessageBus(
+    this IServiceCollection services,
+    MessageBusAccessor messageBusAccessor
+  ) =>
+    services.AddSingleton<IMessageBus>(
+      _ => messageBusAccessor.MessageBus ?? throw new NullReferenceException()
+    );
 }

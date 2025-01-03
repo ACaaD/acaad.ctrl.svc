@@ -6,5 +6,7 @@ public static class ServiceKeys
 
   public const string RootTransformer = "entry-transformation-executor";
 
+  public const string RootJobFactory = "entry-job-factory";
+
   public const string AdHocFlowExecutor = "adhoc-flow-executor";
 }

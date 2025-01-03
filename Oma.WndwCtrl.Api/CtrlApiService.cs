@@ -11,8 +11,10 @@ public class CtrlApiService(
   ComponentConfigurationAccessor configurationAccessor,
   MessageBusAccessor messageBusAccessor
 )
-  : WebApplicationWrapper<CtrlApiService>
+  : WebApplicationWrapper<CtrlApiService>(messageBusAccessor)
 {
+  private readonly MessageBusAccessor _messageBusAccessor = messageBusAccessor;
+
   protected override MvcOptions PreConfigureMvcOptions(MvcOptions options)
   {
     options.Conventions.Add(new ComponentApplicationConvention(configurationAccessor));
@@ -23,5 +25,5 @@ public class CtrlApiService(
     .ConfigureServices(services)
     .AddComponentApi()
     .AddSingleton(configurationAccessor)
-    .AddSingleton(messageBusAccessor);
+    .AddSingleton(_messageBusAccessor);
 }

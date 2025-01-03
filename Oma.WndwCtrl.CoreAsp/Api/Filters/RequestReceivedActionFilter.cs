@@ -10,6 +10,10 @@ namespace Oma.WndwCtrl.CoreAsp.Api.Filters;
 public record RequestReceivedMessage(string correlationId, string path, string method) : IMessage
 {
   public string Topic => "Event";
+  public string Type => "API";
+  public virtual string Name => "RequestReceived";
+
+  public string? ComponentName => null;
 }
 
 [PublicAPI]
@@ -21,6 +25,8 @@ public record RequestProcessedMessage : RequestReceivedMessage
   {
     Duration = duration;
   }
+
+  public override string Name => "RequestProcessed";
 
   public TimeSpan Duration { get; }
 }

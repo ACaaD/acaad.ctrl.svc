@@ -17,6 +17,7 @@
         <ProjectReference Include="..\Oma.WndwCtrl.Api\Oma.WndwCtrl.Api.csproj"/>
         <ProjectReference Include="..\Oma.WndwCtrl.CoreAsp\Oma.WndwCtrl.CoreAsp.csproj"/>
         <ProjectReference Include="..\Oma.WndwCtrl.Messaging\Oma.WndwCtrl.Messaging.csproj"/>
+        <ProjectReference Include="..\Oma.WndwCtrl.Scheduling\Oma.WndwCtrl.Scheduling.csproj"/>
     </ItemGroup>
 
 </Project>

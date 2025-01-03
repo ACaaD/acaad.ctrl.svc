@@ -1,4 +1,4 @@
-using System.Diagnostics.CodeAnalysis;
+using LanguageExt;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Messaging.Model;
 
@@ -6,7 +6,15 @@ namespace Oma.WndwCtrl.Scheduling.Interfaces;
 
 public interface IJobFactory
 {
-  Job CreateJob(DateTime referenceDate, ITrigger trigger);
+  bool Handles(ISchedulableTrigger trigger);
 
-  bool TryGetNext(Job current, [NotNullWhen(returnValue: true)] out Job? next);
+  Option<Job> CreateJob(DateTime referenceDate, ISchedulableTrigger trigger);
+
+  Option<Job> GetNext(Job current);
+}
+
+public interface IJobFactory<TTrigger> : IJobFactory
+  where TTrigger : ISchedulableTrigger
+{
+  bool IJobFactory.Handles(ISchedulableTrigger trigger) => trigger is TTrigger;
 }

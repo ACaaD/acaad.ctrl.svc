@@ -1,22 +1,23 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using LanguageExt;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Oma.WndwCtrl.Abstractions.Extensions;
 using Oma.WndwCtrl.Abstractions.Messaging.Model;
-using Oma.WndwCtrl.Configuration.Model;
+using Oma.WndwCtrl.Core.Model;
 using Oma.WndwCtrl.Scheduling.Interfaces;
 
 namespace Oma.WndwCtrl.Scheduling.Jobs;
 
 public sealed class InMemoryJobList(
   ILogger<InMemoryJobList> logger,
-  IJobFactory jobFactory,
-  ComponentConfigurationAccessor componentConfigurationAccessor
+  [FromKeyedServices(ServiceKeys.RootJobFactory)]
+  IJobFactory jobFactory
 ) : IJobList, IDisposable
 {
   private readonly PriorityQueue<Job, DateTime> _jobQueue = new();
-  private readonly Mutex _mutex = new();
+  private readonly SemaphoreSlim _mutex = new(initialCount: 1, maxCount: 1);
 
   public void Dispose()
   {
@@ -26,34 +27,6 @@ public sealed class InMemoryJobList(
   public string Name => nameof(InMemoryJobList);
 
   public Task StoreAsync(CancellationToken cancelToken) => Task.CompletedTask;
-
-  public async Task<int> LoadAsync(DateTime referenceDate, CancellationToken cancelToken)
-  {
-    logger.LogInformation(
-      "Loading jobs and first executions. Note: This job list processor does not take previous service runs (i.e. schedules) into account."
-    );
-
-    logger.LogInformation(
-      "This means that all previous runs (and therefor wait times in rates) are discarded and the schedule starts now ({now}).",
-      DateTime.UtcNow
-    );
-
-    Option<int> result = await ExecuteWithMutexAsync(PopulateJobQueue, cancelToken);
-
-    return result.Match(cnt => cnt, None: 0);
-
-    Task<int> PopulateJobQueue(PriorityQueue<Job, DateTime> jobQueue)
-    {
-      List<Job> jobsFromConfig =
-        componentConfigurationAccessor.Configuration.Triggers.Select(
-          t => jobFactory.CreateJob(referenceDate, t)
-        ).ToList();
-
-      foreach (Job job in jobsFromConfig) _jobQueue.Enqueue(job, job.ScheduledAt);
-
-      return Task.FromResult(jobsFromConfig.Count);
-    }
-  }
 
   public Task<int> FlagAllToFireAsync(CancellationToken cancelToken) => throw new NotImplementedException();
 
@@ -75,7 +48,7 @@ public sealed class InMemoryJobList(
 
     try
     {
-      await _mutex.WaitOneAsync(cancelToken);
+      await _mutex.WaitAsync(cancelToken);
       obtainedMutex = true;
 
       while (!cancelToken.IsCancellationRequested
@@ -84,17 +57,14 @@ public sealed class InMemoryJobList(
       {
         yield return _jobQueue.Dequeue();
 
-        if (jobFactory.TryGetNext(j, out Job? nextJob))
-        {
-          _jobQueue.Enqueue(nextJob, nextJob.ScheduledAt);
-        }
+        jobFactory.GetNext(j).Do(next => _jobQueue.Enqueue(next, next.ScheduledAt));
       }
     }
     finally
     {
       if (obtainedMutex)
       {
-        _mutex.ReleaseMutex();
+        _mutex.Release();
       }
 
       logger.LogTrace(
@@ -102,6 +72,30 @@ public sealed class InMemoryJobList(
         sw.Measure(),
         referenceTime
       );
+    }
+  }
+
+  public async Task<int> MergeJobsAsync(IEnumerable<Job> jobsFromConfig, CancellationToken cancelToken)
+  {
+    logger.LogInformation(
+      "Loading jobs and first executions. Note: This job list processor does not take previous service runs (i.e. schedules) into account."
+    );
+
+    logger.LogInformation(
+      "This means that all previous runs (and therefor wait times in rates) are discarded and the schedule starts now ({now}).",
+      DateTime.UtcNow
+    );
+
+    Option<int> result = await ExecuteWithMutexAsync(PopulateJobQueue, cancelToken);
+
+    return result.Match(cnt => cnt, None: 0);
+
+    Task<int> PopulateJobQueue(PriorityQueue<Job, DateTime> jobQueue)
+    {
+      List<Job> jobList = jobsFromConfig.ToList();
+      foreach (Job job in jobList) _jobQueue.Enqueue(job, job.ScheduledAt);
+
+      return Task.FromResult(jobList.Count);
     }
   }
 
@@ -115,7 +109,7 @@ public sealed class InMemoryJobList(
 
     try
     {
-      await _mutex.WaitOneAsync(cancelToken);
+      await _mutex.WaitAsync(cancelToken);
       logger.LogTrace("Waiting for job list mutex finished. This took {elapsed}.", stopwatch.Measure());
       obtainedMutex = true;
 
@@ -123,12 +117,14 @@ public sealed class InMemoryJobList(
     }
     catch (OperationCanceledException)
     {
+      return Option<T>.None;
+    }
+    finally
+    {
       if (obtainedMutex)
       {
-        _mutex.ReleaseMutex();
+        _mutex.Release();
       }
-
-      return Option<T>.None;
     }
   }
 }

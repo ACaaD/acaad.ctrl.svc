@@ -4,8 +4,12 @@
       "Default": "Information",
       "Microsoft.AspNetCore": "Warning",
       "Oma.WndwCtrl.Core": "Debug",
-      "Oma.WndwCtrl.Core.Executors": "Trace"
+      "Oma.WndwCtrl.Core.Executors": "Trace",
+      "Oma.WndwCtrl.Scheduling": "Debug"
     }
+  },
+  "Scheduling": {
+    "CheckInterval": "00:00:00.1"
   },
   "Kestrel": {
     "Endpoints": {
