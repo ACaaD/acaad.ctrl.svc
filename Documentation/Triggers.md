@@ -20,7 +20,8 @@ the [At-Most](#at-most) section for more details.
 
 ``` json
 {
-    trigger: {
+    // [..]
+    "trigger": {
       "type": "cron",
       "expression": "0 12 * * ?"
     }
@@ -34,7 +35,8 @@ of now, in UTC!).
 
 ``` json
 {
-    trigger: {
+    // [..]
+    "trigger": {
       "type": "rate",
       "expression": "rate(5 minutes)"
     }
