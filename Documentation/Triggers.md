@@ -18,7 +18,7 @@ the [At-Most](#at-most) section for more details.
 
 ### Cron
 
-``` jsonc
+``` json
 {
     // [..]
     "trigger": {
