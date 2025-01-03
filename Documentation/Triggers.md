@@ -28,7 +28,8 @@ the [At-Most](#at-most) section for more details.
 }
 ```
 
-Based on the passed cron expression, executes the component's command. In the case of the example at noon every day.
+Based on the passed cron expression, executes the component's command. In the case of the example at noon every day (as
+of now, in UTC!).
 
 ### Rate
 
@@ -98,6 +99,9 @@ request.
 
 ### Additional Ideas:
 
-- Create an `/event` endpoint (with the component API?) that allows raising custom events from the consumer to trigger
-  command executions
+- Create a `GET:/event` endpoint that shows events raised in the past
+    - allow providing the same properties (`topic`, `name`, `match`) as in the event-trigger payload to filter events (
+      can help setting up configuration)
+- Create a `POST:/event` endpoint (with the component API?) that allows raising custom events from the consumer to
+  trigger command executions
 
