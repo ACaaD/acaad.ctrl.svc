@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		Directory.Packages.props = Directory.Packages.props
 		Directory.Build.props = Directory.Build.props
 		.editorconfig = .editorconfig
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oma.WndwCtrl.MgmtApi", "Oma.WndwCtrl.MgmtApi\Oma.WndwCtrl.MgmtApi.csproj", "{9A924F75-571C-44B4-803D-42B55B38304D}"
@@ -40,6 +41,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oma.WndwCtrl.Messaging", "Oma.WndwCtrl.Messaging\Oma.WndwCtrl.Messaging.csproj", "{0A682208-9471-4C18-B1F3-DAA2734B80EF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oma.WndwCtrl.Messaging.IntegrationTests", ".integrationTests\Oma.WndwCtrl.Messaging.IntegrationTests\Oma.WndwCtrl.Messaging.IntegrationTests.csproj", "{15C4BD87-A719-4031-900D-1A2A8692CA28}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{94B42F55-3A25-4022-B02B-28F4F945CB00}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation\Commands.md = Documentation\Commands.md
+		Documentation\Transformations.md = Documentation\Transformations.md
+		Documentation\Triggers.md = Documentation\Triggers.md
+		Documentation\Components.md = Documentation\Components.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -112,5 +121,6 @@ Global
 		{F8585B59-62BF-47BB-BF7E-1FA14BA75A6D} = {CB01FB73-6F61-43AA-81EB-C3A19BA74122}
 		{E7217C2E-5C78-4106-977D-3091CFA63F43} = {307F90ED-24AD-4725-960B-0A7AAFFE8C6D}
 		{15C4BD87-A719-4031-900D-1A2A8692CA28} = {CB01FB73-6F61-43AA-81EB-C3A19BA74122}
+		{94B42F55-3A25-4022-B02B-28F4F945CB00} = {FC063003-91F3-415C-AB68-D1C08337FAC2}
 	EndGlobalSection
 EndGlobal
