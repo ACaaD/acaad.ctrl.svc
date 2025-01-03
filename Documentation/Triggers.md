@@ -20,7 +20,6 @@ the [At-Most](#at-most) section for more details.
 
 ``` json
 {
-    // [..]
     trigger: {
       "type": "cron",
       "expression": "0 12 * * ?"
@@ -35,7 +34,6 @@ of now, in UTC!).
 
 ``` json
 {
-    // [..]
     trigger: {
       "type": "rate",
       "expression": "rate(5 minutes)"
@@ -57,7 +55,6 @@ _within_ 5 minutes after the service starts.
 
 ``` json
 {
-    // [..]
     trigger: {
       "type": "event",
       "topic": "command-execution",
