@@ -11,7 +11,7 @@ public record ComponentToRunEvent(IComponent Component) : Event
   }
 
   public override string Type => "Scheduling";
-  public override string? ComponentName => Component.Name;
+  public override string ComponentName => Component.Name;
   public override string Name => nameof(ComponentToRunEvent);
 
   public DateTime? ScheduledFor { get; }

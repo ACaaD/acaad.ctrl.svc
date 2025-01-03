@@ -40,17 +40,17 @@ public class DelegatingJobFactory(ILogger<DelegatingJobFactory> logger, IEnumera
   {
     IJobFactory? factory = jobFactories.SingleOrDefault(jf => jf.Handles(trigger));
 
-    if (factory is null)
+    if (factory is not null)
     {
-      logger.LogWarning(
-        "Could not locate factory for trigger type {type}. Trigger=[{trigger}]",
-        trigger.GetType(),
-        trigger
-      );
-
-      return Option<Job>.None;
+      return factory.CreateJob(referenceDate, trigger);
     }
 
-    return factory.CreateJob(referenceDate, trigger);
+    logger.LogWarning(
+      "Could not locate factory for trigger type {type}. Trigger=[{trigger}]",
+      trigger.GetType(),
+      trigger
+    );
+
+    return Option<Job>.None;
   }
 }

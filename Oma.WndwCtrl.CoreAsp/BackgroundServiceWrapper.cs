@@ -33,7 +33,7 @@ public class BackgroundServiceWrapper<TAssemblyDescriptor>(IConfiguration config
     hostBuilder.ConfigureHostConfiguration(builder => builder.AddConfiguration(configuration));
 
     hostBuilder.ConfigureLogging(
-      (ctx, logging) =>
+      (_, logging) =>
       {
         logging.SetMinimumLevel(LogLevel.Trace);
         logging.AddConsole();

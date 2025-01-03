@@ -1,7 +1,9 @@
+using JetBrains.Annotations;
 using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 
 namespace Oma.WndwCtrl.Core.Model.Triggers;
 
+[PublicAPI]
 public record EventTrigger : BaseTrigger
 {
   public string? Topic { get; init; }

@@ -26,15 +26,17 @@ public sealed class InMemoryJobList(
 
   public string Name => nameof(InMemoryJobList);
 
-  public Task StoreAsync(CancellationToken cancelToken) => Task.CompletedTask;
+  public Task StoreAsync(CancellationToken cancelToken = default) => Task.CompletedTask;
 
-  public Task<int> FlagAllToFireAsync(CancellationToken cancelToken) => throw new NotImplementedException();
+  public Task<int> FlagAllToFireAsync(CancellationToken cancelToken = default) =>
+    throw new NotImplementedException();
 
-  public Task<IEnumerable<Job>> GetScheduledJobsAsync() => Task.FromResult<IEnumerable<Job>>(
-    _jobQueue.UnorderedItems
-      .Select(pair => pair.Element)
-      .OrderBy(job => job.ScheduledAt)
-  );
+  public Task<IEnumerable<Job>> GetScheduledJobsAsync(CancellationToken cancelToken = default) =>
+    Task.FromResult<IEnumerable<Job>>(
+      _jobQueue.UnorderedItems
+        .Select(pair => pair.Element)
+        .OrderBy(job => job.ScheduledAt)
+    );
 
   public async IAsyncEnumerable<Job> GetJobsToExecuteAsync(
     DateTime? referenceTime,
@@ -75,7 +77,7 @@ public sealed class InMemoryJobList(
     }
   }
 
-  public async Task<int> MergeJobsAsync(IEnumerable<Job> jobsFromConfig, CancellationToken cancelToken)
+  public async Task<int> MergeJobsAsync(IList<Job> jobsFromConfig, CancellationToken cancelToken)
   {
     logger.LogInformation(
       "Loading jobs and first executions. Note: This job list processor does not take previous service runs (i.e. schedules) into account."

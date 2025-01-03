@@ -60,7 +60,7 @@ public sealed class SchedulingHostedService(
     IEnumerable<Job> jobsFromConfig = GenerateJobsFromConfiguration();
 
     logger.LogInformation("Starting scheduling service with reference date {refDate}.", referenceDate);
-    int count = await jobList.MergeJobsAsync(jobsFromConfig, cancellationToken);
+    int count = await jobList.MergeJobsAsync(jobsFromConfig.ToList(), cancellationToken);
     logger.LogInformation("Found {count} jobs to schedule (Provider={type}).", count, jobList.Name);
 
     SchedulingSettings settings = settingsOptions.Value;

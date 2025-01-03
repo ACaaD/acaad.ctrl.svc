@@ -1,5 +1,3 @@
 namespace Oma.WndwCtrl.Abstractions;
 
-public interface ISchedulableTrigger : ITrigger
-{
-}
+public interface ISchedulableTrigger : ITrigger;

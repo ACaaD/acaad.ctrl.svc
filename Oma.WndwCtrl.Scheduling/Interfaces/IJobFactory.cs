@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using LanguageExt;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Messaging.Model;
@@ -6,6 +7,7 @@ namespace Oma.WndwCtrl.Scheduling.Interfaces;
 
 public interface IJobFactory
 {
+  [PublicAPI]
   bool Handles(ISchedulableTrigger trigger);
 
   Option<Job> CreateJob(DateTime referenceDate, ISchedulableTrigger trigger);

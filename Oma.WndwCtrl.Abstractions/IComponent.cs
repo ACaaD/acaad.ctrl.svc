@@ -1,6 +1,9 @@
+using JetBrains.Annotations;
+
 namespace Oma.WndwCtrl.Abstractions;
 
+[PublicAPI]
 public interface IComponent
 {
-  public string Name { get; set; }
+  string Name { get; set; }
 }
