@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using System.Windows.Input;
+using Oma.WndwCtrl.Abstractions;
 
 namespace Oma.WndwCtrl.Core.Model;
 

@@ -1,9 +1,10 @@
 using System.Text.Json.Serialization;
+using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Core.Model;
 
 namespace Oma.WndwCtrl.Configuration.Model;
 
-public class ComponentConfiguration
+public class ComponentConfiguration : IHasTriggers
 {
   [JsonRequired]
   [JsonInclude]
@@ -14,4 +15,7 @@ public class ComponentConfiguration
   [JsonPropertyOrder(int.MaxValue)]
   [JsonInclude]
   public ConfigurationMetadata Metadata { get; init; } = new();
+
+  [JsonIgnore]
+  public IEnumerable<ITrigger> Triggers => throw new NotImplementedException();
 }

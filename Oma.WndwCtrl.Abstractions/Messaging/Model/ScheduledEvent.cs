@@ -1,5 +1,5 @@
 namespace Oma.WndwCtrl.Abstractions.Messaging.Model;
 
-public record ScheduledEvent : Event
+public record ScheduledEvent(Job job) : Event
 {
 }

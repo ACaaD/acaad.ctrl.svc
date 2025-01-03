@@ -1,3 +1,4 @@
+using Oma.WndwCtrl.Abstractions.Messaging.Model;
 using Oma.WndwCtrl.Scheduling.Model;
 
 namespace Oma.WndwCtrl.Scheduling.Interfaces;
@@ -15,7 +16,7 @@ public interface IJobList
 
   Task StoreAsync(CancellationToken cancelToken);
 
-  Task<int> LoadAsync(CancellationToken cancelToken);
+  Task<int> LoadAsync(DateTime referenceDate, CancellationToken cancelToken);
 
   Task<int> FlagAllToFireAsync(CancellationToken cancelToken);
 }

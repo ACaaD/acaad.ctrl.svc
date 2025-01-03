@@ -23,12 +23,12 @@ public sealed class SchedulingHostedService(
 
   public async ValueTask DisposeAsync()
   {
+    await CastAndDispose(_cts);
+
     if (_timer != null)
     {
       await CastAndDispose(_timer);
     }
-
-    await CastAndDispose(_cts);
 
     return;
 
@@ -47,8 +47,10 @@ public sealed class SchedulingHostedService(
 
   public async Task StartAsync(CancellationToken cancellationToken)
   {
-    logger.LogInformation("Starting scheduling service.");
-    int count = await jobList.LoadAsync(cancellationToken);
+    DateTime referenceDate = DateTime.UtcNow;
+
+    logger.LogInformation("Starting scheduling service with reference date {refDate}.", referenceDate);
+    int count = await jobList.LoadAsync(referenceDate, cancellationToken);
     logger.LogInformation("Found {count} jobs to schedule (Provider={type}).", count, jobList.Name);
 
     SchedulingSettings settings = settingsOptions.Value;
@@ -105,7 +107,7 @@ public sealed class SchedulingHostedService(
 
   private async Task ProcessJobAsync(Job job, CancellationToken cancelToken = default)
   {
-    ScheduledEvent message = new();
+    ScheduledEvent message = new(job);
     logger.LogTrace("Identified job {job} for processing. Queuing event {event}.", job, message);
 
     await messageBusWriter.SendAsync(message, cancelToken);

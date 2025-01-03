@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Oma.WndwCtrl.Abstractions;
 
 namespace Oma.WndwCtrl.Core.Model;
 
@@ -6,4 +7,7 @@ namespace Oma.WndwCtrl.Core.Model;
 [JsonDerivedType(typeof(Button), "button")]
 [JsonDerivedType(typeof(Sensor), "sensor")]
 [JsonDerivedType(typeof(Switch), "switch")]
-public abstract class Component;
+public abstract class Component : IHasTriggers
+{
+  public IEnumerable<ITrigger> Triggers { get; init; } = [];
+}
