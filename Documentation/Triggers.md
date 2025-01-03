@@ -95,10 +95,25 @@ events.
 For example, it is possible (even though very nonsensical) to define a trigger to fire whenever any API receives a
 request.
 
-## Design
+## Design - For Contributors
+
+This section describes the overall architecture to implement triggers. The intended audience is contributors.
+
+### Model
+
+The different trigger types are bound via polymorphism utilizing `BaseTrigger` as a base class (defining the `at-most`
+property). The same approach is used for `Commands` and `Transformations` as well.
+
+### Processing
+
+The processing of triggers and execution of commands is purposefully decoupled, that means that triggers (even specific
+to commands) are raised independent of the command they are attached to and a listener for that event is generated
+automatically from the configuration. This approach aligns nicely with the `Event` type trigger.
 
 ### Additional Ideas:
 
+- Specify events/triggers globally in the configuration, so that these events can trigger multiple commands
+    - Potentially add a GUID (or such) to the event for easier filtering/referencing.
 - Create a `GET:/event` endpoint that shows events raised in the past
     - allow providing the same properties (`topic`, `name`, `match`) as in the event-trigger payload to filter events (
       can help setting up configuration)
