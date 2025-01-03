@@ -55,7 +55,8 @@ _within_ 5 minutes after the service starts.
 
 ``` json
 {
-    trigger: {
+    // [..]
+    "trigger": {
       "type": "event",
       "topic": "command-execution",
       "name": "CommandExecutionFailed"
