@@ -20,15 +20,15 @@ public class ComponentConfigurationAccessor
 
   public ComponentConfiguration Configuration { get; set; } = new();
 
-  public Option<Component> FindComponentByTrigger(ITrigger trigger)
+  public Option<(Component Component, ITrigger Trigger)> FindComponentByTrigger(ITrigger trigger)
   {
     foreach (Component component in Configuration.Components.Values)
       if (component.Triggers.Any(t => t.UniqueIdentifier == trigger.UniqueIdentifier))
       {
-        return Option<Component>.Some(component);
+        return Option<(Component, ITrigger)>.Some((component, trigger));
       }
 
-    return Option<Component>.None;
+    return Option<(Component, ITrigger)>.None;
   }
 
   public async static Task<ComponentConfigurationAccessor> FromFileAsync(
@@ -60,5 +60,9 @@ public class ComponentConfigurationAccessor
   {
     foreach (KeyValuePair<string, Component> component in componentConfiguration.Components)
       component.Value.Name = component.Key;
+
+    foreach (Component component in componentConfiguration.Components.Values)
+    foreach (ICommand command in component.Commands)
+      command.Component = component;
   }
 }

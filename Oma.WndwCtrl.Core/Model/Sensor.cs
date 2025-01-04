@@ -10,6 +10,8 @@ namespace Oma.WndwCtrl.Core.Model;
 /// </summary>
 public class Sensor : Component, IStateQueryable
 {
+  public override IEnumerable<ICommand> Commands => [QueryCommand,];
+
   [JsonInclude]
   [JsonRequired]
   public ICommand QueryCommand { get; internal set; } = null!;

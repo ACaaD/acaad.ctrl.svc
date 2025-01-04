@@ -61,7 +61,7 @@ _within_ 5 minutes after the service starts.
     "trigger": {
       "type": "event",
       "topic": "command-execution",
-      "name": "CommandExecutionFailed"
+      "name": "CommandExecutionFailed",
       "match": "$.[?(@.component= 'ping-google')]"
     }
 }
@@ -73,11 +73,12 @@ path expression to limit the considered events.
 
 The following properties can be provided and are combined by `AND`-ing if present to filter events:
 
-| Property | Description                                                                       | Mandatory |
-|----------|-----------------------------------------------------------------------------------|-----------|
-| Topic    | Topics are the category of an event                                               | No        |
-| Name     | Name of the event to listen for                                                   | No        |
-| Match    | Allows specifying a json path expression (must evaluate to non-empty set to fire) | No        |
+| Property      | Description                                                                       | Mandatory |
+|---------------|-----------------------------------------------------------------------------------|-----------|
+| Topic         | Topics are the category of an event                                               | No        |
+| Name          | Name of the event to listen for                                                   | No        |
+| ComponentName | Name of the component (from configuration)                                        | No        |
+| Match         | Allows specifying a json path expression (must evaluate to non-empty set to fire) | No        |
 
 The above trigger fires if a command fails where the component's name is _exactly_ `ping-google`.
 

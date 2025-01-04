@@ -19,6 +19,8 @@ public class Switch : Component, IStateQueryable
   [JsonRequired]
   public ICommand OffCommand { get; internal set; } = null!;
 
+  public override IEnumerable<ICommand> Commands => [QueryCommand,];
+
   [JsonInclude]
   [JsonRequired]
   public ICommand QueryCommand { get; internal set; } = null!;

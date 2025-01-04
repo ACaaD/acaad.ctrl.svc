@@ -153,7 +153,7 @@ internal sealed class ChannelWorker<TConsumer, TMessage>(ILogger<TConsumer> logg
             message.GetType().FullName
           );
 
-          return;
+          continue; // Do not return here - that kills the worker (╯°□°）╯︵ ┻━┻
         }
 
         if (_consumer.IsSubscribedTo(message))

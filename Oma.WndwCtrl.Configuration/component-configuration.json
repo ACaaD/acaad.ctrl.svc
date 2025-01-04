@@ -18,24 +18,21 @@
         ]
       },
       "triggers": [
-        {
-          "type": "rate",
-          "expression": "5 seconds"
-        }
       ]
     },
-    "failing-sensor": {
+    "git-bash": {
       "type": "sensor",
       "queryCommand": {
         "type": "cli",
-        "fileName": "doesnt-exist",
-        "arguments": "N/A",
+        "fileName": "C:\\Program Files\\Git\\usr\\bin\\bash.exe",
+        "arguments": "/z/bash/print-something.sh",
         "transformations": []
       },
       "triggers": [
         {
-          "type": "event",
-          "name": "RequestReceived"
+          "type": "rate",
+          "expression": "5 seconds",
+          "friendlyName": "every 5 sec"
         }
       ]
     },
@@ -46,7 +43,13 @@
         "fileName": "ping",
         "arguments": "--this-should-not-work",
         "transformations": []
-      }
+      },
+      "triggers": [
+        {
+          "type": "event",
+          "name": "RequestReceived-not-found"
+        }
+      ]
     }
   }
 }

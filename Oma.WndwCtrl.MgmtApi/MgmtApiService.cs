@@ -1,4 +1,5 @@
 using Oma.WndwCtrl.Api.Extensions;
+using Oma.WndwCtrl.CommandProcessor;
 using Oma.WndwCtrl.CoreAsp;
 using Oma.WndwCtrl.Messaging.Bus;
 using Oma.WndwCtrl.MgmtApi.Extensions;
@@ -20,7 +21,8 @@ public class MgmtApiService(MessageBusAccessor? messageBusAccessor)
       .AddHostedService<ServiceWorker>()
       .AddBackgroundService<MessageBusService>()
       .AddBackgroundService<EventLoggingService>()
-      .AddBackgroundService<SchedulingService>();
+      .AddBackgroundService<SchedulingService>()
+      .AddBackgroundService<CommandProcessingService>();
 
     return result;
   }

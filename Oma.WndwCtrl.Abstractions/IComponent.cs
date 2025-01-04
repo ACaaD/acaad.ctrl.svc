@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 namespace Oma.WndwCtrl.Abstractions;
 
 [PublicAPI]
-public interface IComponent
+public interface IComponent : IHasCommands
 {
   string Name { get; set; }
 }

@@ -1,8 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
-using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 
-namespace Oma.WndwCtrl.Messaging;
+namespace Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 
 [PublicAPI]
 public interface IMessageConsumer

@@ -8,4 +8,6 @@ public abstract record BaseTrigger : ITrigger
 {
   [JsonIgnore]
   public Guid UniqueIdentifier { get; } = Guid.NewGuid();
+
+  public string? FriendlyName { get; set; }
 }

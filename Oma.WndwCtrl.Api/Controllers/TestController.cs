@@ -39,7 +39,7 @@ public class TestController([FromKeyedServices(ServiceKeys.AdHocFlowExecutor)] I
             return NotFound();
 #endif
 
-    Either<FlowError, TransformationOutcome> flowResult =
+    Either<FlowError, FlowOutcome> flowResult =
       await flowExecutor.ExecuteAsync(command, HttpContext.RequestAborted);
 
     return flowResult.BiFold<IActionResult>(

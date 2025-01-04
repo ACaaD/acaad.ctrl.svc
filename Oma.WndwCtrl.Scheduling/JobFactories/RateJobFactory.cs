@@ -9,7 +9,7 @@ namespace Oma.WndwCtrl.Scheduling.JobFactories;
 public class RateJobFactory : IJobFactory<RateTrigger>
 {
   public Option<Job> CreateJob(DateTime referenceDate, ISchedulableTrigger trigger) =>
-    new Job(trigger, referenceDate.AddSeconds(value: 5));
+    new Job(trigger, referenceDate.AddSeconds(value: 1));
 
   public Option<Job> GetNext(Job current) => current with
   {

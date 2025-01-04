@@ -4,10 +4,10 @@ using Microsoft.Extensions.Logging;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 using Oma.WndwCtrl.Abstractions.Messaging.Model;
+using Oma.WndwCtrl.Abstractions.Messaging.Model.ComponentExecution;
 using Oma.WndwCtrl.Configuration.Model;
 using Oma.WndwCtrl.Core.Model;
 using Oma.WndwCtrl.Core.Model.Triggers;
-using Oma.WndwCtrl.Messaging;
 
 namespace Oma.WndwCtrl.Scheduling;
 
@@ -42,10 +42,10 @@ public class TriggerEventConsumer(
       triggersToSearch = triggersToSearch.Concat([job.Trigger,]);
     }
 
-    foreach (Component component in triggersToSearch
+    foreach ((Component Component, ITrigger Trigger) in triggersToSearch
                .Select(componentConfigurationAccessor.FindComponentByTrigger).Somes())
     {
-      IMessage msg = new ComponentToRunEvent(component, job);
+      IMessage msg = new ComponentToRunEvent(Component, Trigger, job);
       await messageBusWriter.SendAsync(msg, cancelToken);
     }
   }

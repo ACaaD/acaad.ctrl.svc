@@ -23,6 +23,8 @@ public record TransformationOutcome : IOutcome
 
   public bool Success { get; init; }
   public string OutcomeRaw { get; init; } = string.Empty;
+
+  public virtual FlowOutcome ToFlowOutcome() => new(this);
 }
 
 [Serializable]
@@ -44,4 +46,8 @@ public record TransformationOutcome<TData> : TransformationOutcome
   }
 
   public TData? Outcome { get; init; }
+
+  public override FlowOutcome ToFlowOutcome() => Outcome is not null
+    ? new FlowOutcome<TData>(Outcome, Success)
+    : new FlowOutcome<TData>(this);
 }

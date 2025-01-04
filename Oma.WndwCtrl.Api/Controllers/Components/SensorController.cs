@@ -18,7 +18,7 @@ public class SensorController : ComponentControllerBase<Sensor>
   [EndpointSummary("Query Sensor")]
   public async Task<IActionResult> QueryAsync()
   {
-    Either<FlowError, TransformationOutcome> flowResult =
+    Either<FlowError, FlowOutcome> flowResult =
       await FlowExecutor.ExecuteAsync(Component.QueryCommand, HttpContext.RequestAborted);
 
     return flowResult.BiFold<IActionResult>(
