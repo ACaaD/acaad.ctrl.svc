@@ -1,7 +1,9 @@
+using JetBrains.Annotations;
 using Oma.WndwCtrl.Abstractions.Model;
 
 namespace Oma.WndwCtrl.Abstractions.Messaging.Model.ComponentExecution;
 
+[PublicAPI]
 public record ComponentCommandExecutionSucceeded : ComponentCommandExecutionFinished
 {
   public ComponentCommandExecutionSucceeded(

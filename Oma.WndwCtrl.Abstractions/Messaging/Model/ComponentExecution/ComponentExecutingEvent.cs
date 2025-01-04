@@ -1,5 +1,8 @@
+using JetBrains.Annotations;
+
 namespace Oma.WndwCtrl.Abstractions.Messaging.Model.ComponentExecution;
 
+[PublicAPI]
 public record ComponentExecutingEvent : ComponentEvent
 {
   public ComponentExecutingEvent(

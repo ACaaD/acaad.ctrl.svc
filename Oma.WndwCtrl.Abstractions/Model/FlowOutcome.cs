@@ -1,7 +1,9 @@
 using System.Text.Json;
+using JetBrains.Annotations;
 
 namespace Oma.WndwCtrl.Abstractions.Model;
 
+[PublicAPI]
 public record FlowOutcome : IOutcome
 {
   public FlowOutcome()

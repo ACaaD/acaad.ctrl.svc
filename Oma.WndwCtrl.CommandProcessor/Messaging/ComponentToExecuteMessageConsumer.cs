@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using LanguageExt;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -11,6 +12,7 @@ using Oma.WndwCtrl.Core.Model;
 
 namespace Oma.WndwCtrl.CommandProcessor.Messaging;
 
+[UsedImplicitly]
 public class ComponentToExecuteMessageConsumer(
   ILogger<ComponentToExecuteMessageConsumer> logger,
   IMessageBusWriter messageBusWriter,
@@ -18,7 +20,6 @@ public class ComponentToExecuteMessageConsumer(
 )
   : IMessageConsumer<ComponentToRunEvent>
 {
-  private Guid Instance { get; } = Guid.NewGuid();
   public bool IsSubscribedTo(IMessage message) => true;
 
   public Task OnExceptionAsync(IMessage message, Exception exception, CancellationToken cancelToken = default)
@@ -41,7 +42,7 @@ public class ComponentToExecuteMessageConsumer(
     ComponentExecutingEvent componentExecutingEvent =
       await RaiseExecutionStartingAsync(message, commands, cancelToken);
 
-    ComponentExecutionResult executionResult = ComponentExecutionResult.Succeeded;
+    ComponentExecutionResult executionResult = ComponentExecutionResult.Initial;
 
     foreach (ICommand command in commands)
     {
@@ -53,6 +54,10 @@ public class ComponentToExecuteMessageConsumer(
       );
 
       await messageBusWriter.SendAsync(eventToRaise, cancelToken);
+
+      executionResult |= either.IsRight
+        ? ComponentExecutionResult.Succeeded
+        : ComponentExecutionResult.Failed;
     }
 
     await RaiseExecutionFinishedAsync(executionResult, componentExecutingEvent, cancelToken);

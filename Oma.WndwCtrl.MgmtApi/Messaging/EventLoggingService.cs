@@ -1,6 +1,5 @@
 using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 using Oma.WndwCtrl.CoreAsp;
-using Oma.WndwCtrl.Messaging;
 using Oma.WndwCtrl.Messaging.Bus;
 using Oma.WndwCtrl.Messaging.Extensions;
 
