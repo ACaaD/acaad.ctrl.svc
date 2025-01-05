@@ -22,7 +22,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Nonr Include="CtrlApiService.config.json"/>
+        <None Include="CtrlApiService.config.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
         <None Include="CtrlApiService.config.development.json"/>
     </ItemGroup>
 

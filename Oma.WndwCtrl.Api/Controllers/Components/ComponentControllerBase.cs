@@ -1,6 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
+using LanguageExt;
 using Microsoft.AspNetCore.Mvc;
+using Oma.WndwCtrl.Abstractions;
+using Oma.WndwCtrl.Abstractions.Errors;
+using Oma.WndwCtrl.Abstractions.Model;
 using Oma.WndwCtrl.Core.Interfaces;
 using Oma.WndwCtrl.Core.Model;
 
@@ -30,4 +34,23 @@ public class ComponentControllerBase<TComponent> : ControllerBase
   [HttpGet("config")]
   [EndpointSummary("Component Details")]
   public IActionResult GetDetails() => Ok(Component);
+
+  [NonAction]
+  public async Task<IActionResult> ExecuteCommandAsync(ICommand command)
+  {
+    Either<FlowError, FlowOutcome> flowResult =
+      await FlowExecutor.ExecuteAsync(command, HttpContext.RequestAborted);
+
+    return flowResult.BiFold<IActionResult>(
+      null!,
+      Right: (_, outcome) => Ok(outcome),
+      Left: (_, error) => Problem(
+        error.Message,
+        title: $"[{error.Code}] A {error.GetType().Name} occurred.",
+        statusCode: error.IsExceptional
+          ? 500
+          : 400
+      )
+    );
+  }
 }

@@ -7,7 +7,7 @@ public class ServiceWorker(ServiceState serviceState) : IHostedService
 {
   public async Task StartAsync(CancellationToken cancellationToken)
   {
-    foreach (IServiceWrapper<IService>? service in serviceState.All)
+    foreach (IServiceWrapper<IService>? service in serviceState.All.Where(s => s.Enabled))
       await service.StartAsync(cancellationToken);
   }
 

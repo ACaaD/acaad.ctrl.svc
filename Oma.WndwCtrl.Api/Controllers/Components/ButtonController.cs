@@ -9,13 +9,9 @@ namespace Oma.WndwCtrl.Api.Controllers.Components;
   "RouteTemplates.MethodMissingRouteParameters",
   Justification = "Won't fix: Controller template; route parameters resolved through convention."
 )]
-public class ButtonController : ComponentControllerBase<Switch>
+public class ButtonController : ComponentControllerBase<Button>
 {
   [HttpPost("trigger")]
   [EndpointSummary("Trigger")]
-  public async Task<IActionResult> TriggerAsync()
-  {
-    await Task.Delay(millisecondsDelay: 0);
-    throw new NotImplementedException();
-  }
+  public async Task<IActionResult> TriggerAsync() => await ExecuteCommandAsync(Component.Command);
 }

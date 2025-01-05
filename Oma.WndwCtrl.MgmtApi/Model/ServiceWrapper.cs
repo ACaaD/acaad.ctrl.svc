@@ -33,6 +33,8 @@ public sealed record ServiceWrapper<TService> : IDisposable, IServiceWrapper<TSe
   public DateTime? StartedAt { get; private set; }
   public ServiceStatus Status { get; private set; }
 
+  public bool Enabled => Service.Enabled;
+
   public Task StartAsync(CancellationToken cancelToken = default, params string[] args)
   {
     if (IsRunning())

@@ -22,7 +22,9 @@ public class MgmtApiService(MessageBusAccessor? messageBusAccessor)
       .AddBackgroundService<MessageBusService>()
       .AddBackgroundService<EventLoggingService>()
       .AddBackgroundService<SchedulingService>()
-      .AddBackgroundService<CommandProcessingService>();
+      .AddBackgroundService<CommandProcessingService>()
+      // TODO: Should not always be added ? 
+      .AddWindowsService();
 
     return result;
   }

@@ -7,6 +7,7 @@ namespace Oma.WndwCtrl.Core.Model.Commands;
 [Serializable]
 public class BaseCommand : ICommand
 {
+  public TimeSpan WaitOnComplete { get; set; } = TimeSpan.Zero;
   public int Retries { get; set; }
 
   public TimeSpan Timeout { get; set; }

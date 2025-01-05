@@ -20,6 +20,29 @@
       "triggers": [
       ]
     },
+    "ip-addr": {
+      "type": "sensor",
+      "queryCommand": {
+        "type": "cli",
+        "fileName": "ipconfig",
+        "transformations": [
+          {
+            "type": "parser",
+            "statements": [
+              "Regex.Match($'\\s*IPv4 Address[\\.\\s\\:]*([\\.\\d]*)');",
+              "Values.Index(1);"
+            ]
+          }
+        ]
+      },
+      "triggers": [
+        {
+          "type": "rate",
+          "expression": "5 seconds",
+          "friendlyName": "every 5 sec"
+        }
+      ]
+    },
     "git-bash": {
       "type": "sensor",
       "queryCommand": {
@@ -29,11 +52,6 @@
         "transformations": []
       },
       "triggers": [
-        {
-          "type": "rate",
-          "expression": "5 seconds",
-          "friendlyName": "every 5 sec"
-        }
       ]
     },
     "invalid-parameters": {

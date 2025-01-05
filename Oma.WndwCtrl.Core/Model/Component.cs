@@ -13,6 +13,8 @@ public abstract class Component : IComponent, IHasTriggers
 {
   public string Name { get; set; } = string.Empty;
 
+  [JsonIgnore]
   public abstract IEnumerable<ICommand> Commands { get; }
+
   public IEnumerable<ITrigger> Triggers { get; init; } = [];
 }

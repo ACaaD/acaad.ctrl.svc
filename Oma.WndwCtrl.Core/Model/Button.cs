@@ -12,5 +12,6 @@ public class Button : Component
   [JsonRequired]
   public ICommand Command { get; internal set; } = null!;
 
+  [JsonIgnore]
   public override IEnumerable<ICommand> Commands => [Command,];
 }

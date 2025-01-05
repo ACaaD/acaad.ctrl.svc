@@ -12,6 +12,8 @@ public interface ICommand
   [UsedImplicitly]
   TimeSpan Timeout { get; }
 
+  TimeSpan WaitOnComplete { get; }
+
   IEnumerable<ITransformation> Transformations { get; }
 
   [JsonIgnore]

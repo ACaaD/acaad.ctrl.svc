@@ -47,6 +47,9 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(MessageBusAccessor? mess
     set => _serviceProvider = value;
   }
 
+  // TODO: Fix me
+  public bool Enabled => true;
+
   public async Task StartAsync(CancellationToken cancelToken = default, params string[] args)
   {
 #if DEBUG
@@ -152,6 +155,8 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(MessageBusAccessor? mess
         )
       );
   }
+
+  protected virtual IHostBuilder ConfigureHost(IHostBuilder hostBuilder) => hostBuilder;
 
   [PublicAPI]
   protected virtual IConfigurationBuilder ConfigurationConfiguration(

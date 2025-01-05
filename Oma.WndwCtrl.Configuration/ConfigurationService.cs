@@ -8,6 +8,8 @@ public class ConfigurationService(
 )
   : IBackgroundService
 {
+  public bool Enabled => true;
+
   public async Task StartAsync(CancellationToken cancelToken = default, params string[] arg)
   {
     // TODO: Error handling

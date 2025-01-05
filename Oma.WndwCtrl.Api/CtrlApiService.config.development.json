@@ -6,5 +6,12 @@
       "Oma.WndwCtrl.Core": "Debug",
       "Oma.WndwCtrl.Core.Executors": "Trace"
     }
+  },
+  "Kestrel": {
+    "Endpoints": {
+      "CtrlApi": {
+        "Url": "http://localhost:5000"
+      }
+    }
   }
 }

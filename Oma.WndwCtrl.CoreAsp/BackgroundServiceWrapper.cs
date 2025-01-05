@@ -22,6 +22,13 @@ public class BackgroundServiceWrapper<TAssemblyDescriptor>(IConfiguration config
   [PublicAPI]
   protected IHost? Host { get; private set; }
 
+  private static string ServiceName => typeof(TAssemblyDescriptor).Name;
+
+  public bool Enabled => !bool.TryParse(
+    configuration.GetSection(ServiceName).GetValue<string>("Enabled") ?? "true",
+    out bool enabled
+  ) || enabled;
+
   public async Task StartAsync(CancellationToken cancelToken = default, params string[] args)
   {
 #if DEBUG

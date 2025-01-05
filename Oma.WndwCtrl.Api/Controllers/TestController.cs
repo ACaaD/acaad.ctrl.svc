@@ -35,8 +35,9 @@ public class TestController([FromKeyedServices(ServiceKeys.AdHocFlowExecutor)] I
   public async Task<IActionResult> TestCommandAsync([FromBody] ICommand command)
   {
     // TODO: Obvious security concerns here...
+    // During development ok.
 #if !DEBUG
-            return NotFound();
+            // return NotFound();
 #endif
 
     Either<FlowError, FlowOutcome> flowResult =
@@ -101,8 +102,10 @@ public class TestController([FromKeyedServices(ServiceKeys.AdHocFlowExecutor)] I
 
   private void AppendLogsToHeader()
   {
+    // TODO: Obvious security concerns here...
+    // During development ok.
 #if !DEBUG
-        return;
+            // return NotFound();
 #endif
 
     try

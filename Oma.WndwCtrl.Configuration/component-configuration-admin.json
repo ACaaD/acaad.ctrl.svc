@@ -1,0 +1,79 @@
+{
+  "components": {
+    "oma-service-status": {
+      "type": "sensor",
+      "queryCommand": {
+        "type": "cli",
+        "fileName": "sc.exe",
+        "arguments": "query state= all",
+        "transformations": [
+          {
+            "type": "parser",
+            "statements": [
+              "Anchor.From('SERVICE_NAME: OmaMgmtApi');",
+              "Anchor.To('WAIT_HINT');",
+              "Regex.Match($'STATE[\\s:\\d]*(\\w+)');",
+              "Values.Index(1);"
+            ]
+          }
+        ]
+      },
+      "triggers": [
+      ]
+    },
+    "oma-service-start": {
+      "type": "button",
+      "command": {
+        "type": "cli",
+        "fileName": "sc.exe",
+        "arguments": "start OmaMgmtApi"
+      },
+      "triggers": [
+        {
+          "type": "event",
+          "name": "ComponentCommandOutcomeEvent",
+          "componentName": "oma-service-copy-configuration"
+        }
+      ]
+    },
+    "oma-service-stop": {
+      "type": "button",
+      "command": {
+        "type": "cli",
+        "fileName": "sc.exe",
+        "arguments": "stop OmaMgmtApi",
+        "waitOnComplete": "00:00:05"
+      }
+    },
+    "oma-service-copy-binaries": {
+      "type": "button",
+      "command": {
+        "type": "cli",
+        "fileName": "xcopy",
+        "arguments": "/Y /F /S \"\\\\nas\\temporary storage\\Build\\MgmtApi\\Release\" \"C:\\Services\\Debug\""
+      },
+      "triggers": [
+        {
+          "type": "event",
+          "name": "ComponentCommandOutcomeEvent",
+          "componentName": "oma-service-stop"
+        }
+      ]
+    },
+    "oma-service-copy-configuration": {
+      "type": "button",
+      "command": {
+        "type": "cli",
+        "fileName": "xcopy",
+        "arguments": "/Y /F /S \"\\\\nas\\mapped\\Service.Cfg\\User\" \"C:\\Services\\Debug\""
+      },
+      "triggers": [
+        {
+          "type": "event",
+          "name": "ComponentCommandOutcomeEvent",
+          "componentName": "oma-service-copy-binaries"
+        }
+      ]
+    }
+  }
+}

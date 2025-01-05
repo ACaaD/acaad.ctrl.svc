@@ -18,6 +18,8 @@ public interface IService
     );
   }
 
+  bool Enabled { get; }
+
   Task StartAsync(CancellationToken cancelToken = default, params string[] args);
 
   Task ForceStopAsync(CancellationToken cancelToken = default);

@@ -16,36 +16,49 @@ public class CliCommandExecutor : ICommandExecutor<CliCommand>
     CancellationToken cancelToken = default
   )
   {
-    ProcessStartInfo processStartInfo = new()
+    try
     {
-      FileName = command.FileName,
-      Arguments = command.Arguments,
-      CreateNoWindow = false,
-      RedirectStandardOutput = true,
-      RedirectStandardError = true,
-    };
+      ProcessStartInfo processStartInfo = new()
+      {
+        FileName = command.FileName,
+        Arguments = command.Arguments,
+        CreateNoWindow = false,
+        RedirectStandardOutput = true,
+        RedirectStandardError = true,
+      };
 
-    Process? process = Process.Start(processStartInfo);
+      Process? process = Process.Start(processStartInfo);
 
-    if (process is null)
-    {
-      return Left<FlowError>(
-        new CliCommandError("Could not obtain process instance.", isExceptional: true, isExpected: false)
+      if (process is null)
+      {
+        return Left<FlowError>(
+          new CliCommandError("Could not obtain process instance.", isExceptional: true, isExpected: false)
+        );
+      }
+
+      // TODO: This sometimes works, sometimes doesnt (depending on the called cli tool??)
+      // Maybe make configurable ? 
+      // await process.WaitForExitAsync(cancelToken);
+
+      string allText = await process.StandardOutput.ReadToEndAsync(cancelToken);
+      string errorText = await process.StandardError.ReadToEndAsync(cancelToken);
+
+      return Right(
+        new CommandOutcome
+        {
+          Success = process.ExitCode == 0,
+          OutcomeRaw = process.ExitCode == 0 ? allText
+            : string.IsNullOrEmpty(errorText) ? allText : errorText,
+        }
       );
     }
-
-    await process.WaitForExitAsync(cancelToken);
-
-    string allText = await process.StandardOutput.ReadToEndAsync(cancelToken);
-    string errorText = await process.StandardError.ReadToEndAsync(cancelToken);
-
-    return Right(
-      new CommandOutcome
-      {
-        Success = process.ExitCode == 0,
-        OutcomeRaw = process.ExitCode == 0 ? allText
-          : string.IsNullOrEmpty(errorText) ? allText : errorText,
-      }
-    );
+    catch (OperationCanceledException ex)
+    {
+      return Left<FlowError>(new OperationCancelledError(ex));
+    }
+    catch (Exception ex)
+    {
+      return Left<FlowError>(new TechnicalError("An unexpected technical error has occured.", Code: -1, ex));
+    }
   }
 }

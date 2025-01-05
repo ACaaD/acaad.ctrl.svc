@@ -9,6 +9,8 @@
     }
   },
   "SchedulingService": {
+    "Enabled": true,
+    "Active": false,
     "CheckInterval": "00:00:00.1"
   },
   "Kestrel": {

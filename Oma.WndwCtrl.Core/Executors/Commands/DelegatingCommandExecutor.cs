@@ -13,6 +13,19 @@ namespace Oma.WndwCtrl.Core.Executors.Commands;
 
 public class DelegatingCommandExecutor : ICommandExecutor
 {
+  private static FlowT<CommandState, Unit> WaitOnCompleteIO =
+  (
+    from c in Flow<CommandState>.asks2(state => state.Command)
+    from _ in Flow<CommandState>.liftAsync(
+      async envIO =>
+      {
+        await Task.Delay(c.WaitOnComplete, envIO.Token);
+        return Unit.Default;
+      }
+    )
+    select _
+  ).As();
+
   private readonly IEnumerable<ICommandExecutor> _commandExecutors;
   private readonly ILogger<DelegatingCommandExecutor> _logger;
 
@@ -44,6 +57,7 @@ public class DelegatingCommandExecutor : ICommandExecutor
     from cmd in Command
     from executor in FindApplicableExecutor
     from outcome in ExecuteExecutorIO(cmd, executor)
+    from dly in WaitOnCompleteIO
     select outcome
   ).As();
 

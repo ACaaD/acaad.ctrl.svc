@@ -7,6 +7,7 @@
     </PropertyGroup>
     <ItemGroup Label="General">
         <PackageVersion Include="LanguageExt.Core" Version="5.0.0-beta-45"/>
+        <PackageVersion Include="Microsoft.Extensions.Hosting.WindowsServices" Version="9.0.0"/>
     </ItemGroup>
     <ItemGroup Label="Host">
         <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0"/>

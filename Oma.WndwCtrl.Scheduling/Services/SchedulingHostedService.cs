@@ -55,6 +55,12 @@ public sealed class SchedulingHostedService(
 
   public async Task StartAsync(CancellationToken cancellationToken)
   {
+    if (!settingsOptions.Value.Active)
+    {
+      logger.LogWarning("Generating of scheduled events is disabled. Exiting early.");
+      return;
+    }
+
     DateTime referenceDate = DateTime.UtcNow;
 
     IEnumerable<Job> jobsFromConfig = GenerateJobsFromConfiguration();
