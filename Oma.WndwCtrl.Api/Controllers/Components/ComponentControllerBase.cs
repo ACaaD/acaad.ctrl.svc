@@ -36,7 +36,7 @@ public class ComponentControllerBase<TComponent> : ControllerBase
   public IActionResult GetDetails() => Ok(Component);
 
   [NonAction]
-  public async Task<IActionResult> ExecuteCommandAsync(ICommand command)
+  protected async Task<IActionResult> ExecuteCommandAsync(ICommand command)
   {
     Either<FlowError, FlowOutcome> flowResult =
       await FlowExecutor.ExecuteAsync(command, HttpContext.RequestAborted);

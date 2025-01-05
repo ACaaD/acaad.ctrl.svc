@@ -13,7 +13,7 @@ namespace Oma.WndwCtrl.Core.Executors.Commands;
 
 public class DelegatingCommandExecutor : ICommandExecutor
 {
-  private static FlowT<CommandState, Unit> WaitOnCompleteIO =
+  private static readonly FlowT<CommandState, Unit> WaitOnCompleteIO =
   (
     from c in Flow<CommandState>.asks2(state => state.Command)
     from _ in Flow<CommandState>.liftAsync(

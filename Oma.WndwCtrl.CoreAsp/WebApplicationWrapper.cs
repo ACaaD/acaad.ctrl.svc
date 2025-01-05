@@ -156,8 +156,6 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(MessageBusAccessor? mess
       );
   }
 
-  protected virtual IHostBuilder ConfigureHost(IHostBuilder hostBuilder) => hostBuilder;
-
   [PublicAPI]
   protected virtual IConfigurationBuilder ConfigurationConfiguration(
     IConfigurationBuilder configurationBuilder

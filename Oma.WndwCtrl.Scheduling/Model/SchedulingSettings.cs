@@ -1,5 +1,8 @@
+using JetBrains.Annotations;
+
 namespace Oma.WndwCtrl.Scheduling.Model;
 
+[PublicAPI]
 public record SchedulingSettings
 {
   public const string SettingsKey = nameof(SchedulingService);
