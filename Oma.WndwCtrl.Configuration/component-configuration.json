@@ -55,8 +55,8 @@
       ]
     },
     "invalid-parameters": {
-      "type": "sensor",
-      "queryCommand": {
+      "type": "button",
+      "command": {
         "type": "cli",
         "fileName": "ping",
         "arguments": "--this-should-not-work",

@@ -13,6 +13,9 @@ public class Sensor : Component, IStateQueryable
   [JsonIgnore]
   public override IEnumerable<ICommand> Commands => [QueryCommand,];
 
+  [JsonIgnore]
+  public override string Type => "sensor";
+
   [JsonInclude]
   [JsonRequired]
   public ICommand QueryCommand { get; internal set; } = null!;

@@ -56,6 +56,7 @@ public class AdHocFlowExecutor(
   private record AdHocComponent(ICommand Command) : IComponent
   {
     public string Name { get; set; } = nameof(AdHocComponent);
+    public string Type => "adhoc";
     public IEnumerable<ICommand> Commands => [Command,];
   }
 }

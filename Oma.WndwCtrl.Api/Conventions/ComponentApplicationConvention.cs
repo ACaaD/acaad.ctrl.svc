@@ -39,6 +39,8 @@ public class ComponentApplicationConvention(ComponentConfigurationAccessor confi
         ControllerName = component.Key,
       };
 
+      controllerModel.Properties.Add(nameof(Component), component);
+      controllerModel.Properties.Add($"{nameof(Component)}.Name", component);
       UpdateSelectorRouteTemplates(controllerModel, component);
       AddComponentToActionProperties(controllerModel, component.Value);
 

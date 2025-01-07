@@ -11,6 +11,9 @@ namespace Oma.WndwCtrl.Core.Model;
 /// </summary>
 public class Switch : Component, IStateQueryable
 {
+  [JsonIgnore]
+  public override string Type => "switch";
+
   [JsonInclude]
   [JsonRequired]
   public ICommand OnCommand { get; internal set; } = null!;

@@ -16,5 +16,8 @@ public abstract class Component : IComponent, IHasTriggers
   [JsonIgnore]
   public abstract IEnumerable<ICommand> Commands { get; }
 
+  [JsonIgnore]
+  public abstract string Type { get; }
+
   public IEnumerable<ITrigger> Triggers { get; init; } = [];
 }

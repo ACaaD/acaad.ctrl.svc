@@ -6,4 +6,6 @@ namespace Oma.WndwCtrl.Abstractions;
 public interface IComponent : IHasCommands
 {
   string Name { get; set; }
+
+  string Type { get; }
 }

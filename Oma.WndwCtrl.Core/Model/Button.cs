@@ -8,6 +8,9 @@ namespace Oma.WndwCtrl.Core.Model;
 /// </summary>
 public class Button : Component
 {
+  [JsonIgnore]
+  public override string Type => "button";
+
   [JsonInclude]
   [JsonRequired]
   public ICommand Command { get; internal set; } = null!;
