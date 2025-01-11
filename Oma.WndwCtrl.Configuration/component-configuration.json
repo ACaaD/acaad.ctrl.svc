@@ -54,6 +54,29 @@
       "triggers": [
       ]
     },
+    "test-switch": {
+      "type": "switch",
+      "queryCommand": {
+        "type": "cli",
+        "fileName": "C:\\Program Files\\Git\\usr\\bin\\bash.exe",
+        "arguments": "/z/bash/print-something.sh",
+        "transformations": []
+      },
+      "onCommand": {
+        "type": "cli",
+        "fileName": "C:\\Program Files\\Git\\usr\\bin\\bash.exe",
+        "arguments": "/z/bash/print-something.sh",
+        "transformations": []
+      },
+      "offCommand": {
+        "type": "cli",
+        "fileName": "C:\\Program Files\\Git\\usr\\bin\\bash.exe",
+        "arguments": "/z/bash/print-something.sh",
+        "transformations": []
+      },
+      "triggers": [
+      ]
+    },
     "invalid-parameters": {
       "type": "button",
       "command": {

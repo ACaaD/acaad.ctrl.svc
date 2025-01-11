@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Errors;
 using Oma.WndwCtrl.Abstractions.Model;
+using Oma.WndwCtrl.Api.Attributes;
 using Oma.WndwCtrl.Core.Interfaces;
 using Oma.WndwCtrl.Core.Model;
 
@@ -33,6 +34,7 @@ public class ComponentControllerBase<TComponent> : ControllerBase
 
   [HttpGet("config")]
   [EndpointSummary("Component Details")]
+  [AcaadHidden]
   public IActionResult GetDetails() => Ok(Component);
 
   [NonAction]

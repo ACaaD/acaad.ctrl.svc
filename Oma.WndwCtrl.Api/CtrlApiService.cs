@@ -1,12 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
-using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Api.Conventions;
 using Oma.WndwCtrl.Api.Extensions;
+using Oma.WndwCtrl.Api.OpenApi;
 using Oma.WndwCtrl.Configuration.Model;
-using Oma.WndwCtrl.Core.Model;
 using Oma.WndwCtrl.CoreAsp;
 using Oma.WndwCtrl.Messaging.Bus;
 
@@ -29,6 +26,7 @@ public class CtrlApiService(
   protected override IServiceCollection ConfigureServices(IServiceCollection services) => base
     .ConfigureServices(services)
     .AddComponentApi()
+    .AddOpenApiComponentWriters()
     .AddSingleton(configurationAccessor)
     .AddSingleton(_messageBusAccessor).AddOpenApi(
       options =>
@@ -47,25 +45,7 @@ public class CtrlApiService(
           }
         );
 
-        options.AddOperationTransformer(
-          async (operation, context, arg3) =>
-          {
-            if (context.Description.ActionDescriptor.Properties.TryGetValue(
-                  nameof(Component),
-                  out object? componentObj
-                )
-                && componentObj is IComponent component)
-            {
-              IOpenApiExtension acaadExtension = new OpenApiObject()
-              {
-                ["type"] = new OpenApiString(component.Type),
-                ["name"] = new OpenApiString(component.Name),
-              };
-
-              operation.Extensions.Add("acaad", acaadExtension);
-            }
-          }
-        );
+        options.AddOperationTransformer<ComponentOperationTransformer>();
       }
     );
 }

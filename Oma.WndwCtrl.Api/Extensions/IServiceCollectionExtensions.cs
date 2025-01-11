@@ -1,6 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Oma.WndwCtrl.Abstractions;
+using Oma.WndwCtrl.Api.OpenApi.ComponentWriters;
+using Oma.WndwCtrl.Api.OpenApi.Interfaces;
 using Oma.WndwCtrl.Api.Transformations.CliParser;
 using Oma.WndwCtrl.CliOutputParser;
 using Oma.WndwCtrl.CliOutputParser.Interfaces;
@@ -32,4 +34,10 @@ public static class IServiceCollectionExtensions
 
     return services;
   }
+
+  public static IServiceCollection AddOpenApiComponentWriters(this IServiceCollection services)
+    => services
+      .AddScoped<IOpenApiComponentWriter, ButtonComponentWriter>()
+      .AddScoped<IOpenApiComponentWriter, SensorComponentWriter>()
+      .AddScoped<IOpenApiComponentWriter, SwitchComponentWriter>();
 }

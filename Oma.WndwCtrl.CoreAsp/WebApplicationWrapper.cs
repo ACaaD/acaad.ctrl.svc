@@ -97,6 +97,14 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(MessageBusAccessor? mess
       builder.Services.UseMessageBus(messageBusAccessor);
     }
 
+    builder.Services.AddLogging(
+      lb =>
+      {
+        // TODO: Pass down logging configuration
+        lb.AddConsole();
+      }
+    );
+
     ConfigureServices(builder.Services);
 
     Application = PostAppBuild(builder.Build());
