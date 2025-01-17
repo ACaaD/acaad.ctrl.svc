@@ -54,6 +54,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oma.WndwCtrl.Scheduling", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oma.WndwCtrl.CommandProcessor", "Oma.WndwCtrl.CommandProcessor\Oma.WndwCtrl.CommandProcessor.csproj", "{E6DFB062-BEC4-4442-BFBA-E9B250E6F023}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oma.WndwCtrl.MetricsApi", "Oma.WndwCtrl.MetricsApi\Oma.WndwCtrl.MetricsApi.csproj", "{59CE4E31-306C-48EC-AD4D-EBB8F9000FFD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -124,6 +126,10 @@ Global
 		{E6DFB062-BEC4-4442-BFBA-E9B250E6F023}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6DFB062-BEC4-4442-BFBA-E9B250E6F023}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E6DFB062-BEC4-4442-BFBA-E9B250E6F023}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59CE4E31-306C-48EC-AD4D-EBB8F9000FFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59CE4E31-306C-48EC-AD4D-EBB8F9000FFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59CE4E31-306C-48EC-AD4D-EBB8F9000FFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59CE4E31-306C-48EC-AD4D-EBB8F9000FFD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{E7217C2E-5C78-4106-977D-3091CFA63F43} = {307F90ED-24AD-4725-960B-0A7AAFFE8C6D}

@@ -54,29 +54,29 @@ public class ComponentOperationTransformer(ILogger<ComponentOperationTransformer
 
     List<IOpenApiComponentWriter> potentialWriters = writers.Where(w => w.Handles(component)).ToList();
 
-    if (potentialWriters.Count == 0)
+    switch (potentialWriters.Count)
     {
-      logger.LogWarning(
-        "Found no component writer that handles {component}. Skipping.",
-        component.GetType().Name
-      );
+      case 0:
+        logger.LogWarning(
+          "Found no component writer that handles {component}. Skipping.",
+          component.GetType().Name
+        );
 
-      return Option<IOpenApiExtension>.None;
+        return Option<IOpenApiExtension>.None;
+      case > 1:
+        logger.LogWarning(
+          "Found more than one component writer that handles {component}. Skipping.",
+          component.GetType().Name
+        );
+
+        return Option<IOpenApiExtension>.None;
+      default:
+      {
+        Option<OpenApiComponentExtension> result =
+          await potentialWriters[index: 0].CreateExtensionAsync(component);
+
+        return result.Map<IOpenApiExtension>(ext => ext.ApplyMetadata(acaadMetadata));
+      }
     }
-
-    if (potentialWriters.Count > 1)
-    {
-      logger.LogWarning(
-        "Found more than one component writer that handles {component}. Skipping.",
-        component.GetType().Name
-      );
-
-      return Option<IOpenApiExtension>.None;
-    }
-
-    Option<OpenApiComponentExtension> result =
-      await potentialWriters[index: 0].CreateExtensionAsync(component);
-
-    return result.Map<IOpenApiExtension>(ext => ext.ApplyMetadata(acaadMetadata));
   }
 }

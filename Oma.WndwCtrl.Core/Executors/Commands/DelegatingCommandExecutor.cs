@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Errors;
 using Oma.WndwCtrl.Abstractions.Extensions;
+using Oma.WndwCtrl.Abstractions.Metrics;
 using Oma.WndwCtrl.Abstractions.Model;
 using Oma.WndwCtrl.FpCore.TransformerStacks.Flow;
 
@@ -13,6 +14,21 @@ namespace Oma.WndwCtrl.Core.Executors.Commands;
 
 public class DelegatingCommandExecutor : ICommandExecutor
 {
+  private static readonly FlowT<CommandState, Unit> RecordExecutionDurationIO =
+  (
+    from c in Flow<CommandState>.asks2(state => state.Command)
+    from sa in Flow<CommandState>.asks2(state => state.StartedAt)
+    from m in Flow<CommandState>.asks2(state => state.Metrics)
+    from _ in Flow<CommandState>.liftAsync(
+      _ =>
+      {
+        m.RecordCommandExecutionDuration(c, (DateTime.UtcNow - sa).TotalSeconds);
+        return Task.FromResult(Unit.Default);
+      }
+    )
+    select _
+  ).As();
+
   private static readonly FlowT<CommandState, Unit> WaitOnCompleteIO =
   (
     from c in Flow<CommandState>.asks2(state => state.Command)
@@ -28,17 +44,20 @@ public class DelegatingCommandExecutor : ICommandExecutor
 
   private readonly IEnumerable<ICommandExecutor> _commandExecutors;
   private readonly ILogger<DelegatingCommandExecutor> _logger;
+  private readonly IAcaadCoreMetrics _metrics;
 
   private readonly Func<CommandState, EnvIO, ValueTask<Either<FlowError, CommandOutcome>>>
     _transformerStack;
 
   public DelegatingCommandExecutor(
     ILogger<DelegatingCommandExecutor> logger,
-    IEnumerable<ICommandExecutor> commandExecutors
+    IEnumerable<ICommandExecutor> commandExecutors,
+    IAcaadCoreMetrics metrics
   )
   {
     _logger = logger;
     _commandExecutors = commandExecutors;
+    _metrics = metrics;
 
     Stopwatch swBuildStack = Stopwatch.StartNew();
 
@@ -57,6 +76,7 @@ public class DelegatingCommandExecutor : ICommandExecutor
     from cmd in Command
     from executor in FindApplicableExecutor
     from outcome in ExecuteExecutorIO(cmd, executor)
+    from metric in RecordExecutionDurationIO
     from dly in WaitOnCompleteIO
     select outcome
   ).As();
@@ -95,7 +115,7 @@ public class DelegatingCommandExecutor : ICommandExecutor
     using IDisposable? ls = _logger.BeginScope(cmd);
     _logger.LogTrace("Received command to execute.");
 
-    CommandState initialState = new(_commandExecutors, cmd);
+    CommandState initialState = new(_commandExecutors, cmd, _metrics);
     EnvIO envIO = EnvIO.New(token: cancelToken);
 
     Either<FlowError, CommandOutcome> outcome = await _transformerStack.Invoke(initialState, envIO);

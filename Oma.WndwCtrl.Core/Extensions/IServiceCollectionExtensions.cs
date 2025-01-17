@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Oma.WndwCtrl.Abstractions;
+using Oma.WndwCtrl.Abstractions.Metrics;
 using Oma.WndwCtrl.CliOutputParser;
 using Oma.WndwCtrl.CliOutputParser.Interfaces;
 using Oma.WndwCtrl.Core.Executors.Commands;
@@ -8,6 +9,7 @@ using Oma.WndwCtrl.Core.Executors.Transformers;
 using Oma.WndwCtrl.Core.FlowExecutors;
 using Oma.WndwCtrl.Core.Interfaces;
 using Oma.WndwCtrl.Core.Logger;
+using Oma.WndwCtrl.Core.Metrics;
 using Oma.WndwCtrl.Core.Model;
 
 namespace Oma.WndwCtrl.Core.Extensions;
@@ -23,7 +25,9 @@ public static class IServiceCollectionExtensions
     services.AddSingleton<ICliOutputParser, CliOutputParserImpl>()
       .AddSingleton<IParserLogger, CliParserLogger>();
 
-    services.AddScoped<ICommandExecutor, CliCommandExecutor>()
+    services
+      .AddSingleton<IAcaadCoreMetrics, AcaadCoreMetrics>()
+      .AddScoped<ICommandExecutor, CliCommandExecutor>()
       .AddScoped<IOutcomeTransformer, NoOpTransformer>()
       .AddScoped<IOutcomeTransformer, ParserTransformer>()
       .AddKeyedScoped<IFlowExecutor, AdHocFlowExecutor>(ServiceKeys.AdHocFlowExecutor)

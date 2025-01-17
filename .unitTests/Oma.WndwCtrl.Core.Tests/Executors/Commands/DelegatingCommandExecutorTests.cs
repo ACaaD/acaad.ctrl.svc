@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Errors;
+using Oma.WndwCtrl.Abstractions.Metrics;
 using Oma.WndwCtrl.Abstractions.Model;
 using Oma.WndwCtrl.Core.Executors.Commands;
 using static LanguageExt.Prelude;
@@ -36,10 +37,11 @@ public class DelegatingCommandExecutorTests
       .Returns(Right(outcome));
 
     _commandMock = Substitute.For<ICommand>();
+    IAcaadCoreMetrics metricsMock = Substitute.For<IAcaadCoreMetrics>();
 
     _cancelToken = TestContext.Current.CancellationToken;
 
-    _instance = new DelegatingCommandExecutor(loggerMock, [_executorMock,]);
+    _instance = new DelegatingCommandExecutor(loggerMock, [_executorMock,], metricsMock);
   }
 
   [Fact]

@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Oma.WndwCtrl.Abstractions.Messaging.Model.ComponentExecution;
 using Oma.WndwCtrl.CommandProcessor.Messaging;
+using Oma.WndwCtrl.CommandProcessor.Metrics;
 using Oma.WndwCtrl.Core.Extensions;
 using Oma.WndwCtrl.CoreAsp;
 using Oma.WndwCtrl.Messaging.Bus;
@@ -14,6 +15,7 @@ public class CommandProcessingService(IConfiguration configuration, MessageBusAc
   : BackgroundServiceWrapper<CommandProcessingService>(configuration)
 {
   protected override IServiceCollection ConfigureServices(IServiceCollection services) => services
+    .AddSingleton<CommandProcessingMetrics>()
     .AddCommandExecutors()
     .UseMessageBus(messageBusAccessor)
     .AddMessageConsumer<ComponentToExecuteMessageConsumer, ComponentToRunEvent>()

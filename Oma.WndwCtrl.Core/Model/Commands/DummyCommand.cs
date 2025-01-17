@@ -10,4 +10,6 @@ public class DummyCommand : BaseCommand
   public bool IsExceptional { get; set; } = false;
 
   public bool IsExpected { get; set; } = false;
+
+  public override string Category => "dummy";
 }

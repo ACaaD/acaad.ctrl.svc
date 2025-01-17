@@ -5,12 +5,15 @@ using Oma.WndwCtrl.Abstractions;
 namespace Oma.WndwCtrl.Core.Model.Commands;
 
 [Serializable]
-public class BaseCommand : ICommand
+public abstract class BaseCommand : ICommand
 {
   public TimeSpan WaitOnComplete { get; set; } = TimeSpan.Zero;
   public int Retries { get; set; }
 
   public TimeSpan Timeout { get; set; }
+
+  [JsonIgnore]
+  public abstract string Category { get; }
 
   public IEnumerable<ITransformation> Transformations { get; set; } = new List<ITransformation>();
 

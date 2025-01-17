@@ -53,6 +53,7 @@ public class CliOutputParserImpl(IParserLogger parserLogger) : ICliOutputParser
       return Error.Many(errorListener.Errors.Cast<Error>().ToArray());
     }
 
+    // TODO: Check feasibility: Cache the tree for known transformations instead of rebuilding
     TransformationListener listener = transformationListenerFactory();
 
     ParseTreeWalker walker = new();

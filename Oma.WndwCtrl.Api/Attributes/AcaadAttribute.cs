@@ -1,5 +1,3 @@
 namespace Oma.WndwCtrl.Api.Attributes;
 
-public abstract class AcaadAttribute : Attribute
-{
-}
+public abstract class AcaadAttribute : Attribute;

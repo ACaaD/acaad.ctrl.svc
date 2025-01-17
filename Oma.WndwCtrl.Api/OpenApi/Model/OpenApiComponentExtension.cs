@@ -1,17 +1,18 @@
 using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Interfaces;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Api.Attributes;
 
 namespace Oma.WndwCtrl.Api.OpenApi.Model;
 
-public class OpenApiComponentExtension : OpenApiObject, IOpenApiExtension
+public class OpenApiComponentExtension : OpenApiObject
 {
   public OpenApiComponentExtension(IComponent component)
   {
-    OpenApiObject componentExt = new();
-    componentExt["name"] = new OpenApiString(component.Name);
-    componentExt["type"] = new OpenApiString(component.Type);
+    OpenApiObject componentExt = new()
+    {
+      ["name"] = new OpenApiString(component.Name),
+      ["type"] = new OpenApiString(component.Type),
+    };
 
     this["component"] = componentExt;
   }

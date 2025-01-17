@@ -15,11 +15,13 @@ public record ComponentExecutingEvent : ComponentEvent
   {
     CommandsToExecute = commandsToExecute;
     StartedAt = startedAt;
+    DelayedBy = componentToRun.DelayedBy;
   }
 
   public int CommandsToExecute { get; }
   public DateTime StartedAt { get; }
 
+  public TimeSpan? DelayedBy { get; }
   public override string Type => "Scheduling";
   public override string Name => nameof(ComponentExecutingEvent);
 }

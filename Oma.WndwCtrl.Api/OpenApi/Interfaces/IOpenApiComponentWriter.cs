@@ -22,18 +22,18 @@ public interface IOpenApiComponentWriter<in TComponent> : IOpenApiComponentWrite
     IComponent component
   )
   {
-    if (component is not TComponent tComponent)
+    if (component is TComponent tComponent)
     {
-      Logger.LogWarning(
-        "Expected component {actual} to be of type {name}. Skipping.",
-        component.GetType().Name,
-        typeof(TComponent).Name
-      );
-
-      return Option<OpenApiComponentExtension>.None;
+      return await CreateExtensionAsync(tComponent);
     }
 
-    return await CreateExtensionAsync(tComponent);
+    Logger.LogWarning(
+      "Expected component {actual} to be of type {name}. Skipping.",
+      component.GetType().Name,
+      typeof(TComponent).Name
+    );
+
+    return Option<OpenApiComponentExtension>.None;
   }
 
   Task<Option<OpenApiComponentExtension>> CreateExtensionAsync(TComponent component);

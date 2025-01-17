@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Errors;
 using Oma.WndwCtrl.Abstractions.Extensions;
+using Oma.WndwCtrl.Abstractions.Metrics;
 using Oma.WndwCtrl.Abstractions.Model;
 using Oma.WndwCtrl.FpCore.TransformerStacks.Flow;
 
@@ -14,7 +15,24 @@ namespace Oma.WndwCtrl.Core.Executors.Transformers;
 
 public class DelegatingTransformer : IRootTransformer
 {
+  private static readonly FlowT<TransformationConfiguration, Unit> RecordTransformationDurationIO =
+  (
+    from c in Flow<TransformationConfiguration>.asks2(state => state.Command)
+    from sa in Flow<TransformationConfiguration>.asks2(state => state.StartedAt)
+    from m in Flow<TransformationConfiguration>.asks2(state => state.Metrics)
+    from _ in Flow<TransformationConfiguration>.liftAsync(
+      _ =>
+      {
+        m.RecordTransformationExecutionDuration(c, (DateTime.UtcNow - sa).TotalSeconds);
+        return Task.FromResult(Unit.Default);
+      }
+    )
+    select _
+  ).As();
+
+
   private readonly ILogger<DelegatingTransformer> _logger;
+  private readonly IAcaadCoreMetrics _metrics;
   private readonly IEnumerable<IOutcomeTransformer> _transformers;
 
   private readonly Func<TransformationConfiguration, EnvIO,
@@ -23,11 +41,13 @@ public class DelegatingTransformer : IRootTransformer
 
   public DelegatingTransformer(
     ILogger<DelegatingTransformer> logger,
-    IEnumerable<IOutcomeTransformer> transformers
+    IEnumerable<IOutcomeTransformer> transformers,
+    IAcaadCoreMetrics metrics
   )
   {
     _logger = logger;
     _transformers = transformers;
+    _metrics = metrics;
 
     Stopwatch swBuildStack = Stopwatch.StartNew();
 
@@ -66,6 +86,7 @@ public class DelegatingTransformer : IRootTransformer
           };
         }
       )
+    from metrics in RecordTransformationDurationIO
     select eitherChained
   ).As();
 
@@ -93,7 +114,7 @@ public class DelegatingTransformer : IRootTransformer
     using IDisposable? ls = _logger.BeginScope(commandOutcome);
     _logger.LogTrace("Received command outcome to transform.");
 
-    TransformationConfiguration initialConfiguration = new(_transformers, command, commandOutcome);
+    TransformationConfiguration initialConfiguration = new(_transformers, command, commandOutcome, _metrics);
     EnvIO envIO = EnvIO.New(token: cancelToken);
 
     Either<FlowError, TransformationOutcome> outcome =

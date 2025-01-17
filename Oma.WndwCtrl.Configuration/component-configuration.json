@@ -1,11 +1,61 @@
 {
   "components": {
+    "oma-service-status": {
+      "type": "sensor",
+      "queryCommand": {
+        "type": "cli",
+        "fileName": "sc.exe",
+        "arguments": "query state= all",
+        "transformations": [
+          {
+            "type": "parser",
+            "statements": [
+              "Anchor.From('SERVICE_NAME: OmaMgmtApi');",
+              "Anchor.To('WAIT_HINT');",
+              "Regex.Match($'STATE[\\s:\\d]*(\\w+)');",
+              "Values.Index(1);"
+            ]
+          }
+        ]
+      },
+      "triggers": [
+        {
+          "type": "rate",
+          "expression": "15 seconds",
+          "friendlyName": "every 15 sec"
+        }
+      ]
+    },
+    "acaad.usage.ram": {
+      "type": "sensor",
+      "queryCommand": {
+        "type": "cli",
+        "fileName": "tasklist.exe",
+        "arguments": "/FI \"IMAGENAME eq Oma.WndwCtrl.MgmtApi.exe\" /FO LIST",
+        "transformations": [
+          {
+            "type": "parser",
+            "statements": [
+              "Regex.Match($'Mem Usage:\\s+([\\d\\.]*)');",
+              "Values.Index(1);"
+            ]
+          }
+        ]
+      },
+      "triggers": [
+        {
+          "type": "rate",
+          "expression": "15 seconds",
+          "friendlyName": "every 15 sec"
+        }
+      ]
+    },
     "ping-xkcd": {
       "type": "sensor",
       "queryCommand": {
         "type": "cli",
         "fileName": "ping",
-        "arguments": "xkcd.com",
+        "arguments": "xkcd.com -n 1",
         "transformations": [
           {
             "type": "parser",
@@ -18,6 +68,11 @@
         ]
       },
       "triggers": [
+        {
+          "type": "rate",
+          "expression": "5 seconds",
+          "friendlyName": "every 5 sec"
+        }
       ]
     },
     "ip-addr": {
@@ -75,6 +130,11 @@
         "transformations": []
       },
       "triggers": [
+        {
+          "type": "rate",
+          "expression": "5 seconds",
+          "friendlyName": "every 5 sec"
+        }
       ]
     },
     "invalid-parameters": {

@@ -14,6 +14,9 @@ public interface ICommand
 
   TimeSpan WaitOnComplete { get; }
 
+  [JsonIgnore]
+  string Category { get; }
+
   IEnumerable<ITransformation> Transformations { get; }
 
   [JsonIgnore]

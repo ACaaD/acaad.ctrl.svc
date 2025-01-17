@@ -1,7 +1,7 @@
 using FluentAssertions;
+using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Model;
 using Oma.WndwCtrl.Api.IntegrationTests.TestFramework;
-using Oma.WndwCtrl.Core.Model.Commands;
 using Oma.WndwCtrl.Core.Model.Transformations;
 
 namespace Oma.WndwCtrl.Api.IntegrationTests.Endpoints.TestController;
@@ -35,7 +35,7 @@ public sealed partial class CommandDeserializationTests(
     using HttpResponseMessage httpResponse = await _httpClient.SendAsync(httpRequestMessage, _cancelToken);
 
     httpResponse.Should().Be200Ok().And
-      .Satisfy<TransformationOutcome<BaseCommand>>(
+      .Satisfy<TransformationOutcome<ICommand>>(
         response =>
         {
           response.Success.Should().BeTrue();
