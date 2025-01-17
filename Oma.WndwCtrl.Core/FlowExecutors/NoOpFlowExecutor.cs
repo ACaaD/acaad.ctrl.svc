@@ -17,6 +17,7 @@ public class NoOpFlowExecutor : IFlowExecutor
     "CA2000:Dispose objects before losing scope",
     Justification = "Must be disposed by caller."
   )]
+  [SuppressMessage("ReSharper", "NotDisposedResource", Justification = "Method flagged as must-dispose.")]
   public Task<Either<FlowError, FlowOutcome>> ExecuteAsync(
     ICommand command,
     CancellationToken cancelToken = default

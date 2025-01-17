@@ -14,9 +14,11 @@ namespace Oma.WndwCtrl.CommandProcessor;
 public class CommandProcessingService(IConfiguration configuration, MessageBusAccessor messageBusAccessor)
   : BackgroundServiceWrapper<CommandProcessingService>(configuration)
 {
+  private readonly IConfiguration _configuration = configuration;
+
   protected override IServiceCollection ConfigureServices(IServiceCollection services) => services
     .AddSingleton<CommandProcessingMetrics>()
-    .AddCommandExecutors(configuration)
+    .AddCommandExecutors(_configuration)
     .UseMessageBus(messageBusAccessor)
     .AddMessageConsumer<ComponentToExecuteMessageConsumer, ComponentToRunEvent>()
     .AddMessageWriter();

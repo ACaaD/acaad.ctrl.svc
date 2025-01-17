@@ -8,7 +8,7 @@ public class CliParserLoggerOptions
 {
   public const string SectionName = "CliParser";
 
-  public bool Silent { get; set; } = true;
+  public bool Silent { get; init; } = true;
 }
 
 public class CliParserLogger(ILogger<ICliOutputParser> logger, IOptions<CliParserLoggerOptions> options)

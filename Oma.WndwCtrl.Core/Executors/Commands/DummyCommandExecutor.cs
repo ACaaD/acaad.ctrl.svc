@@ -17,6 +17,7 @@ public class DummyCommandExecutor : ICommandExecutor<DummyCommand>
     Justification = "Must be disposed by caller."
   )]
   [MustDisposeResource]
+  [SuppressMessage("ReSharper", "NotDisposedResource", Justification = "Method flagged as must-dispose.")]
   public Task<Either<FlowError, CommandOutcome>> ExecuteAsync(
     DummyCommand command,
     CancellationToken cancelToken = default

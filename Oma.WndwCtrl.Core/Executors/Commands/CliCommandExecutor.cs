@@ -19,6 +19,7 @@ public class CliCommandExecutor : ICommandExecutor<CliCommand>
     Justification = "Must be disposed by caller."
   )]
   [MustDisposeResource]
+  [SuppressMessage("ReSharper", "NotDisposedResource", Justification = "Method flagged as must-dispose.")]
   public async Task<Either<FlowError, CommandOutcome>> ExecuteAsync(
     CliCommand command,
     CancellationToken cancelToken = default
@@ -54,11 +55,13 @@ public class CliCommandExecutor : ICommandExecutor<CliCommand>
       string toUse = process.ExitCode == 0 ? allText
         : string.IsNullOrEmpty(errorText) ? allText : errorText;
 
+      CommandOutcome outcome = new(toUse)
+      {
+        Success = process.ExitCode == 0,
+      };
+
       return Right(
-        new CommandOutcome(toUse)
-        {
-          Success = process.ExitCode == 0,
-        }
+        outcome
       );
     }
     catch (OperationCanceledException ex)
