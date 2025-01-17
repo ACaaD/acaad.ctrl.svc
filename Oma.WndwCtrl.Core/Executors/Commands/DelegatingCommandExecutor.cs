@@ -120,7 +120,11 @@ public class DelegatingCommandExecutor : ICommandExecutor
 
     Either<FlowError, CommandOutcome> outcome = await _transformerStack.Invoke(initialState, envIO);
 
-    _logger.LogDebug("Finished command in {elapsed} (Success={isSuccess})", swExec.Measure(), outcome);
+    _logger.LogDebug(
+      "Finished command in {elapsed} (Success={isSuccess})",
+      swExec.Measure(),
+      outcome.IsRight
+    );
 
     return outcome;
   }

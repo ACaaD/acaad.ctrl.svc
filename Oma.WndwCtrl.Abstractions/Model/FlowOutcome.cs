@@ -1,10 +1,12 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 
 namespace Oma.WndwCtrl.Abstractions.Model;
 
 [PublicAPI]
-public record FlowOutcome : IOutcome
+[MustDisposeResource]
+public record FlowOutcome : IOutcome, IDisposable
 {
   public FlowOutcome()
   {
@@ -22,11 +24,28 @@ public record FlowOutcome : IOutcome
     OutcomeRaw = outcome.OutcomeRaw;
   }
 
+  public void Dispose()
+  {
+    Dispose(disposing: true);
+    GC.SuppressFinalize(this);
+  }
+
   public bool Success { get; init; }
-  public string OutcomeRaw { get; init; } = string.Empty;
+
+  [JsonInclude]
+  public string OutcomeRaw { get; internal set; } = string.Empty;
+
+  protected virtual void Dispose(bool disposing)
+  {
+    if (disposing)
+    {
+      OutcomeRaw = null!;
+    }
+  }
 }
 
 [Serializable]
+[MustDisposeResource]
 public record FlowOutcome<TData> : FlowOutcome
 {
   public FlowOutcome()
@@ -44,5 +63,16 @@ public record FlowOutcome<TData> : FlowOutcome
     Outcome = data;
   }
 
-  public TData? Outcome { get; init; }
+  [JsonInclude]
+  public TData? Outcome { get; internal set; }
+
+  protected override void Dispose(bool disposing)
+  {
+    if (disposing)
+    {
+      Outcome = default;
+    }
+
+    base.Dispose(disposing);
+  }
 }

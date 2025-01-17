@@ -7,11 +7,14 @@ public class CtrlApiProgram
 {
   public async static Task Main(string[] args)
   {
-    MessageBusAccessor messageBusAccessor = new();
+    MessageBusAccessor messageBusAccessor = new()
+    {
+      MessageBus = new NoOpMessageBus(),
+    };
 
     CtrlApiService apiService = new(
       await ComponentConfigurationAccessor.FromFileAsync(),
-      messageBusAccessor // TODO: This will crash in stand alone
+      messageBusAccessor
     );
 
     await apiService.StartAsync(CancellationToken.None, args);

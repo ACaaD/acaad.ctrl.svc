@@ -16,7 +16,7 @@ public class CommandProcessingService(IConfiguration configuration, MessageBusAc
 {
   protected override IServiceCollection ConfigureServices(IServiceCollection services) => services
     .AddSingleton<CommandProcessingMetrics>()
-    .AddCommandExecutors()
+    .AddCommandExecutors(configuration)
     .UseMessageBus(messageBusAccessor)
     .AddMessageConsumer<ComponentToExecuteMessageConsumer, ComponentToRunEvent>()
     .AddMessageWriter();

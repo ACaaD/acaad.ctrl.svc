@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Metrics;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Metrics;
@@ -14,6 +15,11 @@ public class AcaadCoreMetrics : IAcaadCoreMetrics
   private readonly Histogram<double> _commandExecutionDuration;
   private readonly Histogram<double> _transformationExecutionDuration;
 
+  [SuppressMessage(
+    "Reliability",
+    "CA2000:Dispose objects before losing scope",
+    Justification = "Won't fix; Meter instances are not meant to be disposed."
+  )]
   public AcaadCoreMetrics(IMeterFactory meterFactory)
   {
     Meter meter = meterFactory.Create(MeterName);

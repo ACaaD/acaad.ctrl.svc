@@ -18,7 +18,7 @@ public class MgmtApiService(MessageBusAccessor? messageBusAccessor)
   {
     IServiceCollection result = base.ConfigureServices(services)
       .AddSingleton<ServiceState>()
-      .AddComponentApi()
+      .AddComponentApi(Configuration)
       .AddHostedService<ServiceWorker>()
       .AddApiService<MetricsApiService>()
       .AddBackgroundService<MessageBusService>()

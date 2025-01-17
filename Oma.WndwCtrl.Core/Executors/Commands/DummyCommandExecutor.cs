@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 using LanguageExt;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Errors;
@@ -9,6 +11,12 @@ namespace Oma.WndwCtrl.Core.Executors.Commands;
 
 public class DummyCommandExecutor : ICommandExecutor<DummyCommand>
 {
+  [SuppressMessage(
+    "Reliability",
+    "CA2000:Dispose objects before losing scope",
+    Justification = "Must be disposed by caller."
+  )]
+  [MustDisposeResource]
   public Task<Either<FlowError, CommandOutcome>> ExecuteAsync(
     DummyCommand command,
     CancellationToken cancelToken = default
@@ -25,10 +33,7 @@ public class DummyCommandExecutor : ICommandExecutor<DummyCommand>
     else
     {
       result = Right(
-        new CommandOutcome
-        {
-          OutcomeRaw = message,
-        }
+        new CommandOutcome(message)
       );
     }
 

@@ -11,6 +11,7 @@ public interface ICommandExecutor
   [PublicAPI]
   bool Handles(ICommand command);
 
+  [MustDisposeResource]
   Task<Either<FlowError, CommandOutcome>> ExecuteAsync(
     ICommand command,
     CancellationToken cancelToken = default

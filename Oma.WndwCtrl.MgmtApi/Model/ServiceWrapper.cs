@@ -81,7 +81,7 @@ public sealed record ServiceWrapper<TService> : IDisposable, IServiceWrapper<TSe
 
     TimeSpan stopTimeout = TimeSpan.FromSeconds(seconds: 5);
 
-    CancellationTokenSource ctsForceCancelAfter =
+    using CancellationTokenSource ctsForceCancelAfter =
       CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
 
     ctsForceCancelAfter.CancelAfter(stopTimeout);

@@ -1,9 +1,12 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using JetBrains.Annotations;
 
 namespace Oma.WndwCtrl.Abstractions.Model;
 
 [Serializable]
-public record TransformationOutcome : IOutcome
+[MustDisposeResource]
+public record TransformationOutcome : IOutcome, IDisposable
 {
   public TransformationOutcome()
   {
@@ -21,13 +24,31 @@ public record TransformationOutcome : IOutcome
     OutcomeRaw = outcome.OutcomeRaw;
   }
 
-  public bool Success { get; init; }
-  public string OutcomeRaw { get; init; } = string.Empty;
+  public void Dispose()
+  {
+    Dispose(disposing: true);
+    GC.SuppressFinalize(this);
+  }
 
+  public bool Success { get; init; }
+  
+  [JsonInclude]
+  public string OutcomeRaw { get; internal set; } = string.Empty;
+
+  [MustDisposeResource]
   public virtual FlowOutcome ToFlowOutcome() => new(this);
+
+  protected virtual void Dispose(bool disposing)
+  {
+    if (disposing)
+    {
+      OutcomeRaw = null!;
+    }
+  }
 }
 
 [Serializable]
+[MustDisposeResource]
 public record TransformationOutcome<TData> : TransformationOutcome
 {
   public TransformationOutcome()
@@ -45,9 +66,20 @@ public record TransformationOutcome<TData> : TransformationOutcome
     Outcome = data;
   }
 
-  public TData? Outcome { get; init; }
+  [JsonInclude]
+  public TData? Outcome { get; internal set; }
 
   public override FlowOutcome ToFlowOutcome() => Outcome is not null
     ? new FlowOutcome<TData>(Outcome, Success)
     : new FlowOutcome<TData>(this);
+
+  protected override void Dispose(bool disposing)
+  {
+    if (disposing)
+    {
+      Outcome = default;
+    }
+
+    base.Dispose(disposing);
+  }
 }

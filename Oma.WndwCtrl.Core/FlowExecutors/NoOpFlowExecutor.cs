@@ -1,4 +1,5 @@
-using System.Text.Json;
+using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 using LanguageExt;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Errors;
@@ -10,17 +11,18 @@ namespace Oma.WndwCtrl.Core.FlowExecutors;
 
 public class NoOpFlowExecutor : IFlowExecutor
 {
+  [MustDisposeResource]
+  [SuppressMessage(
+    "Reliability",
+    "CA2000:Dispose objects before losing scope",
+    Justification = "Must be disposed by caller."
+  )]
   public Task<Either<FlowError, FlowOutcome>> ExecuteAsync(
     ICommand command,
     CancellationToken cancelToken = default
   ) => Task.FromResult<Either<FlowError, FlowOutcome>>(
     Right<FlowOutcome>(
       new FlowOutcome<ICommand>(command)
-      {
-        Success = true,
-        OutcomeRaw = JsonSerializer.Serialize(command),
-        Outcome = command,
-      }
     )
   );
 }

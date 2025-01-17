@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Errors;
+using Oma.WndwCtrl.Abstractions.Extensions;
 using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 using Oma.WndwCtrl.Abstractions.Messaging.Model.ComponentExecution;
 using Oma.WndwCtrl.Abstractions.Model;
@@ -61,6 +62,8 @@ public class ComponentToExecuteMessageConsumer(
       executionResult |= either.IsRight
         ? ComponentExecutionResult.Succeeded
         : ComponentExecutionResult.Failed;
+
+      either.Dispose();
     }
 
     await RaiseExecutionFinishedAsync(executionResult, componentExecutingEvent, cancelToken);

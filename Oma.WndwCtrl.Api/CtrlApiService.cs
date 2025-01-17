@@ -32,7 +32,7 @@ public class CtrlApiService(
       .ConfigureServices(services)
       .UseMessageBus(_messageBusAccessor)
       .AddMessageConsumer<EventHub, Event>(registerConsumer: true)
-      .AddComponentApi()
+      .AddComponentApi(Configuration)
       .AddOpenApiComponentWriters()
       .AddSingleton(configurationAccessor)
       .AddSingleton(_messageBusAccessor).AddOpenApi(

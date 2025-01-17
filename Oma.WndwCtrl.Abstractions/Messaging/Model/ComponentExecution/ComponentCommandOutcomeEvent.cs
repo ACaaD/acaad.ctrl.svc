@@ -4,6 +4,7 @@ namespace Oma.WndwCtrl.Abstractions.Messaging.Model.ComponentExecution;
 
 [PublicAPI]
 [Serializable]
+[MustDisposeResource]
 public record ComponentCommandOutcomeEvent(IComponent Component, ICommand Command, IOutcome Outcome)
   : ComponentEvent(Component)
 {

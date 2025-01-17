@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Metrics;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Messaging.Model.ComponentExecution;
@@ -18,6 +19,11 @@ public class CommandProcessingMetrics
 
   private readonly Counter<long> _successfulExecutionCount;
 
+  [SuppressMessage(
+    "Reliability",
+    "CA2000:Dispose objects before losing scope",
+    Justification = "Won't fix; Meter instances are not meant to be disposed."
+  )]
   public CommandProcessingMetrics(IMeterFactory meterFactory)
   {
     Meter meter = meterFactory.Create(MeterName);

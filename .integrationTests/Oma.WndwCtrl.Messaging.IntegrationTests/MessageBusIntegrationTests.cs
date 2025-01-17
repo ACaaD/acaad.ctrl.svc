@@ -174,7 +174,7 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
   [Fact(Timeout = 2_000)]
   public async Task ShouldStopProcessingIfCtIsCancelled()
   {
-    CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken);
+    using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken);
     SetUpConsumerContainer<DummyMessage>(cancelToken: cts.Token);
 
     // Not calling message bus complete here -> iteration to be stopped by cancelling ct
@@ -188,7 +188,7 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
   [Fact(Timeout = 2_000)]
   public async Task ShouldRecoverFromIncorrectStartHandling()
   {
-    CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken);
+    using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken);
     IMessageConsumer consumer = SetUpConsumerContainer<DummyMessage>(cancelToken: cts.Token);
 
     consumer.OnStartAsync(Arg.Any<CancellationToken>())
@@ -236,7 +236,7 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
   [Fact(Timeout = 2_000)]
   public async Task ShouldRecoverFromIncorrectCancellationHandling()
   {
-    CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken);
+    using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken);
     IMessageConsumer consumer = SetUpConsumerContainer<DummyMessage>(cancelToken: cts.Token);
 
     consumer.OnCancelledAsync(Arg.Any<Exception>(), Arg.Any<CancellationToken>())

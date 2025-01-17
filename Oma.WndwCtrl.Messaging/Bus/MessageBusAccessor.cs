@@ -1,8 +1,10 @@
+using JetBrains.Annotations;
 using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 
 namespace Oma.WndwCtrl.Messaging.Bus;
 
+[UsedImplicitly]
 public record MessageBusAccessor
 {
-  public IMessageBus? MessageBus { get; set; }
+  public virtual IMessageBus? MessageBus { get; set; }
 }

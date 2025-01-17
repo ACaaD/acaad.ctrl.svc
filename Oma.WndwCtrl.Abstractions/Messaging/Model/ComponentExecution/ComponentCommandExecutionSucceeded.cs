@@ -4,6 +4,7 @@ using Oma.WndwCtrl.Abstractions.Model;
 namespace Oma.WndwCtrl.Abstractions.Messaging.Model.ComponentExecution;
 
 [PublicAPI]
+[MustDisposeResource]
 public record ComponentCommandExecutionSucceeded : ComponentCommandExecutionFinished
 {
   public ComponentCommandExecutionSucceeded(

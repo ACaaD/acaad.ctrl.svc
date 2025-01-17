@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 using LanguageExt;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Errors;
@@ -11,6 +13,12 @@ namespace Oma.WndwCtrl.Core.Executors.Commands;
 
 public class CliCommandExecutor : ICommandExecutor<CliCommand>
 {
+  [SuppressMessage(
+    "Reliability",
+    "CA2000:Dispose objects before losing scope",
+    Justification = "Must be disposed by caller."
+  )]
+  [MustDisposeResource]
   public async Task<Either<FlowError, CommandOutcome>> ExecuteAsync(
     CliCommand command,
     CancellationToken cancelToken = default
@@ -27,7 +35,7 @@ public class CliCommandExecutor : ICommandExecutor<CliCommand>
         RedirectStandardError = true,
       };
 
-      Process? process = Process.Start(processStartInfo);
+      using Process? process = Process.Start(processStartInfo);
 
       if (process is null)
       {
@@ -43,12 +51,13 @@ public class CliCommandExecutor : ICommandExecutor<CliCommand>
       string allText = await process.StandardOutput.ReadToEndAsync(cancelToken);
       string errorText = await process.StandardError.ReadToEndAsync(cancelToken);
 
+      string toUse = process.ExitCode == 0 ? allText
+        : string.IsNullOrEmpty(errorText) ? allText : errorText;
+
       return Right(
-        new CommandOutcome
+        new CommandOutcome(toUse)
         {
           Success = process.ExitCode == 0,
-          OutcomeRaw = process.ExitCode == 0 ? allText
-            : string.IsNullOrEmpty(errorText) ? allText : errorText,
         }
       );
     }

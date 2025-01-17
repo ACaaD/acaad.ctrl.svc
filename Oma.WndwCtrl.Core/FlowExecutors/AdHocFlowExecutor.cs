@@ -5,6 +5,7 @@ using Oma.WndwCtrl.Abstractions.Errors;
 using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 using Oma.WndwCtrl.Abstractions.Messaging.Model.ComponentExecution;
 using Oma.WndwCtrl.Abstractions.Model;
+using Oma.WndwCtrl.Core.Extensions;
 using Oma.WndwCtrl.Core.Interfaces;
 using Oma.WndwCtrl.Core.Model;
 
@@ -26,7 +27,9 @@ public class AdHocFlowExecutor(
   {
     Either<FlowError, TransformationOutcome> either = await commandExecutor
       .ExecuteAsync(command, cancelToken)
-      .Bind(oc => rootTransformer.TransformCommandOutcomeAsync(command, oc, cancelToken));
+      .BindDispose(
+        oc => rootTransformer.TransformCommandOutcomeAsync(command, oc, cancelToken)
+      );
 
     // TODO: Might be handy to add a factory here to transform (transformer specific) results
     Either<FlowError, FlowOutcome> result = either.Map(o => o.ToFlowOutcome());

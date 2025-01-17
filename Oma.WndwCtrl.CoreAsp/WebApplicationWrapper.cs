@@ -24,6 +24,8 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(MessageBusAccessor? mess
   )]
   private static IServiceProvider? _serviceProvider;
 
+  private IConfiguration? _configuration;
+
   private IWebHostEnvironment? _environment;
 
   [PublicAPI]
@@ -39,6 +41,13 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(MessageBusAccessor? mess
   {
     get => _environment ?? throw new InvalidOperationException($"{nameof(Environment)} is not populated.");
     private set => _environment = value;
+  }
+
+  protected IConfiguration Configuration
+  {
+    get => _configuration ??
+           throw new InvalidOperationException($"{nameof(Configuration)} is not populated.");
+    private set => _configuration = value;
   }
 
   static IServiceProvider IService.ServiceProvider
@@ -63,6 +72,7 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(MessageBusAccessor? mess
 
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
     Environment = builder.Environment;
+    Configuration = builder.Configuration;
 
     ConfigurationConfiguration(builder.Configuration);
 

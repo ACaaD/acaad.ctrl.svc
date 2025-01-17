@@ -10,6 +10,7 @@ using Oma.WndwCtrl.Api.Transformations.CliParser;
 using Oma.WndwCtrl.CliOutputParser.Interfaces;
 using Oma.WndwCtrl.Core.Interfaces;
 using Oma.WndwCtrl.Core.Model;
+using Oma.WndwCtrl.CoreAsp.Extensions;
 
 namespace Oma.WndwCtrl.Api.Controllers;
 
@@ -42,6 +43,10 @@ public class TestController([FromKeyedServices(ServiceKeys.AdHocFlowExecutor)] I
 
     Either<FlowError, FlowOutcome> flowResult =
       await flowExecutor.ExecuteAsync(command, HttpContext.RequestAborted);
+
+    flowResult.RegisterForDispose(HttpContext);
+
+    AppendLogsToHeader();
 
     return flowResult.BiFold<IActionResult>(
       null!,
@@ -102,12 +107,6 @@ public class TestController([FromKeyedServices(ServiceKeys.AdHocFlowExecutor)] I
 
   private void AppendLogsToHeader()
   {
-    // TODO: Obvious security concerns here...
-    // During development ok.
-#if !DEBUG
-            // return NotFound();
-#endif
-
     try
     {
       List<string> toAppend = ParserLogDrain.Messages.Select(

@@ -16,10 +16,13 @@ namespace Oma.WndwCtrl.Api.Extensions;
 [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "Extension methods")]
 public static class IServiceCollectionExtensions
 {
-  public static IServiceCollection AddComponentApi(this IServiceCollection services)
+  public static IServiceCollection AddComponentApi(
+    this IServiceCollection services,
+    IConfiguration configuration
+  )
   {
     services.AddConfiguration()
-      .AddCommandExecutors()
+      .AddCommandExecutors(configuration)
       .AddScoped<IFlowExecutor>(
         sp => sp.GetRequiredKeyedService<IFlowExecutor>(ServiceKeys.AdHocFlowExecutor)
       )

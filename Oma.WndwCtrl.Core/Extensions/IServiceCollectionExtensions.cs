@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Metrics;
@@ -17,13 +18,21 @@ namespace Oma.WndwCtrl.Core.Extensions;
 [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "Extension methods")]
 public static class IServiceCollectionExtensions
 {
-  public static IServiceCollection AddCommandExecutors(this IServiceCollection services)
+  public static IServiceCollection AddCommandExecutors(
+    this IServiceCollection services,
+    IConfiguration configuration
+  )
   {
+    IConfigurationSection coreConfig = configuration.GetSection("Core");
+
     // TODO: Will cause problems when called multiple times.
     // Also: The name is wrong
 
     services.AddSingleton<ICliOutputParser, CliOutputParserImpl>()
-      .AddSingleton<IParserLogger, CliParserLogger>();
+      .AddSingleton<IParserLogger, CliParserLogger>()
+      .Configure<CliParserLoggerOptions>(
+        coreConfig.GetSection(CliParserLoggerOptions.SectionName)
+      );
 
     services
       .AddSingleton<IAcaadCoreMetrics, AcaadCoreMetrics>()
