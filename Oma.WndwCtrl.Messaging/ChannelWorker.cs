@@ -16,7 +16,6 @@ internal abstract class ChannelWorker(ILogger logger, IMessageConsumer consumer)
   private Channel<IMessage>? _channel;
   private CancellationTokenSource? _loopCts;
   private CancellationTokenSource? _onExceptionCts;
-
   private ChannelSettings? _settings;
 
   protected Channel<IMessage> Channel =>
@@ -129,81 +128,71 @@ internal sealed class ChannelWorker<TConsumer, TMessage>(ILogger<TConsumer> logg
 {
   private TConsumer _consumer = consumer;
 
-#pragma warning disable CA2000
   protected async override Task ProcessMessagesAsync(CancellationToken cancelToken = default)
   {
     CancellationTokenSource iterationCts = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
 
-    while (await Channel.Reader.WaitToReadAsync(cancelToken).ConfigureAwait(continueOnCapturedContext: false))
+    try
     {
-      if (cancelToken.IsCancellationRequested)
+      while (await Channel.Reader.WaitToReadAsync(cancelToken)
+               .ConfigureAwait(continueOnCapturedContext: false))
       {
-        return;
-      }
-
-      IMessage message = default(TMessage)!;
-
-      try
-      {
-        message = await Channel.Reader.ReadAsync(cancelToken)
-          .ConfigureAwait(continueOnCapturedContext: false);
-
-        if (message is not TMessage)
+        if (cancelToken.IsCancellationRequested)
         {
-          logger.LogTrace(
-            "Received a message expecting type {expected}, but received: {actual}. Dropping message.",
-            typeof(TMessage),
-            message.GetType().FullName
-          );
-
-          continue; // Do not return here - that kills the worker (╯°□°）╯︵ ┻━┻
+          return;
         }
 
-        if (_consumer.IsSubscribedTo(message))
-        {
-          if (iterationCts.TryReset())
-          {
-            await _consumer.OnMessageAsync(message, iterationCts.Token)
-              .ConfigureAwait(continueOnCapturedContext: false);
-          }
-          else
-          {
-            logger.LogWarning("Channel worker could not reset cancellation token source. Creating new one.");
+        IMessage message = default(TMessage)!;
 
-            try
+        try
+        {
+          message = await Channel.Reader.ReadAsync(cancelToken)
+            .ConfigureAwait(continueOnCapturedContext: false);
+
+          if (message is not TMessage)
+          {
+            logger.LogTrace(
+              "Received a message expecting type {expected}, but received: {actual}. Dropping message.",
+              typeof(TMessage),
+              message.GetType().FullName
+            );
+
+            continue; // Do not return here - that kills the worker (╯°□°）╯︵ ┻━┻
+          }
+
+          if (_consumer.IsSubscribedTo(message))
+          {
+            if (!iterationCts.TryReset())
             {
-              iterationCts.Dispose();
-            }
-            catch (Exception ex)
-            {
-              logger.LogError(
-                ex,
-                "An error occurred attempting to dispose non-resettable cancellation token source."
+              logger.LogWarning(
+                "Channel worker could not reset cancellation token source. Creating new one."
               );
-            }
 
-            iterationCts = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
+              iterationCts.Dispose();
+              iterationCts = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
+            }
 
             await _consumer.OnMessageAsync(message, iterationCts.Token)
               .ConfigureAwait(continueOnCapturedContext: false);
           }
         }
-      }
-      catch (ChannelClosedException ex)
-      {
-        logger.LogDebug(ex, "Channel was closed.");
-      }
-      catch (OperationCanceledException ex)
-      {
-        logger.LogDebug(ex, "Operation was cancelled.");
-      }
-      catch (Exception ex)
-      {
-        await OnExceptionAsync(message, ex, cancelToken);
+        catch (ChannelClosedException ex)
+        {
+          logger.LogDebug(ex, "Channel was closed.");
+        }
+        catch (OperationCanceledException ex)
+        {
+          logger.LogDebug(ex, "Operation was cancelled.");
+        }
+        catch (Exception ex)
+        {
+          await OnExceptionAsync(message, ex, cancelToken);
+        }
       }
     }
-
-    iterationCts.Dispose();
+    finally
+    {
+      iterationCts.Dispose();
+    }
   }
-#pragma warning restore CA2000
 }
