@@ -23,8 +23,11 @@ public class MetricsApiService(MessageBusAccessor messageBusAccessor)
         .AddAspNetCoreInstrumentation()
         .AddMeter("ACaaD.Core")
         .AddMeter("ACaaD.Processing")
+        .AddMeter("ACaaD.Processing.Parser")
         .AddMeter("Microsoft.AspNetCore.Hosting")
         .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
+        .AddMeter("Microsoft.Extensions.Diagnostics.ResourceMonitoring")
+        .AddMeter("System.Runtime")
         .AddPrometheusExporter()
     );
 

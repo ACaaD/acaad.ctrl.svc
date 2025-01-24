@@ -13,6 +13,6 @@ public class RateJobFactory : IJobFactory<RateTrigger>
 
   public Option<Job> GetNext(Job current) => current with
   {
-    ScheduledAt = DateTime.UtcNow.AddSeconds(value: 5),
+    ScheduledAt = DateTime.UtcNow.AddSeconds(value: 1),
   };
 }

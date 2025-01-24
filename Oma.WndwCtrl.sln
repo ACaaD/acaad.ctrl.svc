@@ -56,6 +56,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oma.WndwCtrl.CommandProcess
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oma.WndwCtrl.MetricsApi", "Oma.WndwCtrl.MetricsApi\Oma.WndwCtrl.MetricsApi.csproj", "{59CE4E31-306C-48EC-AD4D-EBB8F9000FFD}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dashboards", "Dashboards", "{C0FC9E76-5113-4E14-8061-4A9EE8CA1507}"
+	ProjectSection(SolutionItems) = preProject
+		Dashboards\Acaad.Monitoring.json = Dashboards\Acaad.Monitoring.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -140,5 +145,6 @@ Global
 		{E7217C2E-5C78-4106-977D-3091CFA63F43} = {307F90ED-24AD-4725-960B-0A7AAFFE8C6D}
 		{15C4BD87-A719-4031-900D-1A2A8692CA28} = {CB01FB73-6F61-43AA-81EB-C3A19BA74122}
 		{94B42F55-3A25-4022-B02B-28F4F945CB00} = {FC063003-91F3-415C-AB68-D1C08337FAC2}
+		{C0FC9E76-5113-4E14-8061-4A9EE8CA1507} = {FC063003-91F3-415C-AB68-D1C08337FAC2}
 	EndGlobalSection
 EndGlobal

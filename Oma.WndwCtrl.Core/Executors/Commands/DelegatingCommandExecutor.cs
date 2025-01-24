@@ -8,6 +8,7 @@ using Oma.WndwCtrl.Abstractions.Errors;
 using Oma.WndwCtrl.Abstractions.Extensions;
 using Oma.WndwCtrl.Abstractions.Metrics;
 using Oma.WndwCtrl.Abstractions.Model;
+using Oma.WndwCtrl.Core.Interfaces;
 using Oma.WndwCtrl.FpCore.TransformerStacks.Flow;
 
 namespace Oma.WndwCtrl.Core.Executors.Commands;
@@ -42,6 +43,13 @@ public class DelegatingCommandExecutor : ICommandExecutor
     select _
   ).As();
 
+  private static readonly Expression<Func<CommandState, EnvIO, ValueTask<Either<FlowError, CommandOutcome>>>>
+    _expression
+      = (cfg, io) => OverallFlow.ExecuteFlow
+        .Run(cfg)
+        .Run()
+        .RunAsync(io);
+
   private readonly IEnumerable<ICommandExecutor> _commandExecutors;
   private readonly ILogger<DelegatingCommandExecutor> _logger;
   private readonly IAcaadCoreMetrics _metrics;
@@ -52,7 +60,8 @@ public class DelegatingCommandExecutor : ICommandExecutor
   public DelegatingCommandExecutor(
     ILogger<DelegatingCommandExecutor> logger,
     IEnumerable<ICommandExecutor> commandExecutors,
-    IAcaadCoreMetrics metrics
+    IAcaadCoreMetrics metrics,
+    IExpressionCache expressionCache
   )
   {
     _logger = logger;
@@ -61,13 +70,7 @@ public class DelegatingCommandExecutor : ICommandExecutor
 
     Stopwatch swBuildStack = Stopwatch.StartNew();
 
-    Expression<Func<CommandState, EnvIO, ValueTask<Either<FlowError, CommandOutcome>>>> expression
-      = (cfg, io) => OverallFlow.ExecuteFlow
-        .Run(cfg)
-        .Run()
-        .RunAsync(io);
-
-    _transformerStack = expression.Compile();
+    _transformerStack = expressionCache.GetOrCompile(_expression);
 
     _logger.LogTrace("Build transformer stack in {elapsed}.", swBuildStack.Measure());
   }
@@ -112,11 +115,16 @@ public class DelegatingCommandExecutor : ICommandExecutor
   {
     Stopwatch swExec = Stopwatch.StartNew();
 
+    // Create a short-lived cancellation token source to allow for cancellation of the command.
+    // This is a TODO: We can read from the configuration a (hierarchical) setting to define how long a certain command _can_ run.
+    using CancellationTokenSource
+      ctsCommandCts = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
+
     using IDisposable? ls = _logger.BeginScope(cmd);
     _logger.LogTrace("Received command to execute.");
 
     CommandState initialState = new(_commandExecutors, cmd, _metrics);
-    EnvIO envIO = EnvIO.New(token: cancelToken);
+    EnvIO envIO = EnvIO.New(token: ctsCommandCts.Token);
 
     Either<FlowError, CommandOutcome> outcome = await _transformerStack.Invoke(initialState, envIO);
 

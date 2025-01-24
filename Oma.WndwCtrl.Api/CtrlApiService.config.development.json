@@ -1,8 +1,11 @@
 {
   "Kestrel": {
     "Endpoints": {
-      "CtrlApi": {
-        "Url": "http://localhost:5000"
+      "Http1": {
+        "Url": "http://*:5000"
+      },
+      "Http": {
+        "Url": "http://localhost:8000"
       }
     }
   }

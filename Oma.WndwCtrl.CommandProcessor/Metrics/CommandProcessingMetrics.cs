@@ -35,7 +35,7 @@ public class CommandProcessingMetrics
       advice: new InstrumentAdvice<double>
       {
         HistogramBucketBoundaries =
-          [10, 20, 30, 50, 80, 130, 210, 340, 550,],
+          [0.05, 0.1, 0.25, 0.5, 1, 2, 3, 5, 10, 20, 30, 50, 80, 130,],
       }
     );
 
@@ -72,7 +72,7 @@ public class CommandProcessingMetrics
   {
     if (componentToRun.DelayedBy is not null)
     {
-      _schedulingDelay.Record(componentToRun.DelayedBy.Value.TotalMilliseconds);
+      _schedulingDelay.Record(componentToRun.DelayedBy.Value.TotalMicroseconds / 1000);
     }
   }
 }

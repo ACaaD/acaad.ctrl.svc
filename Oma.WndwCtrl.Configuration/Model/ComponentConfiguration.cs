@@ -11,12 +11,16 @@ public class ComponentConfiguration : IHasTriggers
   public IReadOnlyDictionary<string, Component> Components { get; init; } =
     new Dictionary<string, Component>();
 
+  [JsonIgnore]
+  public IReadOnlyDictionary<string, Component> ActiveComponents => Components.Where(kvp => kvp.Value.Active)
+    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
   [JsonPropertyName("__meta")]
   [JsonPropertyOrder(int.MaxValue)]
   [JsonInclude]
   public ConfigurationMetadata Metadata { get; init; } = new();
 
   [JsonIgnore]
-  public IEnumerable<ITrigger> Triggers => Components
+  public IEnumerable<ITrigger> Triggers => ActiveComponents
     .SelectMany(component => component.Value.Triggers);
 }

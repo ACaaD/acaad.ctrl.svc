@@ -131,6 +131,8 @@ internal sealed class ChannelWorker<TConsumer, TMessage>(ILogger<TConsumer> logg
 
   protected async override Task ProcessMessagesAsync(CancellationToken cancelToken = default)
   {
+    CancellationTokenSource iterationCts = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
+
     while (await Channel.Reader.WaitToReadAsync(cancelToken).ConfigureAwait(continueOnCapturedContext: false))
     {
       if (cancelToken.IsCancellationRequested)
@@ -158,8 +160,32 @@ internal sealed class ChannelWorker<TConsumer, TMessage>(ILogger<TConsumer> logg
 
         if (_consumer.IsSubscribedTo(message))
         {
-          await _consumer.OnMessageAsync(message, cancelToken)
-            .ConfigureAwait(continueOnCapturedContext: false);
+          if (iterationCts.TryReset())
+          {
+            await _consumer.OnMessageAsync(message, iterationCts.Token)
+              .ConfigureAwait(continueOnCapturedContext: false);
+          }
+          else
+          {
+            logger.LogWarning("Channel worker could not reset cancellation token source. Creating new one.");
+
+            try
+            {
+              iterationCts.Dispose();
+            }
+            catch (Exception ex)
+            {
+              logger.LogError(
+                ex,
+                "An error occurred attempting to dispose non-resettable cancellation token source."
+              );
+            }
+
+            iterationCts = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
+
+            await _consumer.OnMessageAsync(message, iterationCts.Token)
+              .ConfigureAwait(continueOnCapturedContext: false);
+          }
         }
       }
       catch (ChannelClosedException ex)
@@ -175,5 +201,7 @@ internal sealed class ChannelWorker<TConsumer, TMessage>(ILogger<TConsumer> logg
         await OnExceptionAsync(message, ex, cancelToken);
       }
     }
+
+    iterationCts.Dispose();
   }
 }

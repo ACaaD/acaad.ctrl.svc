@@ -48,7 +48,9 @@ public class AdHocFlowExecutor(
     IComponent component = command.Component.IfNone(new AdHocComponent(command));
 
     Option<ComponentCommandOutcomeEvent> result =
-      either.ToOption().Select(outcome => new ComponentCommandOutcomeEvent(component, command, outcome));
+      either.ToOption().Select(
+        outcome => new ComponentCommandOutcomeEvent(component, command, outcome with { })
+      );
 
     await result.Match<Task>(
       @event => messageBusWriter.SendAsync(@event, cancelToken),
@@ -58,6 +60,7 @@ public class AdHocFlowExecutor(
 
   private record AdHocComponent(ICommand Command) : IComponent
   {
+    public bool Active { get; set; } = true;
     public string Name { get; set; } = nameof(AdHocComponent);
     public string Type => "adhoc";
     public IEnumerable<ICommand> Commands => [Command,];

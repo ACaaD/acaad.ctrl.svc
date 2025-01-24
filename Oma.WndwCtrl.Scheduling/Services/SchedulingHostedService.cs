@@ -22,7 +22,8 @@ public sealed class SchedulingHostedService(
   IJobFactory jobFactory,
   IOptions<SchedulingSettings> settingsOptions,
   IMessageBusWriter messageBusWriter,
-  ComponentConfigurationAccessor componentConfigurationAccessor
+  ComponentConfigurationAccessor componentConfigurationAccessor,
+  ISchedulingContext schedulingContext
 )
   : IHostedService, IAsyncDisposable
 {
@@ -117,10 +118,10 @@ public sealed class SchedulingHostedService(
       Stopwatch sw = Stopwatch.StartNew();
       logger.LogTrace("Checking for jobs to process.");
 
-      DateTime referenceTime = DateTime.UtcNow;
+      DateTime executionReferenceTime = schedulingContext.GetNextExecutionReferenceDate();
       int processed = 0;
 
-      await foreach (Job job in jobList.GetJobsToExecuteAsync(referenceTime, _cts.Token))
+      await foreach (Job job in jobList.GetJobsToExecuteAsync(executionReferenceTime, _cts.Token))
       {
         await ProcessJobAsync(job, _cts.Token);
         processed++;

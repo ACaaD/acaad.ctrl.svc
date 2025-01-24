@@ -1,15 +1,15 @@
 {
   "Logging": {
     "LogLevel": {
-      "Oma.WndwCtrl.Core": "Debug",
-      "Oma.WndwCtrl.Core.Executors": "Debug",
-      "Oma.WndwCtrl.Scheduling": "Debug"
+      "Oma.WndwCtrl.Core": "Information",
+      "Oma.WndwCtrl.Core.Executors": "Information",
+      "Oma.WndwCtrl.Scheduling": "Information"
     }
   },
   "SchedulingService": {
     "Enabled": true,
     "Active": true,
-    "CheckInterval": "00:00:00.1"
+    "CheckInterval": "00:00:00.001"
   },
   "Core": {
     "CliParser": {

@@ -36,11 +36,13 @@ public class SchedulingService(
     .UseMessageBus(messageBusAccessor)
     .AddMessageWriter()
     .AddKeyedSingleton<IJobFactory, DelegatingJobFactory>(ServiceKeys.RootJobFactory)
+    .AddSingleton<ISchedulingContext, SchedulingContext>()
     .AddSingleton<IJobFactory, RateJobFactory>()
     .AddSingleton<IJobList, InMemoryJobList>()
     .AddHostedService<SchedulingHostedService>()
     .Configure<SchedulingSettings>(_configuration.GetSection(SchedulingSettings.SettingsKey))
-    .AddMessageConsumer<TriggerEventConsumer, IMessage>();
+    .AddMessageConsumer<TriggerEventConsumer, IMessage>()
+    .AddMessageConsumer<SchedulingDelayEventConsumer, IMessage>();
 
   protected override IHost PostHostRun(IHost host, CancellationToken cancelToken = default)
   {

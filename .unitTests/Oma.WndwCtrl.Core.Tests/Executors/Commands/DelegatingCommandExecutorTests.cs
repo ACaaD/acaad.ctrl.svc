@@ -7,6 +7,7 @@ using Oma.WndwCtrl.Abstractions.Errors;
 using Oma.WndwCtrl.Abstractions.Extensions;
 using Oma.WndwCtrl.Abstractions.Metrics;
 using Oma.WndwCtrl.Abstractions.Model;
+using Oma.WndwCtrl.Core.Executors;
 using Oma.WndwCtrl.Core.Executors.Commands;
 using static LanguageExt.Prelude;
 
@@ -40,7 +41,12 @@ public sealed class DelegatingCommandExecutorTests : IDisposable
 
     _cancelToken = TestContext.Current.CancellationToken;
 
-    _instance = new DelegatingCommandExecutor(loggerMock, [_executorMock,], metricsMock);
+    _instance = new DelegatingCommandExecutor(
+      loggerMock,
+      [_executorMock,],
+      metricsMock,
+      new ExpressionCache() // Give the actual correct instance, that's ok since we're just caching something.
+    );
   }
 
   public void Dispose()

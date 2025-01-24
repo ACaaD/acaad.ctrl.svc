@@ -11,6 +11,7 @@ namespace Oma.WndwCtrl.Core.Model;
 [PublicAPI]
 public abstract class Component : IComponent, IHasTriggers
 {
+  public bool Active { get; set; } = true;
   public string Name { get; set; } = string.Empty;
 
   [JsonIgnore]

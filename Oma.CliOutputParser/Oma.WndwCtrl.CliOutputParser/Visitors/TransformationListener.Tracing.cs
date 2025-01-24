@@ -6,11 +6,16 @@ public partial class TransformationListener
 {
   private void LogCurrentState(string name)
   {
-    _log($"{Environment.NewLine}After {name}:");
-    _log($"JSON::{JsonSerializer.Serialize(CurrentValues)}");
+    if (!_log.Enabled)
+    {
+      return;
+    }
+
+    _log.Log($"{Environment.NewLine}After {name}:");
+    _log.Log($"JSON::{JsonSerializer.Serialize(CurrentValues)}");
 
     string toLog = LogDataRecursive(CurrentValues);
-    _log($"RECU::{toLog}");
+    _log.Log($"RECU::{toLog}");
   }
 
   public override void ExitMap(Grammar.CliOutputParser.MapContext context)

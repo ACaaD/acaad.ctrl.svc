@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
 using Oma.WndwCtrl.Abstractions.Messaging.Model;
 using Oma.WndwCtrl.Api.Conventions;
 using Oma.WndwCtrl.Api.Extensions;
 using Oma.WndwCtrl.Api.Hubs;
+using Oma.WndwCtrl.Api.Hubs.MessageConsumer;
 using Oma.WndwCtrl.Api.OpenApi;
 using Oma.WndwCtrl.Configuration.Model;
 using Oma.WndwCtrl.CoreAsp;
@@ -31,7 +34,8 @@ public class CtrlApiService(
     base
       .ConfigureServices(services)
       .UseMessageBus(_messageBusAccessor)
-      .AddMessageConsumer<EventHub, Event>(registerConsumer: true)
+      .AddSingleton<EventHubContext>()
+      .AddMessageConsumer<EventMessageConsumer, Event>(registerConsumer: true)
       .AddComponentApi(Configuration)
       .AddOpenApiComponentWriters()
       .AddSingleton(configurationAccessor)
@@ -46,6 +50,10 @@ public class CtrlApiService(
                 Title = "Component Control API",
                 Version = "v1",
                 Description = "API for discovering and interacting with Components.",
+                Extensions = new Dictionary<string, IOpenApiExtension>
+                {
+                  ["acaad"] = new OpenApiString("commithash"),
+                },
               };
 
               return Task.CompletedTask;

@@ -1,14 +1,17 @@
-using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using LanguageExt;
 using LanguageExt.Common;
-using Oma.WndwCtrl.CliOutputParser.Grammar;
 using Oma.WndwCtrl.CliOutputParser.Interfaces;
+using Oma.WndwCtrl.CliOutputParser.Metrics;
 using Oma.WndwCtrl.CliOutputParser.Visitors;
 
 namespace Oma.WndwCtrl.CliOutputParser;
 
-public class CliOutputParserImpl(IParserLogger parserLogger) : ICliOutputParser
+public class CliOutputParserImpl(
+  IParserLogger parserLogger,
+  ParserMetrics metrics,
+  TransformationTreeCache treeCache
+) : ICliOutputParser
 {
   public Either<Error, ParserResult> Parse(string transformation, string text)
   {
@@ -16,7 +19,7 @@ public class CliOutputParserImpl(IParserLogger parserLogger) : ICliOutputParser
 
     TransformationListener Build()
     {
-      return new TransformationListener(parserLogger.Log, text);
+      return new TransformationListener(parserLogger, text);
     }
   }
 
@@ -26,34 +29,28 @@ public class CliOutputParserImpl(IParserLogger parserLogger) : ICliOutputParser
 
     TransformationListener Build()
     {
-      return new TransformationListener(parserLogger.Log, values);
+      return new TransformationListener(parserLogger, values);
     }
   }
 
-  private static Either<Error, ParserResult> Parse(
+  private Either<Error, ParserResult> Parse(
     string transformation,
     Func<TransformationListener> transformationListenerFactory
   )
   {
-    CollectingErrorListener errorListener = new();
-    AntlrInputStream charStream = new(transformation);
-    CliOutputLexer lexer = new(charStream);
+    Either<Error, Grammar.CliOutputParser.TransformationContext>
+      treeOrError = treeCache.GetOrCreateTree(transformation);
 
-    lexer.AddErrorListener(errorListener);
+    return treeOrError.Map(
+      tree => ExecuteParser(transformationListenerFactory, tree)
+    );
+  }
 
-    CommonTokenStream tokenStream = new(lexer);
-
-    CliOutputParser.Grammar.CliOutputParser parser = new(tokenStream);
-    parser.AddErrorListener(errorListener);
-
-    CliOutputParser.Grammar.CliOutputParser.TransformationContext? tree = parser.transformation();
-
-    if (errorListener.Errors.Count > 0)
-    {
-      return Error.Many(errorListener.Errors.Cast<Error>().ToArray());
-    }
-
-    // TODO: Check feasibility: Cache the tree for known transformations instead of rebuilding
+  private static ParserResult ExecuteParser(
+    Func<TransformationListener> transformationListenerFactory,
+    Grammar.CliOutputParser.TransformationContext tree
+  )
+  {
     TransformationListener listener = transformationListenerFactory();
 
     ParseTreeWalker walker = new();
@@ -63,7 +60,7 @@ public class CliOutputParserImpl(IParserLogger parserLogger) : ICliOutputParser
 
     if (enumeratedList.Count == 1)
     {
-      return new ParserResult { enumeratedList.Single(), };
+      return [enumeratedList.Single(),];
     }
 
     ParserResult result = [];

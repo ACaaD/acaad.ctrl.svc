@@ -1,13 +1,14 @@
 using Oma.WndwCtrl.CliOutputParser.Grammar;
+using Oma.WndwCtrl.CliOutputParser.Interfaces;
 using Oma.WndwCtrl.CliOutputParser.Model;
 
 namespace Oma.WndwCtrl.CliOutputParser.Visitors;
 
 public partial class TransformationListener : CliOutputParserBaseListener
 {
-  private readonly Action<object> _log;
+  private readonly IParserLogger _log;
 
-  public TransformationListener(Action<object> log, IEnumerable<object> values)
+  public TransformationListener(IParserLogger log, IEnumerable<object> values)
   {
     _log = log;
     CurrentValues = NestedEnumerable.FromEnumerable(values);
@@ -15,7 +16,7 @@ public partial class TransformationListener : CliOutputParserBaseListener
     LogCurrentState("input");
   }
 
-  public TransformationListener(Action<object> log, string input)
+  public TransformationListener(IParserLogger log, string input)
   {
     _log = log;
     CurrentValues = NestedEnumerable.FromString(input);
@@ -27,7 +28,11 @@ public partial class TransformationListener : CliOutputParserBaseListener
 
   public override void EnterStatement(Grammar.CliOutputParser.StatementContext context)
   {
-    _log($"{Environment.NewLine}\t### COMMAND -> {context.GetChild(i: 0).GetText()}");
+    if (_log.Enabled)
+    {
+      _log.Log($"{Environment.NewLine}\t### COMMAND -> {context.GetChild(i: 0).GetText()}");
+    }
+
     base.EnterStatement(context);
   }
 }

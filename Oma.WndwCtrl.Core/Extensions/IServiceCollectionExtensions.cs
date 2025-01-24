@@ -3,8 +3,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Metrics;
-using Oma.WndwCtrl.CliOutputParser;
+using Oma.WndwCtrl.CliOutputParser.Extensions;
 using Oma.WndwCtrl.CliOutputParser.Interfaces;
+using Oma.WndwCtrl.Core.Executors;
 using Oma.WndwCtrl.Core.Executors.Commands;
 using Oma.WndwCtrl.Core.Executors.Transformers;
 using Oma.WndwCtrl.Core.FlowExecutors;
@@ -28,7 +29,7 @@ public static class IServiceCollectionExtensions
     // TODO: Will cause problems when called multiple times.
     // Also: The name is wrong
 
-    services.AddSingleton<ICliOutputParser, CliOutputParserImpl>()
+    services.AddCliOutputParser(configuration)
       .AddSingleton<IParserLogger, CliParserLogger>()
       .Configure<CliParserLoggerOptions>(
         coreConfig.GetSection(CliParserLoggerOptions.SectionName)
@@ -36,6 +37,7 @@ public static class IServiceCollectionExtensions
 
     services
       .AddSingleton<IAcaadCoreMetrics, AcaadCoreMetrics>()
+      .AddSingleton<IExpressionCache, ExpressionCache>()
       .AddScoped<ICommandExecutor, CliCommandExecutor>()
       .AddScoped<IOutcomeTransformer, NoOpTransformer>()
       .AddScoped<IOutcomeTransformer, ParserTransformer>()

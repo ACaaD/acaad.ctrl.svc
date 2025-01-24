@@ -10,6 +10,7 @@
           {
             "type": "parser",
             "statements": [
+              "// Extract svc state",
               "Anchor.From('SERVICE_NAME: OmaMgmtApi');",
               "Anchor.To('WAIT_HINT');",
               "Regex.Match($'STATE[\\s:\\d]*(\\w+)');",

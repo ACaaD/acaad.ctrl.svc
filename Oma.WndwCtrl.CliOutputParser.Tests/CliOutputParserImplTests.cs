@@ -2,11 +2,14 @@ using FluentAssertions;
 using LanguageExt;
 using LanguageExt.Common;
 using Oma.WndwCtrl.CliOutputParser.Interfaces;
+using Oma.WndwCtrl.CliOutputParser.Tests.Fixtures;
 
 namespace Oma.WndwCtrl.CliOutputParser.Tests;
 
 public class XUnitLogger(ITestOutputHelper output) : IParserLogger
 {
+  public bool Enabled => true;
+
   public void Log(object message)
   {
     output.WriteLine(message.ToString()?.Replace("\r", string.Empty) ?? string.Empty);
@@ -42,12 +45,11 @@ public class CliOutputParserImplTests
                                            3.g 3.h 3.i
                                            """;
 
-  private readonly CliOutputParserImpl _instance;
+  private readonly ICliOutputParser _instance;
 
-  public CliOutputParserImplTests(ITestOutputHelper outputHelper)
+  public CliOutputParserImplTests(IocContextFixture iocContext)
   {
-    XUnitLogger logger = new(outputHelper);
-    _instance = new CliOutputParserImpl(logger);
+    _instance = iocContext.Instance;
   }
 
   [Fact]
@@ -108,6 +110,7 @@ public class CliOutputParserImplTests
   public void ShouldFailOnExtraneousInput()
   {
     const string transformationInput = """
+                                       // Extract ping
                                        Anchor.From('Pinging xkcd.com').To('Ping statistics');
                                        Regex.Match($'time=(\d+)ms').YieldGroup(1); 
                                        Values.Average2();
@@ -126,6 +129,7 @@ public class CliOutputParserImplTests
   public void ShouldApplyAnchors()
   {
     const string transformationInput = """
+                                       // Anchor test
                                        Anchor.From('statistics');
                                        Anchor.To('151.101.64.67');
                                        """;
@@ -216,6 +220,14 @@ public class CliOutputParserImplTests
     Either<Error, ParserResult> transformationResult
       = _instance.Parse(transformation, text);
 
+    AssertSingleValue(expectedValue, transformationResult);
+  }
+
+  private static void AssertSingleValue(
+    object expectedValue,
+    Either<Error, ParserResult> transformationResult
+  )
+  {
     transformationResult.Match(
       Right: output =>
       {
@@ -225,5 +237,38 @@ public class CliOutputParserImplTests
       },
       Left: val => val.Should().BeNull()
     );
+  }
+
+  [Fact]
+  public void ShouldCacheTransformations()
+  {
+    const string input = """
+                         This is
+                         multiline
+                         text
+                         """;
+
+    const string transformationOne = """
+                                     Anchor.From('This');
+                                     Anchor.To(' is');
+                                     """;
+
+    const string transformationTwo = """
+                                     Anchor.From('multiline');
+                                     Anchor.To('multiline');
+                                     """;
+
+    Either<Error, ParserResult> transformationResult1
+      = _instance.Parse(transformationOne, input);
+
+    Either<Error, ParserResult> transformationResult2
+      = _instance.Parse(transformationTwo, input);
+
+    Either<Error, ParserResult> transformationResult3
+      = _instance.Parse(transformationOne, input);
+
+    AssertSingleValue("This is", transformationResult1);
+    AssertSingleValue("multiline", transformationResult2);
+    AssertSingleValue("This is", transformationResult3);
   }
 }

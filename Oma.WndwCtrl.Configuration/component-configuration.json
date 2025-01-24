@@ -1,15 +1,26 @@
 {
   "components": {
+    "acaad.ctrl.reboot": {
+      "type": "button",
+      "command": {
+        "type": "cli",
+        "fileName": "shutdown",
+        "arguments": "/r /t 1",
+        "transformations": []
+      }
+    },
     "oma-service-status": {
       "type": "sensor",
+      "active": true,
       "queryCommand": {
         "type": "cli",
         "fileName": "sc.exe",
-        "arguments": "query state= all",
+        "arguments": "query OmaMgmtApi",
         "transformations": [
           {
             "type": "parser",
             "statements": [
+              "// Find OmaMgmt in services",
               "Anchor.From('SERVICE_NAME: OmaMgmtApi');",
               "Anchor.To('WAIT_HINT');",
               "Regex.Match($'STATE[\\s:\\d]*(\\w+)');",
@@ -36,6 +47,7 @@
           {
             "type": "parser",
             "statements": [
+              "// Match mem-usage",
               "Regex.Match($'Mem Usage:\\s+([\\d\\.]*)');",
               "Values.Index(1);"
             ]
@@ -50,12 +62,12 @@
         }
       ]
     },
-    "ping-xkcd": {
+    "ping-google": {
       "type": "sensor",
       "queryCommand": {
         "type": "cli",
         "fileName": "ping",
-        "arguments": "xkcd.com -n 1",
+        "arguments": "google.com -n 1",
         "transformations": [
           {
             "type": "parser",
@@ -84,6 +96,7 @@
           {
             "type": "parser",
             "statements": [
+              "// Extract ip addr",
               "Regex.Match($'\\s*IPv4 Address[\\.\\s\\:]*([\\.\\d]*)');",
               "Values.Index(1);"
             ]

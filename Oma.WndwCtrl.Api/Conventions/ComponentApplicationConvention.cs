@@ -32,7 +32,8 @@ public class ComponentApplicationConvention(ComponentConfigurationAccessor confi
   {
     PopulateControllerBases(application);
 
-    foreach (KeyValuePair<string, Component> component in configurationAccessor.Configuration.Components)
+    foreach (KeyValuePair<string, Component> component in
+             configurationAccessor.Configuration.ActiveComponents)
     {
       ControllerModel controllerModel = new(GetBaseController(component.Value))
       {

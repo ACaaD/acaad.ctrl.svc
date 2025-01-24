@@ -15,9 +15,11 @@ public static class StringExtensions
   {
     int end = text.IndexOf(to, StringComparison.Ordinal);
 
-    return end == -1
+    string result = end == -1
       // TODO: Does this make sense here? If the string is not found we might want to return nothing.
       ? text
       : text[..(end + to.Length)];
+
+    return result;
   }
 }

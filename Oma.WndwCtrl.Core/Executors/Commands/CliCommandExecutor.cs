@@ -1,11 +1,11 @@
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using CliWrap;
 using JetBrains.Annotations;
 using LanguageExt;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Errors;
 using Oma.WndwCtrl.Abstractions.Model;
-using Oma.WndwCtrl.Core.Errors.Commands;
 using Oma.WndwCtrl.Core.Model.Commands;
 using static LanguageExt.Prelude;
 
@@ -27,37 +27,41 @@ public class CliCommandExecutor : ICommandExecutor<CliCommand>
   {
     try
     {
-      ProcessStartInfo processStartInfo = new()
-      {
-        FileName = command.FileName,
-        Arguments = command.Arguments,
-        CreateNoWindow = false,
-        RedirectStandardOutput = true,
-        RedirectStandardError = true,
-      };
+      StringBuilder stdOutBuffer = new();
+      StringBuilder stdErrBuffer = new();
 
-      using Process? process = Process.Start(processStartInfo);
+      Command cliBuilder = Cli.Wrap(command.FileName)
+        .WithArguments(command.Arguments ?? string.Empty)
+        .WithStandardOutputPipe(PipeTarget.ToStringBuilder(stdOutBuffer))
+        .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
+        .WithValidation(CommandResultValidation.None);
 
-      if (process is null)
+      if (command.WorkingDirectory is not null)
       {
-        return Left<FlowError>(
-          new CliCommandError("Could not obtain process instance.", isExceptional: true, isExpected: false)
-        );
+        cliBuilder = cliBuilder.WithWorkingDirectory(command.WorkingDirectory);
       }
 
-      // TODO: This sometimes works, sometimes doesnt (depending on the called cli tool??)
-      // Maybe make configurable ? 
-      // await process.WaitForExitAsync(cancelToken);
+      CommandResult result = await cliBuilder.ExecuteAsync(CancellationToken.None, cancelToken);
 
-      string allText = await process.StandardOutput.ReadToEndAsync(cancelToken);
-      string errorText = await process.StandardError.ReadToEndAsync(cancelToken);
+      string stdOutRes = stdOutBuffer.ToString();
+      string toUse;
 
-      string toUse = process.ExitCode == 0 ? allText
-        : string.IsNullOrEmpty(errorText) ? allText : errorText;
+      if (result.ExitCode == 0)
+      {
+        toUse = stdOutRes;
+      }
+      else
+      {
+        string stdErrRes = stdErrBuffer.ToString();
+
+        toUse = string.IsNullOrEmpty(stdErrRes)
+          ? stdOutRes
+          : stdErrRes;
+      }
 
       CommandOutcome outcome = new(toUse)
       {
-        Success = process.ExitCode == 0,
+        Success = result.ExitCode == 0,
       };
 
       return Right(
@@ -71,6 +75,9 @@ public class CliCommandExecutor : ICommandExecutor<CliCommand>
     catch (Exception ex)
     {
       return Left<FlowError>(new TechnicalError("An unexpected technical error has occured.", Code: -1, ex));
+    }
+    finally
+    {
     }
   }
 }

@@ -9,6 +9,7 @@ using Oma.WndwCtrl.Abstractions.Errors;
 using Oma.WndwCtrl.Abstractions.Extensions;
 using Oma.WndwCtrl.Abstractions.Metrics;
 using Oma.WndwCtrl.Abstractions.Model;
+using Oma.WndwCtrl.Core.Interfaces;
 using Oma.WndwCtrl.FpCore.TransformerStacks.Flow;
 
 namespace Oma.WndwCtrl.Core.Executors.Transformers;
@@ -30,6 +31,14 @@ public class DelegatingTransformer : IRootTransformer
     select _
   ).As();
 
+  private static readonly Expression<Func<TransformationConfiguration, EnvIO,
+      ValueTask<Either<FlowError, TransformationOutcome>>>>
+    _expression
+      = (cfg, io) => OverallFlow.ExecuteFlow
+        .Run(cfg)
+        .Run()
+        .RunAsync(io);
+
 
   private readonly ILogger<DelegatingTransformer> _logger;
   private readonly IAcaadCoreMetrics _metrics;
@@ -42,7 +51,8 @@ public class DelegatingTransformer : IRootTransformer
   public DelegatingTransformer(
     ILogger<DelegatingTransformer> logger,
     IEnumerable<IOutcomeTransformer> transformers,
-    IAcaadCoreMetrics metrics
+    IAcaadCoreMetrics metrics,
+    IExpressionCache expressionCache
   )
   {
     _logger = logger;
@@ -51,14 +61,7 @@ public class DelegatingTransformer : IRootTransformer
 
     Stopwatch swBuildStack = Stopwatch.StartNew();
 
-    Expression<Func<TransformationConfiguration, EnvIO, ValueTask<Either<FlowError, TransformationOutcome>>>>
-      expression
-        = (cfg, io) => OverallFlow.ExecuteFlow
-          .Run(cfg)
-          .Run()
-          .RunAsync(io);
-
-    _transformerStack = expression.Compile();
+    _transformerStack = expressionCache.GetOrCompile(_expression);
 
     _logger.LogTrace("Build transformer stack in {elapsed}.", swBuildStack.Measure());
   }

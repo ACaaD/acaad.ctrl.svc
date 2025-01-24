@@ -14,7 +14,7 @@ public record ComponentCommandExecutionSucceeded : ComponentCommandExecutionFini
     componentExecuting
   )
   {
-    Outcome = outcome;
+    Outcome = outcome with { };
   }
 
   public FlowOutcome Outcome { get; }
