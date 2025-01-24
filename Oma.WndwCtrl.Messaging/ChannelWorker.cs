@@ -129,6 +129,7 @@ internal sealed class ChannelWorker<TConsumer, TMessage>(ILogger<TConsumer> logg
 {
   private TConsumer _consumer = consumer;
 
+#pragma warning disable CA2000
   protected async override Task ProcessMessagesAsync(CancellationToken cancelToken = default)
   {
     CancellationTokenSource iterationCts = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
@@ -204,4 +205,5 @@ internal sealed class ChannelWorker<TConsumer, TMessage>(ILogger<TConsumer> logg
 
     iterationCts.Dispose();
   }
+#pragma warning restore CA2000
 }
