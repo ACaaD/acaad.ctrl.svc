@@ -1,9 +1,11 @@
+using JetBrains.Annotations;
 using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 using Oma.WndwCtrl.Abstractions.Messaging.Model;
 using Oma.WndwCtrl.Abstractions.Messaging.Model.ComponentExecution;
 
 namespace Oma.WndwCtrl.Api.Hubs.MessageConsumer;
 
+[UsedImplicitly]
 public class EventMessageConsumer(ILogger<EventMessageConsumer> logger, EventHubContext hubContext)
   : IMessageConsumer<Event>
 {

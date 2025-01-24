@@ -11,7 +11,7 @@ namespace Oma.WndwCtrl.CliOutputParser;
 
 public class TransformationTreeCache(ParserMetrics metrics)
 {
-  private ConcurrentDictionary<string, Either<Error, Grammar.CliOutputParser.TransformationContext>>
+  private readonly ConcurrentDictionary<string, Either<Error, Grammar.CliOutputParser.TransformationContext>>
     _treeCache = new();
 
   internal Either<Error, Grammar.CliOutputParser.TransformationContext> GetOrCreateTree(string transformation)
@@ -66,10 +66,8 @@ public class TransformationTreeCache(ParserMetrics metrics)
 
   private static string GetMd5(string input)
   {
-    using System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create();
-
     byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
-    byte[] hashBytes = md5.ComputeHash(inputBytes);
+    byte[] hashBytes = System.Security.Cryptography.MD5.HashData(inputBytes);
 
     return Convert.ToHexString(hashBytes);
   }

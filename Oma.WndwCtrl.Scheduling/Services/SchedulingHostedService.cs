@@ -1,11 +1,9 @@
-using System.Diagnostics;
 using LanguageExt;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Oma.WndwCtrl.Abstractions;
-using Oma.WndwCtrl.Abstractions.Extensions;
 using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 using Oma.WndwCtrl.Abstractions.Messaging.Model;
 using Oma.WndwCtrl.Configuration.Model;
@@ -115,19 +113,10 @@ public sealed class SchedulingHostedService(
   {
     try
     {
-      Stopwatch sw = Stopwatch.StartNew();
-      logger.LogTrace("Checking for jobs to process.");
-
       DateTime executionReferenceTime = schedulingContext.GetNextExecutionReferenceDate();
-      int processed = 0;
 
       await foreach (Job job in jobList.GetJobsToExecuteAsync(executionReferenceTime, _cts.Token))
-      {
         await ProcessJobAsync(job, _cts.Token);
-        processed++;
-      }
-
-      logger.LogTrace("Processed {num} jobs in {elapsed}.", processed, sw.Measure());
     }
     catch (Exception ex)
     {

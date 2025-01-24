@@ -16,10 +16,10 @@ public sealed class SchedulingDelayEventConsumer(
   // TODO: Make configurable
   private const int _chunkSize = 30;
 
-  private SemaphoreSlim _mutex = new(initialCount: 1);
+  private readonly SemaphoreSlim _mutex = new(initialCount: 1);
 
-  private ConcurrentBag<TimeSpan> _recentDelays = new();
-  private ConcurrentBag<TimeSpan> _recentDelaysOther = new();
+  private ConcurrentBag<TimeSpan> _recentDelays = [];
+  private ConcurrentBag<TimeSpan> _recentDelaysOther = [];
 
   public void Dispose()
   {
@@ -56,7 +56,7 @@ public sealed class SchedulingDelayEventConsumer(
           _recentDelaysOther
         );
 
-        _recentDelaysOther = new ConcurrentBag<TimeSpan>();
+        _recentDelaysOther = [];
 
         await ProcessAggregatedDelaysAsync(aggregatedValues.ToList(), cancelToken);
       }

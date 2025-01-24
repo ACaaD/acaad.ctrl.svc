@@ -5,22 +5,20 @@ namespace Oma.WndwCtrl.Scheduling;
 
 public class SchedulingContext(ILogger<SchedulingContext> logger) : ISchedulingContext
 {
+  private const double _dampeningFactor = 0.8d;
+
   // TODO: Make configurable
   private static readonly long _maxOffsetDelta = TimeSpan.FromMilliseconds(milliseconds: 10).Ticks;
   private static readonly long _minOffsetDelta = TimeSpan.FromMilliseconds(milliseconds: -10).Ticks;
-
-  private readonly double _dampeningFactor = 0.8d;
   private TimeSpan _currentOffset = TimeSpan.Zero;
 
-  private long _currentTickOffset = 0;
+  private long _currentTickOffset;
 
   public Task UpdateSchedulingOffsetAsync(List<TimeSpan> delays, CancellationToken cancelToken)
   {
-    long calculatedOffsetChange = 0;
-
     long aggregatedValues = (long)Math.Round(GetDurationsWithoutOutliers(delays).Average(ts => ts.Ticks));
 
-    calculatedOffsetChange = (long)Math.Round(aggregatedValues * _dampeningFactor);
+    long calculatedOffsetChange = (long)Math.Round(aggregatedValues * _dampeningFactor);
 
     long clampedOffsetChange = Math.Clamp(calculatedOffsetChange, _minOffsetDelta, _maxOffsetDelta);
 

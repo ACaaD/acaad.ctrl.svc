@@ -11,6 +11,11 @@
   "EventLoggingService": {
     "Enabled": false
   },
+  "Core": {
+    "CliParser": {
+      "Silent": true
+    }
+  },
   "Kestrel": {
     "Endpoints": {
       "ManagementApi": {

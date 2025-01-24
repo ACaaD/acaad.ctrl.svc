@@ -2,14 +2,12 @@ using Antlr4.Runtime.Tree;
 using LanguageExt;
 using LanguageExt.Common;
 using Oma.WndwCtrl.CliOutputParser.Interfaces;
-using Oma.WndwCtrl.CliOutputParser.Metrics;
 using Oma.WndwCtrl.CliOutputParser.Visitors;
 
 namespace Oma.WndwCtrl.CliOutputParser;
 
 public class CliOutputParserImpl(
   IParserLogger parserLogger,
-  ParserMetrics metrics,
   TransformationTreeCache treeCache
 ) : ICliOutputParser
 {

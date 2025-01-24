@@ -38,12 +38,12 @@ public sealed class InMemoryJobList(
         .OrderBy(job => job.ScheduledAt)
     );
 
+  // Very hot path. Logs and time-measurements removed for performance reasons.
   public async IAsyncEnumerable<Job> GetJobsToExecuteAsync(
     DateTime? referenceTime,
     [EnumeratorCancellation] CancellationToken cancelToken = default
   )
   {
-    Stopwatch sw = Stopwatch.StartNew();
     referenceTime ??= DateTime.UtcNow;
 
     bool obtainedMutex = false;
@@ -68,12 +68,6 @@ public sealed class InMemoryJobList(
       {
         _mutex.Release();
       }
-
-      logger.LogTrace(
-        "Processing job list done in {stopwatch}. Reference time: {refDate}",
-        sw.Measure(),
-        referenceTime
-      );
     }
   }
 

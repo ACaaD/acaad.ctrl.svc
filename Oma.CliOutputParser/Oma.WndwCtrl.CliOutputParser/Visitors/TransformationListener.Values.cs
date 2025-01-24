@@ -1,5 +1,8 @@
+using JetBrains.Annotations;
+
 namespace Oma.WndwCtrl.CliOutputParser.Visitors;
 
+[UsedImplicitly]
 public partial class TransformationListener
 {
   public override void ExitValuesAvg(Grammar.CliOutputParser.ValuesAvgContext context)

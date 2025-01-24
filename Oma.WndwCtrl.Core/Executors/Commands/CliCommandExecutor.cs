@@ -76,8 +76,5 @@ public class CliCommandExecutor : ICommandExecutor<CliCommand>
     {
       return Left<FlowError>(new TechnicalError("An unexpected technical error has occured.", Code: -1, ex));
     }
-    finally
-    {
-    }
   }
 }

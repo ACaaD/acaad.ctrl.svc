@@ -29,7 +29,7 @@ public static class IServiceCollectionExtensions
     // TODO: Will cause problems when called multiple times.
     // Also: The name is wrong
 
-    services.AddCliOutputParser(configuration)
+    services.AddCliOutputParser()
       .AddSingleton<IParserLogger, CliParserLogger>()
       .Configure<CliParserLoggerOptions>(
         coreConfig.GetSection(CliParserLoggerOptions.SectionName)
