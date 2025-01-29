@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Oma.WndwCtrl.Abstractions;
@@ -13,6 +14,7 @@ using Oma.WndwCtrl.Core.Interfaces;
 using Oma.WndwCtrl.Core.Logger;
 using Oma.WndwCtrl.Core.Metrics;
 using Oma.WndwCtrl.Core.Model;
+using Oma.WndwCtrl.Core.Model.Settings;
 
 namespace Oma.WndwCtrl.Core.Extensions;
 
@@ -24,6 +26,8 @@ public static class IServiceCollectionExtensions
     IConfiguration configuration
   )
   {
+    services.AddOptions();
+
     IConfigurationSection coreConfig = configuration.GetSection("Core");
 
     // TODO: Will cause problems when called multiple times.
@@ -35,6 +39,13 @@ public static class IServiceCollectionExtensions
         coreConfig.GetSection(CliParserLoggerOptions.SectionName)
       );
 
+    ExtensionSettings extensions = new();
+    coreConfig.GetSection(ExtensionSettings.SectionName).Bind(extensions);
+
+    List<Assembly> extensionAssemblies = extensions.GetAssemblies();
+    JsonExtensions.AddAssembliesToLoad(extensionAssemblies.ToList());
+    AddExtensionExecutors(services, extensionAssemblies);
+
     services
       .AddSingleton<IAcaadCoreMetrics, AcaadCoreMetrics>()
       .AddSingleton<IExpressionCache, ExpressionCache>()
@@ -44,6 +55,35 @@ public static class IServiceCollectionExtensions
       .AddKeyedScoped<IFlowExecutor, AdHocFlowExecutor>(ServiceKeys.AdHocFlowExecutor)
       .AddKeyedScoped<ICommandExecutor, DelegatingCommandExecutor>(ServiceKeys.EntryCommandExecutor)
       .AddKeyedScoped<IRootTransformer, DelegatingTransformer>(ServiceKeys.RootTransformer);
+
+    return services;
+  }
+
+  private static IServiceCollection AddExtensionExecutors(
+    IServiceCollection services,
+    List<Assembly> extensionAssemblies
+  )
+  {
+    foreach (Assembly assembly in extensionAssemblies)
+    {
+      AddAllFromAssembly<ICommandExecutor>(services, assembly);
+      AddAllFromAssembly<IOutcomeTransformer>(services, assembly);
+    }
+
+    return services;
+  }
+
+  public static IServiceCollection AddAllFromAssembly<T>(
+    IServiceCollection services,
+    Assembly assembly,
+    ServiceLifetime serviceLifetime = ServiceLifetime.Scoped
+  )
+  {
+    Type baseType = typeof(T);
+
+    foreach (Type implType in assembly.GetTypes()
+               .Where(t => t is { IsAbstract: false, } && t.IsAssignableTo(baseType)))
+      services.Add(new ServiceDescriptor(baseType, implType, serviceLifetime));
 
     return services;
   }

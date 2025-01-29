@@ -16,10 +16,19 @@ public class BackgroundServiceWrapper<TAssemblyDescriptor>(IConfiguration config
 
   protected readonly string RunningInOs = configuration.GetValue<string>("ACaaD:OS") ?? "windows";
 
+  private IConfiguration _configuration;
+
   protected static IServiceProvider ServiceProvider => _serviceProvider
                                                        ?? throw new InvalidOperationException(
                                                          "The WebApplicationWrapper has not been initialized properly."
                                                        );
+
+  protected IConfiguration Configuration
+  {
+    get => _configuration ??
+           throw new InvalidOperationException($"{nameof(Configuration)} is not populated.");
+    private set => _configuration = value;
+  }
 
   [PublicAPI]
   protected IHost? Host { get; private set; }
@@ -37,6 +46,7 @@ public class BackgroundServiceWrapper<TAssemblyDescriptor>(IConfiguration config
     Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
 #endif
 
+    Configuration = configuration;
     HostBuilder hostBuilder = new();
 
     hostBuilder.ConfigureHostConfiguration(builder => builder.AddConfiguration(configuration));

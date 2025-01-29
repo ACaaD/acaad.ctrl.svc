@@ -19,7 +19,9 @@ public sealed class MockedFlowExecutorApiFixture : WebApplicationFactory<CtrlApi
 {
   public MockedFlowExecutorApiFixture()
   {
-    WebApplicationWrapper<IApiService>.ModifyJsonSerializerOptions(SystemTextJsonSerializerConfig.Options);
+    WebApplicationWrapper<IApiService>.ModifyJsonSerializerOptions(
+      SystemTextJsonSerializerConfig.Options
+    );
   }
 
   public ValueTask InitializeAsync() => ValueTask.CompletedTask;

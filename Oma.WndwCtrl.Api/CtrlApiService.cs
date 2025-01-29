@@ -17,9 +17,10 @@ namespace Oma.WndwCtrl.Api;
 
 public class CtrlApiService(
   ComponentConfigurationAccessor configurationAccessor,
-  MessageBusAccessor messageBusAccessor
+  MessageBusAccessor messageBusAccessor,
+  IConfiguration rootConfiguration
 )
-  : WebApplicationWrapper<CtrlApiService>(messageBusAccessor)
+  : WebApplicationWrapper<CtrlApiService>(messageBusAccessor, rootConfiguration)
 {
   private readonly MessageBusAccessor _messageBusAccessor = messageBusAccessor;
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Oma.WndwCtrl.CoreAsp;
 using Oma.WndwCtrl.Messaging.Bus;
@@ -8,8 +9,8 @@ using OpenTelemetry.Resources;
 
 namespace Oma.WndwCtrl.MetricsApi;
 
-public class MetricsApiService(MessageBusAccessor messageBusAccessor)
-  : WebApplicationWrapper<MetricsApiService>(messageBusAccessor)
+public class MetricsApiService(MessageBusAccessor messageBusAccessor, IConfiguration rootConfiguration)
+  : WebApplicationWrapper<MetricsApiService>(messageBusAccessor, rootConfiguration)
 {
   protected override IServiceCollection ConfigureServices(IServiceCollection services)
   {

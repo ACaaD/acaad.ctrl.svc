@@ -3,12 +3,5 @@
     "LogLevel": {
       "Default": "Warning"
     }
-  },
-  "Kestrel": {
-    "Endpoints": {
-      "MetricsApi": {
-        "Url": "http://192.168.178.22:19090"
-      }
-    }
   }
 }

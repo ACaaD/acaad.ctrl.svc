@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Core.Extensions;
+using Oma.WndwCtrl.Core.Model.Settings;
 using Oma.WndwCtrl.CoreAsp.Api.Filters;
 using Oma.WndwCtrl.CoreAsp.Conventions;
 using Oma.WndwCtrl.Messaging.Bus;
@@ -14,7 +15,10 @@ using Scalar.AspNetCore;
 
 namespace Oma.WndwCtrl.CoreAsp;
 
-public class WebApplicationWrapper<TAssemblyDescriptor>(MessageBusAccessor? messageBusAccessor) : IApiService
+public class WebApplicationWrapper<TAssemblyDescriptor>(
+  MessageBusAccessor? messageBusAccessor,
+  IConfiguration? rootConfiguration
+) : IApiService
   where TAssemblyDescriptor : class, IApiService
 {
   [SuppressMessage(
@@ -23,6 +27,8 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(MessageBusAccessor? mess
     Justification = "Exactly the intended behaviour."
   )]
   private static IServiceProvider? _serviceProvider;
+
+  private static readonly string _serviceName = typeof(TAssemblyDescriptor).Name;
 
   private IConfiguration? _configuration;
 
@@ -74,7 +80,19 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(MessageBusAccessor? mess
     Environment = builder.Environment;
     Configuration = builder.Configuration;
 
+    IConfiguration coreConfig = Configuration.GetSection("Core");
+    ExtensionSettings extensions = new();
+    coreConfig.GetSection(ExtensionSettings.SectionName).Bind(extensions);
+
     ConfigurationConfiguration(builder.Configuration);
+
+    builder.WebHost.ConfigureKestrel(
+      (context, options) =>
+      {
+        IConfiguration configToUse = context.Configuration.GetSection(_serviceName).GetSection("Kestrel");
+        options.Configure(configToUse);
+      }
+    );
 
     IMvcCoreBuilder mvcBuilder = builder.Services
       .AddMvcCore(
@@ -154,7 +172,9 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(MessageBusAccessor? mess
     ? Application.StopAsync(cancelToken)
     : Task.CompletedTask;
 
-  public static void ModifyJsonSerializerOptions(JsonSerializerOptions jsonSerializerOptions)
+  public static void ModifyJsonSerializerOptions(
+    JsonSerializerOptions jsonSerializerOptions
+  )
   {
     jsonSerializerOptions.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
       .WithAddedModifier(
@@ -179,7 +199,10 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(MessageBusAccessor? mess
     IConfigurationBuilder configurationBuilder
   )
   {
-    string serviceName = typeof(TAssemblyDescriptor).Name;
+    if (rootConfiguration is not null)
+    {
+      configurationBuilder.AddConfiguration(rootConfiguration);
+    }
 
     IFileProvider standardFileProvider = configurationBuilder.GetFileProvider();
 
@@ -190,12 +213,12 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(MessageBusAccessor? mess
 
     configurationBuilder.SetFileProvider(compositeFileProvider);
 
-    configurationBuilder.AddJsonFile($"{serviceName}.config.json", optional: true, reloadOnChange: false);
+    configurationBuilder.AddJsonFile($"{_serviceName}.config.json", optional: true, reloadOnChange: false);
 
     if (Environment.IsDevelopment())
     {
       configurationBuilder.AddJsonFile(
-        $"{serviceName}.config.development.json",
+        $"{_serviceName}.config.development.json",
         optional: true,
         reloadOnChange: false
       );

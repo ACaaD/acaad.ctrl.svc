@@ -6,11 +6,6 @@
       "Oma.WndwCtrl.Scheduling": "Information"
     }
   },
-  "SchedulingService": {
-    "Enabled": true,
-    "Active": true,
-    "CheckInterval": "00:00:00.001"
-  },
   "Core": {
     "CliParser": {
       "Silent": true

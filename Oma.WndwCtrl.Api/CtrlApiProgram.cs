@@ -12,9 +12,13 @@ public class CtrlApiProgram
       MessageBus = new NoOpMessageBus(),
     };
 
+    IConfiguration configuration = new ConfigurationBuilder()
+      .Build();
+
     CtrlApiService apiService = new(
       await ComponentConfigurationAccessor.FromFileAsync(),
-      messageBusAccessor
+      messageBusAccessor,
+      configuration
     );
 
     await apiService.StartAsync(CancellationToken.None, args);

@@ -11,8 +11,8 @@ using Oma.WndwCtrl.Scheduling;
 
 namespace Oma.WndwCtrl.MgmtApi;
 
-public class MgmtApiService(MessageBusAccessor? messageBusAccessor)
-  : WebApplicationWrapper<MgmtApiService>(messageBusAccessor)
+public class MgmtApiService(MessageBusAccessor? messageBusAccessor, IConfiguration? rootConfiguration)
+  : WebApplicationWrapper<MgmtApiService>(messageBusAccessor, rootConfiguration)
 {
   protected override IServiceCollection ConfigureServices(IServiceCollection services)
   {

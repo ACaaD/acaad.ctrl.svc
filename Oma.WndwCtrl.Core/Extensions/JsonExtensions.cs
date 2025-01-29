@@ -7,12 +7,24 @@ namespace Oma.WndwCtrl.Core.Extensions;
 
 public static class JsonExtensions
 {
-  private static readonly Assembly AssembliesToSearch = typeof(BaseTransformation).Assembly;
+  private static IEnumerable<Assembly> _assembliesToInspect = [];
+
+  internal static void AddAssembliesToLoad(List<Assembly> assembliesToLoad)
+  {
+    if (assembliesToLoad.Count == 0)
+    {
+      return;
+    }
+
+    _assembliesToInspect = _assembliesToInspect.Union(assembliesToLoad).Distinct();
+  }
 
   public static Action<JsonTypeInfo> GetPolymorphismModifierFor<T>(
     Func<Type, string> typeToDiscriminatorTransform
   )
   {
+    List<Assembly> assembliesToSearch = new(_assembliesToInspect) { typeof(BaseTransformation).Assembly, };
+
     return jsonTypeInfo =>
     {
       Type baseType = typeof(T);
@@ -29,7 +41,7 @@ public static class JsonExtensions
         UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization,
       };
 
-      IEnumerable<Type> types = AssembliesToSearch.GetTypes()
+      IEnumerable<Type> types = assembliesToSearch.SelectMany(a => a.GetTypes())
         .Where(t => t is { IsClass: true, IsAbstract: false, } && t.IsAssignableTo(baseType));
 
       foreach (Type t in types)

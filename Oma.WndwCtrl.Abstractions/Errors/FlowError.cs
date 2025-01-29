@@ -35,7 +35,7 @@ public record FlowError(string Message, bool IsExceptional, bool IsExpected) : E
 
   [System.Diagnostics.Contracts.Pure]
   public static FlowError NoCommandExecutorFound(ICommand command) => new(
-    $"No transformation executor found that handles transformation type {command.GetType().FullName}.",
+    $"No command executor found that handles transformation type {command.GetType().FullName}.",
     isExceptional: false
   );
 
