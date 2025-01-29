@@ -10,6 +10,7 @@ using static LanguageExt.Prelude;
 
 namespace Oma.WndwCtrl.Ext.Windows.Media.Executors.Commands;
 
+[UsedImplicitly]
 public partial class MediaCommandExecutor : ICommandExecutor<MediaCommand>
 {
   private const int KEYEVENTF_EXTENTEDKEY = 1;
