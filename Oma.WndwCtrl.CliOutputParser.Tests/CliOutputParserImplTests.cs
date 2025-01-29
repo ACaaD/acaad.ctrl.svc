@@ -16,7 +16,7 @@ public class XUnitLogger(ITestOutputHelper output) : IParserLogger
   }
 }
 
-public class CliOutputParserImplTests
+public class CliOutputParserImplTests(IocContextFixture iocContext)
 {
   private const string _testInputPing = """
                                         $ ping xkcd.com
@@ -45,12 +45,7 @@ public class CliOutputParserImplTests
                                            3.g 3.h 3.i
                                            """;
 
-  private readonly ICliOutputParser _instance;
-
-  public CliOutputParserImplTests(IocContextFixture iocContext)
-  {
-    _instance = iocContext.Instance;
-  }
+  private readonly ICliOutputParser _instance = iocContext.Instance;
 
   [Fact]
   public void ShouldParseTransformationSuccessfully()

@@ -14,7 +14,7 @@ public class BackgroundServiceWrapper<TAssemblyDescriptor>(IConfiguration config
   )]
   private static IServiceProvider? _serviceProvider;
 
-  protected string RunningInOs = configuration.GetValue<string>("ACaaD:OS") ?? "windows";
+  protected readonly string RunningInOs = configuration.GetValue<string>("ACaaD:OS") ?? "windows";
 
   protected static IServiceProvider ServiceProvider => _serviceProvider
                                                        ?? throw new InvalidOperationException(

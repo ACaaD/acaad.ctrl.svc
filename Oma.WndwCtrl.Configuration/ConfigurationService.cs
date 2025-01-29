@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Configuration.Model;
 using Oma.WndwCtrl.CoreAsp;
 
@@ -9,7 +8,7 @@ public class ConfigurationService(
   IConfiguration configuration,
   ComponentConfigurationAccessor componentConfigurationAccessor
 )
-  : BackgroundServiceWrapper<ConfigurationService>(configuration), IBackgroundService
+  : BackgroundServiceWrapper<ConfigurationService>(configuration)
 {
   protected async override Task PreHostRunAsync(CancellationToken cancelToken = default)
   {
