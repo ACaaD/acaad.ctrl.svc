@@ -81,7 +81,7 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(
     Configuration = builder.Configuration;
 
     IConfiguration coreConfig = Configuration.GetSection("Core");
-    ExtensionSettings extensions = new();
+    ExtensionSettings extensions = [];
     coreConfig.GetSection(ExtensionSettings.SectionName).Bind(extensions);
 
     ConfigurationConfiguration(builder.Configuration);

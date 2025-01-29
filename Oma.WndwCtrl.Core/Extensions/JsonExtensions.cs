@@ -23,7 +23,7 @@ public static class JsonExtensions
     Func<Type, string> typeToDiscriminatorTransform
   )
   {
-    List<Assembly> assembliesToSearch = new(_assembliesToInspect) { typeof(BaseTransformation).Assembly, };
+    List<Assembly> assembliesToSearch = [.._assembliesToInspect, typeof(BaseTransformation).Assembly,];
 
     return jsonTypeInfo =>
     {

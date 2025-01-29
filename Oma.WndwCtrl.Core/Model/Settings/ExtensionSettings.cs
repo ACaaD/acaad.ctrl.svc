@@ -8,7 +8,7 @@ public class ExtensionSettings : List<AssemblyInfo2>
 
   public List<Assembly> GetAssemblies()
   {
-    // TODO: Obvious security concerns..
+    // TODO: [Required for MVP] Obvious security concerns..
     return this.Select(assemblyInfo => Assembly.LoadFrom($"{assemblyInfo.AssemblyName}")).ToList();
   }
 }

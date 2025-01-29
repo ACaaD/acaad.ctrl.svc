@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using JetBrains.Annotations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Oma.WndwCtrl.Abstractions;
@@ -39,7 +40,7 @@ public static class IServiceCollectionExtensions
         coreConfig.GetSection(CliParserLoggerOptions.SectionName)
       );
 
-    ExtensionSettings extensions = new();
+    ExtensionSettings extensions = [];
     coreConfig.GetSection(ExtensionSettings.SectionName).Bind(extensions);
 
     List<Assembly> extensionAssemblies = extensions.GetAssemblies();
@@ -59,7 +60,7 @@ public static class IServiceCollectionExtensions
     return services;
   }
 
-  private static IServiceCollection AddExtensionExecutors(
+  private static void AddExtensionExecutors(
     IServiceCollection services,
     List<Assembly> extensionAssemblies
   )
@@ -69,10 +70,9 @@ public static class IServiceCollectionExtensions
       AddAllFromAssembly<ICommandExecutor>(services, assembly);
       AddAllFromAssembly<IOutcomeTransformer>(services, assembly);
     }
-
-    return services;
   }
 
+  [PublicAPI]
   public static IServiceCollection AddAllFromAssembly<T>(
     IServiceCollection services,
     Assembly assembly,
