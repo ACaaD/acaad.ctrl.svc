@@ -1,0 +1,175 @@
+{
+  "components": {
+    "acaad.ctrl.reboot": {
+      "type": "button",
+      "command": {
+        "type": "cli",
+        "fileName": "reboot",
+        "arguments": "",
+        "transformations": []
+      }
+    },
+    "oma-service-status": {
+      "type": "sensor",
+      "active": false,
+      "queryCommand": {
+        "type": "cli",
+        "fileName": "sc.exe",
+        "arguments": "query OmaMgmtApi",
+        "transformations": [
+          {
+            "type": "parser",
+            "statements": [
+              "// Find OmaMgmt in services",
+              "Anchor.From('SERVICE_NAME: OmaMgmtApi');",
+              "Anchor.To('WAIT_HINT');",
+              "Regex.Match($'STATE[\\s:\\d]*(\\w+)');",
+              "Values.Index(1);"
+            ]
+          }
+        ]
+      },
+      "triggers": [
+        {
+          "type": "rate",
+          "expression": "15 seconds",
+          "friendlyName": "every 15 sec"
+        }
+      ]
+    },
+    "acaad.usage.ram": {
+      "type": "sensor",
+      "active": false,
+      "queryCommand": {
+        "type": "cli",
+        "fileName": "tasklist.exe",
+        "arguments": "/FI \"IMAGENAME eq Oma.WndwCtrl.MgmtApi.exe\" /FO LIST",
+        "transformations": [
+          {
+            "type": "parser",
+            "statements": [
+              "// Match mem-usage",
+              "Regex.Match($'Mem Usage:\\s+([\\d\\.]*)');",
+              "Values.Index(1);"
+            ]
+          }
+        ]
+      },
+      "triggers": [
+        {
+          "type": "rate",
+          "expression": "15 seconds",
+          "friendlyName": "every 15 sec"
+        }
+      ]
+    },
+    "ping-google": {
+      "type": "sensor",
+      "queryCommand": {
+        "type": "cli",
+        "fileName": "ping",
+        "arguments": "google.com -c 1",
+        "transformations": [
+          {
+            "type": "parser",
+            "statements": [
+              "// Match ping duration",
+              "Regex.Match($'mdev = (\\d+(\\.\\d+)?)');",
+              "Values.Index(1);",
+              "Values.First();"
+            ]
+          }
+        ]
+      },
+      "triggers": [
+        {
+          "type": "rate",
+          "expression": "5 seconds",
+          "friendlyName": "every 5 sec"
+        }
+      ]
+    },
+    "ip-addr": {
+      "type": "sensor",
+      "active": false,
+      "queryCommand": {
+        "type": "cli",
+        "fileName": "ipconfig",
+        "transformations": [
+          {
+            "type": "parser",
+            "statements": [
+              "// Extract ip addr",
+              "Regex.Match($'\\s*IPv4 Address[\\.\\s\\:]*([\\.\\d]*)');",
+              "Values.Index(1);"
+            ]
+          }
+        ]
+      },
+      "triggers": [
+        {
+          "type": "rate",
+          "expression": "5 seconds",
+          "friendlyName": "every 5 sec"
+        }
+      ]
+    },
+    "git-bash": {
+      "type": "sensor",
+      "active": false,
+      "queryCommand": {
+        "type": "cli",
+        "fileName": "C:\\Program Files\\Git\\usr\\bin\\bash.exe",
+        "arguments": "/z/bash/print-something.sh",
+        "transformations": []
+      },
+      "triggers": [
+      ]
+    },
+    "test-switch": {
+      "type": "switch",
+      "active": false,
+      "queryCommand": {
+        "type": "cli",
+        "fileName": "C:\\Program Files\\Git\\usr\\bin\\bash.exe",
+        "arguments": "/z/bash/print-something.sh",
+        "transformations": []
+      },
+      "onCommand": {
+        "type": "cli",
+        "fileName": "C:\\Program Files\\Git\\usr\\bin\\bash.exe",
+        "arguments": "/z/bash/print-something.sh",
+        "transformations": []
+      },
+      "offCommand": {
+        "type": "cli",
+        "fileName": "C:\\Program Files\\Git\\usr\\bin\\bash.exe",
+        "arguments": "/z/bash/print-something.sh",
+        "transformations": []
+      },
+      "triggers": [
+        {
+          "type": "rate",
+          "expression": "5 seconds",
+          "friendlyName": "every 5 sec"
+        }
+      ]
+    },
+    "invalid-parameters": {
+      "type": "button",
+      "active": false,
+      "command": {
+        "type": "cli",
+        "fileName": "ping",
+        "arguments": "--this-should-not-work",
+        "transformations": []
+      },
+      "triggers": [
+        {
+          "type": "event",
+          "name": "RequestReceived-not-found"
+        }
+      ]
+    }
+  }
+}

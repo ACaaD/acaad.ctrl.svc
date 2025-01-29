@@ -1,23 +1,22 @@
-﻿using Oma.WndwCtrl.Abstractions;
+﻿using Microsoft.Extensions.Configuration;
+using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Configuration.Model;
+using Oma.WndwCtrl.CoreAsp;
 
 namespace Oma.WndwCtrl.Configuration;
 
 public class ConfigurationService(
+  IConfiguration configuration,
   ComponentConfigurationAccessor componentConfigurationAccessor
 )
-  : IBackgroundService
+  : BackgroundServiceWrapper<ConfigurationService>(configuration), IBackgroundService
 {
-  public bool Enabled => true;
-
-  public async Task StartAsync(CancellationToken cancelToken = default, params string[] arg)
+  protected async override Task PreHostRunAsync(CancellationToken cancelToken = default)
   {
+    await base.PreHostRunAsync(cancelToken);
+
     // TODO: Error handling
     componentConfigurationAccessor.Configuration =
-      (await ComponentConfigurationAccessor.FromFileAsync(cancelToken)).Configuration;
+      (await ComponentConfigurationAccessor.FromFileAsync(RunningInOs, cancelToken)).Configuration;
   }
-
-  public Task ForceStopAsync(CancellationToken cancelToken = default) => Task.CompletedTask;
-
-  public Task WaitForShutdownAsync(CancellationToken cancelToken = default) => Task.CompletedTask;
 }

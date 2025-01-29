@@ -14,6 +14,8 @@ public class BackgroundServiceWrapper<TAssemblyDescriptor>(IConfiguration config
   )]
   private static IServiceProvider? _serviceProvider;
 
+  protected string RunningInOs = configuration.GetValue<string>("ACaaD:OS") ?? "windows";
+
   protected static IServiceProvider ServiceProvider => _serviceProvider
                                                        ?? throw new InvalidOperationException(
                                                          "The WebApplicationWrapper has not been initialized properly."
@@ -55,6 +57,7 @@ public class BackgroundServiceWrapper<TAssemblyDescriptor>(IConfiguration config
 
     TAssemblyDescriptor.ServiceProvider = Host.Services;
 
+    await PreHostRunAsync(cancelToken);
     await Host.StartAsync(cancelToken);
     PostHostRun(Host, cancelToken);
   }
@@ -91,4 +94,6 @@ public class BackgroundServiceWrapper<TAssemblyDescriptor>(IConfiguration config
   [PublicAPI]
   protected virtual IHost PostHostRun(IHost host, CancellationToken cancelToken = default) =>
     host;
+
+  protected virtual Task PreHostRunAsync(CancellationToken cancelToken = default) => Task.CompletedTask;
 }

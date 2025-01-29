@@ -32,10 +32,11 @@ public class ComponentConfigurationAccessor
   }
 
   public async static Task<ComponentConfigurationAccessor> FromFileAsync(
+    string runningInOs = "windows",
     CancellationToken cancelToken = default
   )
   {
-    const string configurationFilePath = "component-configuration.json";
+    string configurationFilePath = $"component-configuration-{runningInOs}.json";
 
     string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, configurationFilePath);
     string fileContent = await File.ReadAllTextAsync(filePath, cancelToken);

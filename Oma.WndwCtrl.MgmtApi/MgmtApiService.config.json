@@ -1,4 +1,7 @@
 {
+  "ACaaD": {
+    "OS": "windows"
+  },
   "Logging": {
     "LogLevel": {
       "Default": "Warning"

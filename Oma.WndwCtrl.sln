@@ -61,6 +61,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dashboards", "Dashboards", 
 		Dashboards\Acaad.Monitoring.json = Dashboards\Acaad.Monitoring.json
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installation", "Installation", "{41D1E3C4-0AC3-4245-BB9C-68F8D13481ED}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation\Installation\Linux.md = Documentation\Installation\Linux.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -146,5 +151,6 @@ Global
 		{15C4BD87-A719-4031-900D-1A2A8692CA28} = {CB01FB73-6F61-43AA-81EB-C3A19BA74122}
 		{94B42F55-3A25-4022-B02B-28F4F945CB00} = {FC063003-91F3-415C-AB68-D1C08337FAC2}
 		{C0FC9E76-5113-4E14-8061-4A9EE8CA1507} = {FC063003-91F3-415C-AB68-D1C08337FAC2}
+		{41D1E3C4-0AC3-4245-BB9C-68F8D13481ED} = {94B42F55-3A25-4022-B02B-28F4F945CB00}
 	EndGlobalSection
 EndGlobal

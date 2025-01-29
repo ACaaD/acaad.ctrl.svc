@@ -17,6 +17,9 @@ public class Sensor : Component, IStateQueryable
   public override string Type => "sensor";
 
   [JsonInclude]
+  public string? UnitOfMeasure { get; internal set; }
+
+  [JsonInclude]
   [JsonRequired]
   public ICommand QueryCommand { get; internal set; } = null!;
 }

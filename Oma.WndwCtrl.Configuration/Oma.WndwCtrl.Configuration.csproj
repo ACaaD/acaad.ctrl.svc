@@ -18,10 +18,13 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="component-configuration.json">
+        <None Update="component-configuration-windows.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="component-configuration-admin.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="component-configuration-linux.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>

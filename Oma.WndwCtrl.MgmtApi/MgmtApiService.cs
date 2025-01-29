@@ -24,9 +24,21 @@ public class MgmtApiService(MessageBusAccessor? messageBusAccessor)
       .AddBackgroundService<MessageBusService>()
       .AddBackgroundService<EventLoggingService>()
       .AddBackgroundService<SchedulingService>()
-      .AddBackgroundService<CommandProcessingService>()
-      // TODO: Should not always be added ? 
-      .AddWindowsService();
+      .AddBackgroundService<CommandProcessingService>();
+
+    string runningInOs = Configuration.GetValue<string>("ACaaD:OS") ?? "windows";
+
+    switch (runningInOs)
+    {
+      case "windows":
+        result.AddWindowsService();
+        break;
+      case "linux":
+        result.AddSystemd();
+        break;
+      default:
+        throw new InvalidOperationException($"OS value '{runningInOs}' is not supported.");
+    }
 
     return result;
   }
