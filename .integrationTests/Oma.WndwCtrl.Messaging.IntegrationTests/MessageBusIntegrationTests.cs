@@ -286,6 +286,7 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
 
     IMessageConsumer<TMessage> messageConsumer = Substitute.For<IMessageConsumer<TMessage>>();
 
+    messageConsumer.IsSubscribedTo(Arg.Any<IMessage>()).Returns(returnThis: false);
     messageConsumer.IsSubscribedTo(Arg.Any<TMessage>()).Returns(returnThis: true);
 
     services.AddMessageConsumer<IMessageConsumer<TMessage>, TMessage>(
