@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
@@ -15,7 +16,7 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
   private readonly List<ServiceProvider> _consumerProviders = [];
   private readonly ServiceProvider _serviceProvider = SetUpMessageBusContainer();
 
-  private Task? _consumerTask;
+  private ConcurrentBag<Task> _consumerTasks = [];
 
   private IMessageBus? _messageBus;
 
@@ -61,7 +62,7 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
 
   private async Task WaitForConsumerCompletion()
   {
-    await (_consumerTask ?? Task.CompletedTask);
+    await Task.WhenAll(_consumerTasks);
   }
 
   [Fact]
@@ -96,7 +97,7 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
     IMessageConsumer otherC = AddConsumerToContainer<OtherMessage>(services);
 
     ServiceProvider provider = services.BuildServiceProvider();
-    _consumerTask = provider.StartConsumersAsync(MessageBus, _cancelToken);
+    _consumerTasks.Add(provider.StartConsumersAsync(MessageBus, _cancelToken));
 
     await MessageBus.SendAsync(new DummyMessage(), _cancelToken);
     await MessageBus.SendAsync(new DummyMessage(), _cancelToken);
@@ -271,7 +272,7 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
     ServiceProvider result = services.BuildServiceProvider();
     _consumerProviders.Add(result);
 
-    _consumerTask = result.StartConsumersAsync(MessageBus, cancelToken ?? _cancelToken);
+    _consumerTasks.Add(result.StartConsumersAsync(MessageBus, cancelToken ?? _cancelToken));
 
     return messageConsumer;
   }
