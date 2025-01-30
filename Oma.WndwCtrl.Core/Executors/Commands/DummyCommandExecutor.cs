@@ -27,7 +27,12 @@ public class DummyCommandExecutor : ICommandExecutor<DummyCommand>
 
     string message = string.Join(Environment.NewLine, command.Returns);
 
-    if (command.SimulateFailure)
+    if (cancelToken.IsCancellationRequested)
+    {
+      OperationCancelledError opCancelled = new(new OperationCanceledException());
+      result = Left(new FlowError(opCancelled));
+    }
+    else if (command.SimulateFailure)
     {
       result = Left(new FlowError(message, command.IsExceptional, command.IsExpected));
     }

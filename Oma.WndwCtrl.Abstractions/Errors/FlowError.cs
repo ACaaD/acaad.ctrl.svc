@@ -13,7 +13,7 @@ public record FlowError(string Message, bool IsExceptional, bool IsExpected) : E
     Inner = other;
   }
 
-  protected FlowError(TechnicalError technicalError) : this((Error)technicalError)
+  public FlowError(TechnicalError technicalError) : this((Error)technicalError)
   {
     Inner = technicalError.Inner;
   }

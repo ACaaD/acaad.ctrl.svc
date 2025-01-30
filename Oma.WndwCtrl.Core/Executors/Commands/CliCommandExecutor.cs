@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
@@ -45,9 +46,9 @@ public class CliCommandExecutor : ICommandExecutor<CliCommand>
         );
       }
 
-      List<string> errorChunks = [];
+      ConcurrentBag<string> errorChunks = [];
 
-      process.ErrorDataReceived += (sender, e) =>
+      process.ErrorDataReceived += (_, e) =>
       {
         if (!string.IsNullOrWhiteSpace(e.Data))
         {
@@ -60,14 +61,14 @@ public class CliCommandExecutor : ICommandExecutor<CliCommand>
 
       await process.WaitForExitAsync(cancelToken);
 
-      string outcome = process.ExitCode == 0 && errorChunks.Count == 0
+      string outcome = process.ExitCode == 0 && errorChunks.IsEmpty
         ? allText
         : string.Join(Environment.NewLine, errorChunks);
 
       return Right(
         new CommandOutcome(outcome)
         {
-          Success = process.ExitCode == 0 && errorChunks.Count == 0,
+          Success = process.ExitCode == 0 && errorChunks.IsEmpty,
         }
       );
     }
