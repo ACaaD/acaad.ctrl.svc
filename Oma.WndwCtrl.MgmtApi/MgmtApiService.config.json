@@ -9,7 +9,7 @@
   },
   "SchedulingService": {
     "CheckInterval": "00:00:00.001",
-    "Active": true
+    "Active": false
   },
   "EventLoggingService": {
     "Enabled": false

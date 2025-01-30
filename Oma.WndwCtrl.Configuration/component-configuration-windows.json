@@ -39,7 +39,7 @@
     },
     "acaad.usage.ram": {
       "type": "sensor",
-      "active": false,
+      "active": true,
       "queryCommand": {
         "type": "cli",
         "fileName": "tasklist.exe",
@@ -65,7 +65,7 @@
     },
     "ping-google": {
       "type": "sensor",
-      "active": false,
+      "active": true,
       "queryCommand": {
         "type": "cli",
         "fileName": "ping",
@@ -92,7 +92,7 @@
     },
     "ip-addr": {
       "type": "sensor",
-      "active": false,
+      "active": true,
       "queryCommand": {
         "type": "cli",
         "fileName": "ipconfig",
@@ -128,7 +128,7 @@
     },
     "test-switch": {
       "type": "switch",
-      "active": false,
+      "active": true,
       "queryCommand": {
         "type": "cli",
         "fileName": "C:\\Program Files\\Git\\usr\\bin\\bash.exe",
@@ -157,7 +157,7 @@
     },
     "invalid-parameters": {
       "type": "button",
-      "active": false,
+      "active": true,
       "command": {
         "type": "cli",
         "fileName": "ping",
@@ -170,6 +170,15 @@
           "name": "RequestReceived-not-found"
         }
       ]
+    },
+    "invalid-sc": {
+      "type": "button",
+      "command": {
+        "type": "cli",
+        "fileName": "sc.exe",
+        "arguments": "query2 not-exists",
+        "transformations": []
+      }
     }
   }
 }
