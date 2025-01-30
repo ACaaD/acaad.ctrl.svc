@@ -9,32 +9,50 @@ on:
   pull_request:
     branches: [ "main" ]
 
-jobs: 
-  build:
+jobs:
+  build-and-analyze:
     name: 'Build & Analyze'
-    permissions: write-all  
+    permissions: write-all
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore -warnaserror
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
-    - name: JetBrains ReSharper Inspect Code
-      uses: JetBrains/ReSharper-InspectCode@v0.8
-      with:
-        solution: 'Oma.WndwCtrl.sln'
-    - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v4.5.0
-      with:
-        name: 'Upload Code Inspection Result'
-        path: 'results.sarif.json'
-        if-no-files-found: error
-        retention-days: 7
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore -warnaserror
+      - name: JetBrains ReSharper Inspect Code
+        uses: JetBrains/ReSharper-InspectCode@v0.8
+        with:
+          solution: 'Oma.WndwCtrl.sln'
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v4.5.0
+        with:
+          name: 'Upload Code Inspection Result'
+          path: 'results.sarif.json'
+          if-no-files-found: error
+          retention-days: 7
+  
+  test-matrix:
+    name: 'Run Test Matrix'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore -warnaserror
+      - name: Test
+        run: dotnet test --no-build --verbosity normal
+    
