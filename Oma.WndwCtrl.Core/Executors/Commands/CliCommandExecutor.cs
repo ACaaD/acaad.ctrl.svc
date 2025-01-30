@@ -46,13 +46,13 @@ public class CliCommandExecutor : ICommandExecutor<CliCommand>
         );
       }
 
-      ConcurrentBag<string> errorChunks = [];
+      ConcurrentQueue<string> errorChunks = [];
 
       process.ErrorDataReceived += (_, e) =>
       {
         if (!string.IsNullOrWhiteSpace(e.Data))
         {
-          errorChunks.Add(e.Data);
+          errorChunks.Enqueue(e.Data);
         }
       };
 
