@@ -14,9 +14,9 @@ public sealed class MessageBusIntegrationTests : IAsyncLifetime
   private readonly CancellationToken _cancelToken = TestContext.Current.CancellationToken;
 
   private readonly List<ServiceProvider> _consumerProviders = [];
-  private readonly ServiceProvider _serviceProvider = SetUpMessageBusContainer();
 
-  private ConcurrentBag<Task> _consumerTasks = [];
+  private readonly ConcurrentBag<Task> _consumerTasks = [];
+  private readonly ServiceProvider _serviceProvider = SetUpMessageBusContainer();
 
   private IMessageBus? _messageBus;
 
