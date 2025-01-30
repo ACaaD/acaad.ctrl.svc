@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using LanguageExt;
 using Oma.WndwCtrl.Abstractions;
@@ -14,13 +13,7 @@ namespace Oma.WndwCtrl.Core.Executors.Commands;
 
 public class CliCommandExecutor : ICommandExecutor<CliCommand>
 {
-  [SuppressMessage(
-    "Reliability",
-    "CA2000:Dispose objects before losing scope",
-    Justification = "Must be disposed by caller."
-  )]
   [MustDisposeResource]
-  [SuppressMessage("ReSharper", "NotDisposedResource", Justification = "Method flagged as must-dispose.")]
   public async Task<Either<FlowError, CommandOutcome>> ExecuteAsync(
     CliCommand command,
     CancellationToken cancelToken = default
@@ -65,12 +58,10 @@ public class CliCommandExecutor : ICommandExecutor<CliCommand>
         ? allText
         : string.Join(Environment.NewLine, errorChunks);
 
-      return Right(
-        new CommandOutcome(outcome)
-        {
-          Success = process.ExitCode == 0 && errorChunks.IsEmpty,
-        }
-      );
+      return new CommandOutcome(outcome)
+      {
+        Success = process.ExitCode == 0 && errorChunks.IsEmpty,
+      };
     }
     catch (OperationCanceledException ex)
     {
