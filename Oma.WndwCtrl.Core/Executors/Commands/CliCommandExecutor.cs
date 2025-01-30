@@ -45,21 +45,29 @@ public class CliCommandExecutor : ICommandExecutor<CliCommand>
         );
       }
 
-      string errorText = string.Empty;
-      process.ErrorDataReceived += (sender, e) => { errorText += e.Data; };
+      List<string> errorChunks = [];
+
+      process.ErrorDataReceived += (sender, e) =>
+      {
+        if (!string.IsNullOrWhiteSpace(e.Data))
+        {
+          errorChunks.Add(e.Data);
+        }
+      };
 
       process.BeginErrorReadLine();
       string allText = await process.StandardOutput.ReadToEndAsync(cancelToken);
 
       await process.WaitForExitAsync(cancelToken);
 
-      string outcome = process.ExitCode == 0 ? allText
-        : string.IsNullOrEmpty(errorText) ? allText : errorText;
+      string outcome = process.ExitCode == 0 && errorChunks.Count == 0
+        ? allText
+        : string.Join(Environment.NewLine, errorChunks);
 
       return Right(
         new CommandOutcome(outcome)
         {
-          Success = process.ExitCode == 0,
+          Success = process.ExitCode == 0 && errorChunks.Count == 0,
         }
       );
     }
@@ -69,7 +77,9 @@ public class CliCommandExecutor : ICommandExecutor<CliCommand>
     }
     catch (Exception ex)
     {
-      return Left<FlowError>(new TechnicalError("An unexpected technical error has occured.", Code: -1, ex));
+      return Left<FlowError>(
+        new TechnicalError("An unexpected technical error has occured executing CLI command.", Code: -1, ex)
+      );
     }
   }
 }

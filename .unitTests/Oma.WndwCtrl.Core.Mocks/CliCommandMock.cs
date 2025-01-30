@@ -104,5 +104,6 @@ public record CliInvocationOptions
   [Option(shortName: 't', "text", Required = true, HelpText = "The text to write to standard out or error.")]
   public string Text { get; init; } = string.Empty;
 
-  public override string ToString() => $"--code {ExitCode} --targetStreams {TargetStreams} --text \"{Text}\"";
+  public override string ToString() =>
+    $"--code {ExitCode} --targetStreams \"{TargetStreams}\" --text \"{Text}\"";
 }

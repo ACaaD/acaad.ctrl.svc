@@ -15,6 +15,7 @@ public record FlowError(string Message, bool IsExceptional, bool IsExpected) : E
 
   protected FlowError(TechnicalError technicalError) : this((Error)technicalError)
   {
+    Inner = technicalError.Inner;
   }
 
   [PublicAPI]
@@ -29,9 +30,11 @@ public record FlowError(string Message, bool IsExceptional, bool IsExpected) : E
 
   public override Option<Error> Inner { get; } = Option<Error>.None;
 
-  public override ErrorException ToErrorException() => throw
-    // TODO
-    new NotImplementedException();
+  public override ErrorException ToErrorException() =>
+    Inner.Match(
+      err => new WrappedErrorExceptionalException(err),
+      new WrappedErrorExceptionalException(this)
+    );
 
   [System.Diagnostics.Contracts.Pure]
   public static FlowError NoCommandExecutorFound(ICommand command) => new(
