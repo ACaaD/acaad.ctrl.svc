@@ -26,6 +26,7 @@ Description=acaad-user
 
 [Service]
 Type=notify
+Environment="DOTNET_hostBuilder__reloadConfigOnChange=false"
 ExecStart=/usr/sbin/acaad-user/Oma.WndwCtrl.MgmtApi
 
 [Install]
