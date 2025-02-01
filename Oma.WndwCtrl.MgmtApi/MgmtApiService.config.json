@@ -28,7 +28,7 @@
     "Kestrel": {
       "Endpoints": {
         "Http": {
-          "Url": "http://localhost:8443"
+          "Url": "http://192.168.178.22:8443"
         }
       }
     }
@@ -37,7 +37,7 @@
     "Kestrel": {
       "Endpoints": {
         "Http": {
-          "Url": "http://localhost:5000"
+          "Url": "http://192.168.178.22:5000"
         }
       }
     }
@@ -46,7 +46,7 @@
     "Kestrel": {
       "Endpoints": {
         "Http": {
-          "Url": "http://localhost:19090"
+          "Url": "http://192.168.178.22:19090"
         }
       }
     }
