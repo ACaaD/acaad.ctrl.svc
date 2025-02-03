@@ -59,6 +59,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dashboards", "Dashboards", "{C0FC9E76-5113-4E14-8061-4A9EE8CA1507}"
 	ProjectSection(SolutionItems) = preProject
 		Dashboards\Acaad.Monitoring.json = Dashboards\Acaad.Monitoring.json
+		Dashboards\Host.Monitoring.json = Dashboards\Host.Monitoring.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installation", "Installation", "{41D1E3C4-0AC3-4245-BB9C-68F8D13481ED}"
