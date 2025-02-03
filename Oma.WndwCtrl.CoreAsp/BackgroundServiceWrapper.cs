@@ -131,41 +131,7 @@ public class BackgroundServiceWrapper<TAssemblyDescriptor>(IConfiguration config
   }
 
   [PublicAPI]
-  protected virtual IServiceCollection ConfigureServices(IServiceCollection services) =>
-    // services.AddOpenTelemetry()
-    //   .ConfigureResource(
-    //     b =>
-    //     {
-    //       // TODO: Finally introduce version handling
-    //       b.AddService(_serviceName, "ACaaD", "1.0.0", autoGenerateServiceInstanceId: true);
-    //     }
-    //   )
-    // .WithMetrics(
-    //   metricsBuilder =>
-    //   {
-    //     metricsBuilder.AddMeter("ACaaD.Core")
-    //       .AddMeter("ACaaD.Processing")
-    //       .AddMeter("ACaaD.Processing.Parser");
-    //
-    //     metricsBuilder.AddMeter(
-    //       "System.Net.Quic.MsQuic",
-    //       "Private.InternalDiagnostics.System.Net.Quic.MsQuic",
-    //       "System.Runtime",
-    //       "System.Net.NameResolution",
-    //       "System.Net.Http",
-    //       "Microsoft.AspNetCore.Diagnostics",
-    //       "Microsoft.AspNetCore.Hosting",
-    //       "Microsoft.AspNetCore.Routing",
-    //       "Microsoft.AspNetCore.Server.Kestrel",
-    //       "Microsoft.AspNetCore.Http.Connections"
-    //     );
-    //   }
-    // )
-    // .WithLogging(
-    //   lo => { }
-    // )
-    // .UseOtlpExporter(OtlpExportProtocol.Grpc, new Uri("http://localhost:4317"));
-    services;
+  protected virtual IServiceCollection ConfigureServices(IServiceCollection services) => services;
 
   [PublicAPI]
   protected virtual IHost PostHostRun(IHost host, CancellationToken cancelToken = default) =>
