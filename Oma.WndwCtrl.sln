@@ -81,6 +81,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub Actions", "GitHub Ac
 		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Monitoring", "Monitoring", "{A9B442DC-7D2D-4C08-87DB-365B66A631F7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenTelemetry Collector", "OpenTelemetry Collector", "{DB6F3E0B-F6D0-4AF5-A8AE-5C9FC5AB4150}"
+	ProjectSection(SolutionItems) = preProject
+		Monitoring\OpenTelemetry Collector\config.yaml = Monitoring\OpenTelemetry Collector\config.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -184,5 +191,7 @@ Global
 		{05B8421B-071F-4C9E-96DC-9978F0AE59F7} = {307F90ED-24AD-4725-960B-0A7AAFFE8C6D}
 		{BECCCB65-C4D8-4AD1-B156-A745370BE36A} = {CB01FB73-6F61-43AA-81EB-C3A19BA74122}
 		{E66E5673-DF95-4D11-8FF9-3E814BD40B4B} = {FC063003-91F3-415C-AB68-D1C08337FAC2}
+		{A9B442DC-7D2D-4C08-87DB-365B66A631F7} = {FC063003-91F3-415C-AB68-D1C08337FAC2}
+		{DB6F3E0B-F6D0-4AF5-A8AE-5C9FC5AB4150} = {A9B442DC-7D2D-4C08-87DB-365B66A631F7}
 	EndGlobalSection
 EndGlobal

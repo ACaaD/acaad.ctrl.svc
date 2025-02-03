@@ -14,7 +14,7 @@ using Oma.WndwCtrl.FpCore.TransformerStacks.Flow;
 
 namespace Oma.WndwCtrl.Core.Executors.Transformers;
 
-public class DelegatingTransformer : IRootTransformer
+public partial class DelegatingTransformer : IRootTransformer
 {
   private static readonly FlowT<TransformationConfiguration, Unit> RecordTransformationDurationIO =
   (
@@ -123,10 +123,21 @@ public class DelegatingTransformer : IRootTransformer
     Either<FlowError, TransformationOutcome> outcome =
       await _transformerStack.Invoke(initialConfiguration, envIO);
 
-    _logger.LogDebug("Finished command in {elapsed} (Success={isSuccess})", swExec.Measure(), outcome);
+    LogFinishedTransformation(_logger, swExec.Measure(), outcome);
 
     return outcome;
   }
+
+  [LoggerMessage(
+    Level = LogLevel.Debug,
+    Message =
+      "Finished transformations in {elapsed} (Outcome={outcome})"
+  )]
+  public static partial void LogFinishedTransformation(
+    ILogger logger,
+    TimeSpan elapsed,
+    Either<FlowError, TransformationOutcome> outcome
+  );
 
   [ExcludeFromCodeCoverage]
   [PublicAPI]

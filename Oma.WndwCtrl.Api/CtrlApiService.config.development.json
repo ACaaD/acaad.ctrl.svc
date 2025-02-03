@@ -1,12 +1,7 @@
 {
-  "Kestrel": {
-    "Endpoints": {
-      "Http1": {
-        "Url": "http://*:5000"
-      },
-      "Http": {
-        "Url": "http://localhost:8000"
-      }
+  "Logging": {
+    "LogLevel": {
+      "Oma.WndwCtrl.Core": "Debug"
     }
   }
 }

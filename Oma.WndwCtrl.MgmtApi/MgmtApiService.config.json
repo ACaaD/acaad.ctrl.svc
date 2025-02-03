@@ -1,6 +1,8 @@
 {
   "ACaaD": {
-    "OS": "windows"
+    "OS": "windows",
+    "Name": "oma-development",
+    "UseOtlp": true
   },
   "Logging": {
     "LogLevel": {
@@ -43,6 +45,7 @@
     }
   },
   "MetricsApiService": {
+    "Enabled": true,
     "Kestrel": {
       "Endpoints": {
         "Http": {

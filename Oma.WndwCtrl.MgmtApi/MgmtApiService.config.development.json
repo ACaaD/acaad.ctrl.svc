@@ -1,21 +1,12 @@
 {
   "Logging": {
     "LogLevel": {
-      "Oma.WndwCtrl.Core": "Information",
-      "Oma.WndwCtrl.Core.Executors": "Information",
-      "Oma.WndwCtrl.Scheduling": "Information"
+      "Default": "Trace"
     }
   },
   "Core": {
     "CliParser": {
       "Silent": true
-    }
-  },
-  "Kestrel": {
-    "Endpoints": {
-      "ManagementApi": {
-        "Url": "http://localhost:8443"
-      }
     }
   }
 }

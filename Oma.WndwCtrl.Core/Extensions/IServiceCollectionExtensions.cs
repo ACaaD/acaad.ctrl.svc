@@ -38,7 +38,8 @@ public static class IServiceCollectionExtensions
       .AddSingleton<IParserLogger, CliParserLogger>()
       .Configure<CliParserLoggerOptions>(
         coreConfig.GetSection(CliParserLoggerOptions.SectionName)
-      );
+      )
+      .Configure<GeneralSettings>(coreConfig.GetSection(GeneralSettings.SectionName));
 
     ExtensionSettings extensions = [];
     coreConfig.GetSection(ExtensionSettings.SectionName).Bind(extensions);

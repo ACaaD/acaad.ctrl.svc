@@ -2,8 +2,10 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using JetBrains.Annotations;
 using LanguageExt;
+using Microsoft.Extensions.Logging;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Errors;
+using Oma.WndwCtrl.Abstractions.Extensions;
 using Oma.WndwCtrl.Abstractions.Model;
 using Oma.WndwCtrl.Core.Errors.Commands;
 using Oma.WndwCtrl.Core.Model.Commands;
@@ -11,7 +13,7 @@ using static LanguageExt.Prelude;
 
 namespace Oma.WndwCtrl.Core.Executors.Commands;
 
-public class CliCommandExecutor : ICommandExecutor<CliCommand>
+public partial class CliCommandExecutor(ILogger<CliCommandExecutor> logger) : ICommandExecutor<CliCommand>
 {
   [MustDisposeResource]
   public async Task<Either<FlowError, CommandOutcome>> ExecuteAsync(
@@ -21,6 +23,8 @@ public class CliCommandExecutor : ICommandExecutor<CliCommand>
   {
     try
     {
+      Stopwatch swCliCommand = Stopwatch.StartNew();
+
       ProcessStartInfo processStartInfo = new()
       {
         FileName = command.FileName,
@@ -58,10 +62,14 @@ public class CliCommandExecutor : ICommandExecutor<CliCommand>
         ? allText
         : string.Join(Environment.NewLine, errorChunks);
 
-      return new CommandOutcome(outcome)
+      CommandOutcome result = new(outcome)
       {
         Success = process.ExitCode == 0 && errorChunks.IsEmpty,
       };
+
+      LogExecution(logger, swCliCommand.Measure(), result.Success, result);
+
+      return result;
     }
     catch (OperationCanceledException ex)
     {
@@ -74,4 +82,16 @@ public class CliCommandExecutor : ICommandExecutor<CliCommand>
       );
     }
   }
+
+  [LoggerMessage(
+    Level = LogLevel.Trace,
+    Message =
+      "Finished executing cli command in {elapsed} (Success: {isSuccess}, Outcome={outcome})."
+  )]
+  public static partial void LogExecution(
+    ILogger logger,
+    TimeSpan elapsed,
+    bool isSuccess,
+    CommandOutcome outcome
+  );
 }

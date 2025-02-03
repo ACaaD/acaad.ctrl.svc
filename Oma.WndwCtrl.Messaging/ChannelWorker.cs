@@ -38,8 +38,11 @@ internal abstract class ChannelWorker(ILogger logger, IMessageConsumer consumer)
     {
       await OnStartAsync(cancelToken);
 
+      int concurrency = _settings?.Concurrency ?? 16;
+      logger.LogInformation("Starting channel worker with {concurrency} tasks.", concurrency);
+
       await Task.WhenAll(
-        Enumerable.Range(start: 0, _settings?.Concurrency ?? 16)
+        Enumerable.Range(start: 0, concurrency)
           .Select(_ => ProcessMessagesAsync(_loopCts.Token))
       );
     }
@@ -121,12 +124,22 @@ internal abstract class ChannelWorker(ILogger logger, IMessageConsumer consumer)
   }
 }
 
-internal sealed class ChannelWorker<TConsumer, TMessage>(ILogger<TConsumer> logger, TConsumer consumer)
+internal partial class ChannelWorker<TConsumer, TMessage>(ILogger<TConsumer> logger, TConsumer consumer)
   : ChannelWorker(logger, consumer)
   where TConsumer : IMessageConsumer<TMessage>
   where TMessage : IMessage
 {
+  private readonly ILogger _logger = logger;
   private TConsumer _consumer = consumer;
+
+  private static string ExpectedMessageTypeName => typeof(TMessage).FullName ?? "unknown";
+
+  [LoggerMessage(
+    Level = LogLevel.Trace,
+    Message =
+      "Received a message expecting type {ExpectedTypeName}, but received: {Actual:Name}. Dropping message."
+  )]
+  public partial void LogDroppedMessage(string ExpectedTypeName, IMessage Actual);
 
   protected async override Task ProcessMessagesAsync(CancellationToken cancelToken = default)
   {
@@ -151,11 +164,7 @@ internal sealed class ChannelWorker<TConsumer, TMessage>(ILogger<TConsumer> logg
 
           if (message is not TMessage)
           {
-            logger.LogTrace(
-              "Received a message expecting type {expected}, but received: {actual}. Dropping message.",
-              typeof(TMessage),
-              message.GetType().FullName
-            );
+            LogDroppedMessage(ExpectedMessageTypeName, message);
 
             continue; // Do not return here - that kills the worker (╯°□°）╯︵ ┻━┻
           }

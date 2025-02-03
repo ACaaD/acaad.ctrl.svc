@@ -1,6 +1,8 @@
 using FluentAssertions;
 using FluentAssertions.Execution;
 using LanguageExt;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
 using Oma.WndwCtrl.Abstractions.Errors;
 using Oma.WndwCtrl.Abstractions.Extensions;
 using Oma.WndwCtrl.Abstractions.Model;
@@ -14,7 +16,9 @@ public sealed class CliCommandExecutorTests : IDisposable
 {
   private const string DEFAULT_OUTPUT_TEXT = "Hello World!";
 
-  private readonly CliCommandExecutor _instance = new();
+  private static readonly ILogger<CliCommandExecutor> _logger = Substitute.For<ILogger<CliCommandExecutor>>();
+
+  private readonly CliCommandExecutor _instance = new(_logger);
   private readonly CancellationToken _xunitCancelToken = TestContext.Current.CancellationToken;
 
   private Either<FlowError, CommandOutcome>? _result;

@@ -11,6 +11,8 @@ using Oma.WndwCtrl.CoreAsp.Api.Filters;
 using Oma.WndwCtrl.CoreAsp.Conventions;
 using Oma.WndwCtrl.Messaging.Bus;
 using Oma.WndwCtrl.Messaging.Extensions;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Resources;
 using Scalar.AspNetCore;
 
 namespace Oma.WndwCtrl.CoreAsp;
@@ -29,6 +31,11 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(
   private static IServiceProvider? _serviceProvider;
 
   private static readonly string _serviceName = typeof(TAssemblyDescriptor).Name;
+
+  private readonly string AcaadName =
+    rootConfiguration?.GetValue<string>("ACaaD:Name") ?? Guid.NewGuid().ToString();
+
+  private readonly bool UseOtlp = rootConfiguration?.GetValue<bool>("ACaaD:UseOtlp") ?? false;
 
   private IConfiguration? _configuration;
 
@@ -62,8 +69,10 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(
     set => _serviceProvider = value;
   }
 
-  // TODO: Fix me
-  public bool Enabled => true;
+  public bool Enabled => !bool.TryParse(
+    rootConfiguration?.GetSection(_serviceName).GetValue<string>("Enabled") ?? "true",
+    out bool enabled
+  ) || enabled;
 
   public async Task StartAsync(CancellationToken cancelToken = default, params string[] args)
   {
@@ -128,16 +137,45 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(
     builder.Services.AddLogging(
       lb =>
       {
-        // TODO: Pass down logging configuration
-        lb.AddConsole();
+        lb.ClearProviders();
+
+        if (UseOtlp)
+        {
+          lb.AddOpenTelemetry(
+            otelOptions =>
+            {
+              ResourceBuilder resourceBuilder =
+                ResourceBuilder.CreateDefault().AddService(
+                    _serviceName,
+                    "ACaaD",
+                    serviceInstanceId: AcaadName
+                  )
+                  .AddEnvironmentVariableDetector();
+
+              otelOptions.SetResourceBuilder(resourceBuilder);
+
+              otelOptions.IncludeScopes = true;
+              otelOptions.IncludeFormattedMessage = true;
+              otelOptions.ParseStateValues = true;
+
+              otelOptions.AddOtlpExporter();
+            }
+          );
+        }
+
+        if (rootConfiguration is not null)
+        {
+          lb.AddConfiguration(rootConfiguration.GetSection("Logging"));
+        }
       }
     );
 
     ConfigureServices(builder.Services);
 
-    Application = PostAppBuild(builder.Build());
-
+    Application = builder.Build();
     TAssemblyDescriptor.ServiceProvider = Application.Services;
+
+    Application = PostAppBuild(Application);
 
     Application.MapControllers();
     Application.MapOpenApi();

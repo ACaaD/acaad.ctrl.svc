@@ -13,7 +13,7 @@ using Oma.WndwCtrl.FpCore.TransformerStacks.Flow;
 
 namespace Oma.WndwCtrl.Core.Executors.Commands;
 
-public class DelegatingCommandExecutor : ICommandExecutor
+public partial class DelegatingCommandExecutor : ICommandExecutor
 {
   private static readonly FlowT<CommandState, Unit> RecordExecutionDurationIO =
   (
@@ -128,14 +128,21 @@ public class DelegatingCommandExecutor : ICommandExecutor
 
     Either<FlowError, CommandOutcome> outcome = await _transformerStack.Invoke(initialState, envIO);
 
-    _logger.LogDebug(
-      "Finished command in {elapsed} (Success={isSuccess})",
-      swExec.Measure(),
-      outcome.IsRight
-    );
+    LogFinishedCommand(_logger, swExec.Measure(), outcome.IsRight);
 
     return outcome;
   }
+
+  [LoggerMessage(
+    Level = LogLevel.Debug,
+    Message =
+      "Finished command in {elapsed} (Success={isSuccess})"
+  )]
+  public static partial void LogFinishedCommand(
+    ILogger logger,
+    TimeSpan elapsed,
+    bool isSuccess
+  );
 
   private static FlowT<CommandState, CommandOutcome> ExecuteExecutorIO(
     ICommand cmd,
