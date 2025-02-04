@@ -1,3 +1,4 @@
+using Antlr4.Runtime.Tree;
 using JetBrains.Annotations;
 using Oma.WndwCtrl.CliOutputParser.Errors;
 using Oma.WndwCtrl.CliOutputParser.Model;
@@ -140,7 +141,25 @@ public partial class TransformationListener
 
     if (collapsedValues.Count == 0)
     {
-      Error = new EmptyEnumerationAggregationError("No values to average.", isExceptional: true);
+      IParseTree aggregationFunctionContext = context.GetChild(i: 0);
+
+      // TODO: This is really stupid.. Instead the parser should be fixed so that all aggregation functions are handled generically. 
+      string aggregationFunction = aggregationFunctionContext switch
+      {
+        Grammar.CliOutputParser.ValuesAvgContext => "Average",
+        Grammar.CliOutputParser.ValuesMinContext => "Min",
+        Grammar.CliOutputParser.ValuesMaxContext => "Max",
+        Grammar.CliOutputParser.ValuesFirstContext => "First",
+        Grammar.CliOutputParser.ValuesLastContext => "Last",
+        var _ => throw new InvalidOperationException(
+          $"Unknown aggregation function {aggregationFunctionContext.GetText()}. This is a programming error. Finally fix the parser."
+        ),
+      };
+
+      Error = new EmptyEnumerationAggregationError(
+        aggregationFunction
+      );
+
       return;
     }
 

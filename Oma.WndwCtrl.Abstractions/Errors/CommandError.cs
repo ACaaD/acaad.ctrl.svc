@@ -9,19 +9,23 @@ public record CommandError : FlowError, ICommandExecutionMetadata
 {
   protected CommandError(Error other) : base(other)
   {
+    Message = other.Message;
   }
 
   protected CommandError(TechnicalError technicalError) : base(technicalError)
   {
+    Message = technicalError.Message;
   }
 
   protected CommandError(string message, bool isExceptional, bool isExpected) : base(
-    message,
     isExceptional,
     isExpected
   )
   {
+    Message = message;
   }
+
+  public override string Message { get; }
 
   [PublicAPI]
   public Option<TimeSpan> ExecutionDuration { get; } = Option<TimeSpan>.None;

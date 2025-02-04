@@ -4,6 +4,7 @@ using LanguageExt;
 using Oma.WndwCtrl.Abstractions;
 using Oma.WndwCtrl.Abstractions.Errors;
 using Oma.WndwCtrl.Abstractions.Model;
+using Oma.WndwCtrl.Core.Errors;
 using Oma.WndwCtrl.Core.Model.Commands;
 using static LanguageExt.Prelude;
 
@@ -34,7 +35,7 @@ public class DummyCommandExecutor : ICommandExecutor<DummyCommand>
     }
     else if (command.SimulateFailure)
     {
-      result = Left(new FlowError(message, command.IsExceptional, command.IsExpected));
+      result = Left<FlowError>(new SimulatedFlowError(message, command.IsExceptional));
     }
     else
     {

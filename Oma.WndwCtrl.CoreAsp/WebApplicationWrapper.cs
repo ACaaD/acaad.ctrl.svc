@@ -9,6 +9,7 @@ using Oma.WndwCtrl.Core.Extensions;
 using Oma.WndwCtrl.Core.Model.Settings;
 using Oma.WndwCtrl.CoreAsp.Api.Filters;
 using Oma.WndwCtrl.CoreAsp.Conventions;
+using Oma.WndwCtrl.CoreAsp.Filters;
 using Oma.WndwCtrl.Messaging.Bus;
 using Oma.WndwCtrl.Messaging.Extensions;
 using OpenTelemetry.Logs;
@@ -112,6 +113,7 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(
           opts.Conventions.Add(new ContainingAssemblyApplicationModelConvention<TAssemblyDescriptor>());
 
           opts.Filters.Add<RequestReceivedActionFilter>();
+          opts.Filters.Add<EitherResultFilter>();
 
           PostConfigureMvcOptions(opts);
         }

@@ -11,9 +11,7 @@ public record TransformationError : FlowError
 
   [PublicAPI]
   public TransformationError(string message, bool isExceptional, bool isExpected) : base(
-    message,
-    isExceptional,
-    isExpected
+    isExceptional
   )
   {
   }

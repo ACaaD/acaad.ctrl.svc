@@ -33,7 +33,7 @@ public class TestController([FromKeyedServices(ServiceKeys.AdHocFlowExecutor)] I
   [EndpointSummary("Test Command")]
   [EndpointDescription("Run an ad-hoc command")]
   [Produces("application/json")]
-  public async Task<IActionResult> TestCommandAsync([FromBody] ICommand command)
+  public async Task<Either<FlowError, FlowOutcome>> TestCommandAsync([FromBody] ICommand command)
   {
     // TODO: Obvious security concerns here...
     // During development ok.
@@ -48,23 +48,7 @@ public class TestController([FromKeyedServices(ServiceKeys.AdHocFlowExecutor)] I
 
     AppendLogsToHeader();
 
-    return flowResult.BiFold<IActionResult>(
-      null!,
-      Right: (_, outcome) => Ok(outcome),
-      Left: (_, error) => Problem(
-        error.Message,
-        title: $"[{error.Code}] A {error.GetType().Name} occurred.",
-        statusCode: error.IsExceptional
-          ? 500
-          : 400,
-        extensions: error.Inner.IsSome
-          ? new Dictionary<string, object?>
-          {
-            ["inner"] = (Error)error.Inner,
-          }
-          : null
-      )
-    );
+    return flowResult;
   }
 
   [HttpPost("transformation/parser")]
