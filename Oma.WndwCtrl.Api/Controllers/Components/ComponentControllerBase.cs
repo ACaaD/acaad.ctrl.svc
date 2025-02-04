@@ -39,23 +39,13 @@ public class ComponentControllerBase<TComponent> : ControllerBase
   public IActionResult GetDetails() => Ok(Component);
 
   [NonAction]
-  protected async Task<IActionResult> ExecuteCommandAsync(ICommand command)
+  protected async Task<Either<FlowError, FlowOutcome>> ExecuteCommandAsync(ICommand command)
   {
     Either<FlowError, FlowOutcome> flowResult =
       await FlowExecutor.ExecuteAsync(command, HttpContext.RequestAborted);
 
     flowResult.RegisterForDispose(HttpContext);
 
-    return flowResult.BiFold<IActionResult>(
-      null!,
-      Right: (_, outcome) => Ok(outcome),
-      Left: (_, error) => Problem(
-        error.Message,
-        title: $"[{error.Code}] A {error.GetType().Name} occurred.",
-        statusCode: error.IsExceptional
-          ? 500
-          : 400
-      )
-    );
+    return flowResult;
   }
 }

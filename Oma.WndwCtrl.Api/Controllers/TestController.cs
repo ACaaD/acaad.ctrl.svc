@@ -56,7 +56,9 @@ public class TestController([FromKeyedServices(ServiceKeys.AdHocFlowExecutor)] I
   [EndpointSummary("Transformation - Cli Parser")]
   [EndpointDescription("Run an ad-hoc transformation processed by the CLI parser")]
   [Produces("application/json")]
-  public IActionResult TestTransformationCliParserAsync([FromBody] TransformationTestRequest request)
+  public Either<Error, ParserResult> TestTransformationCliParserAsync(
+    [FromBody] TransformationTestRequest request
+  )
   {
     Either<Error, ParserResult> transformResult = CliOutputParser.Parse(
       string.Join(Environment.NewLine, request.Transformation),
@@ -65,28 +67,7 @@ public class TestController([FromKeyedServices(ServiceKeys.AdHocFlowExecutor)] I
 
     AppendLogsToHeader();
 
-    return transformResult.BiFold<IActionResult>(
-      null!,
-      Right: (_, outcome) => Ok(outcome),
-      Left: (_, error) => Problem(
-        error.Message,
-        title: $"[{error.Code}] A {error.GetType().Name} occurred.",
-        statusCode: error.IsExceptional
-          ? 500
-          : 400,
-        extensions: error.Inner.IsSome
-          ? new Dictionary<string, object?>
-          {
-            ["inner"] = new List<Error> { (Error)error.Inner, },
-          }
-          : error is ManyErrors manyErrors
-            ? new Dictionary<string, object?>
-            {
-              ["inner"] = manyErrors.Errors,
-            }
-            : null
-      )
-    );
+    return transformResult;
   }
 
   private void AppendLogsToHeader()

@@ -300,7 +300,7 @@ public class CliOutputParserImplTests(IocContextFixture iocContext)
       Right: val => val.Should().BeNull(),
       Left: val => val.Should().BeOfType<EmptyEnumerationAggregationError>().And
         .Match<EmptyEnumerationAggregationError>(
-          err => err.Detailgit ==
+          err => err.Detail ==
                  $"Strict aggregation (function: '{aggregate}') requires at least one value to be present, but the collection was empty. This could be caused by an invalid transformation or the input text was in an invalid/irregular format."
         )
     );

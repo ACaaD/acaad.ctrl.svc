@@ -1,6 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
+using LanguageExt;
 using Microsoft.AspNetCore.Mvc;
+using Oma.WndwCtrl.Abstractions.Errors;
 using Oma.WndwCtrl.Abstractions.Messaging.Model.ComponentExecution;
+using Oma.WndwCtrl.Abstractions.Model;
 using Oma.WndwCtrl.Api.Attributes;
 using Oma.WndwCtrl.Core.Model;
 
@@ -17,5 +20,6 @@ public class ButtonController : ComponentControllerBase<Button>
   [EndpointSummary("Trigger")]
   [Produces<ComponentCommandOutcomeEvent>]
   [Actionable]
-  public async Task<IActionResult> TriggerAsync() => await ExecuteCommandAsync(Component.Command);
+  public async Task<Either<FlowError, FlowOutcome>> TriggerAsync() =>
+    await ExecuteCommandAsync(Component.Command);
 }
