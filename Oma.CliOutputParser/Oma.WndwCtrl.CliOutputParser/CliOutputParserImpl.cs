@@ -1,6 +1,7 @@
 using Antlr4.Runtime.Tree;
 using LanguageExt;
 using LanguageExt.Common;
+using Oma.WndwCtrl.Abstractions.Errors;
 using Oma.WndwCtrl.CliOutputParser.Interfaces;
 using Oma.WndwCtrl.CliOutputParser.Visitors;
 using static LanguageExt.Prelude;
@@ -53,7 +54,7 @@ public class CliOutputParserImpl(
     TransformationListener listener = transformationListenerFactory();
 
     ParseTreeWalker walker = new();
-    Exception? thrownException;
+    Exception? thrownException = null;
 
     try
     {
@@ -66,7 +67,15 @@ public class CliOutputParserImpl(
 
     if (listener.Error is not null)
     {
-      return listener.Error;
+      return listener.Error with
+      {
+        ThrownException = thrownException,
+      };
+    }
+
+    if (thrownException is not null)
+    {
+      return new FlowError(new TechnicalError("An unexpected error occurred.", Code: 5_000, thrownException));
     }
 
     List<object> enumeratedList = listener.CurrentValues.ToList();

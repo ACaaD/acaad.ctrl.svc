@@ -344,7 +344,10 @@ public class CliOutputParserImplTests(IocContextFixture iocContext)
 
     transformationResult.Match(
       Right: val => val.Should().BeNull(),
-      Left: val => val.Should().BeOfType<EmptyEnumerationAggregationError>()
+      Left: val => val.Should().BeOfType<EmptyEnumerationAggregationError>().And
+        .Match<EmptyEnumerationAggregationError>(
+          err => err.ToException() is InvalidOperationException
+        )
     );
   }
 }
