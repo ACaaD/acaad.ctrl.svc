@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using LanguageExt;
 using LanguageExt.Common;
@@ -53,6 +54,11 @@ public class ParserTransformer(ICliOutputParser cliOutputParser) : IOutcomeTrans
   }
 
   [MustDisposeResource]
+  [SuppressMessage(
+    "ReSharper",
+    "NotDisposedResource",
+    Justification = "Disposable is returned to the caller."
+  )]
   private static Either<FlowError, TransformationOutcome> MapOutcome(
     ParserTransformation transformation,
     ParserResult parserResult
@@ -72,7 +78,8 @@ public class ParserTransformer(ICliOutputParser cliOutputParser) : IOutcomeTrans
 
     object single = parserResult.Single();
 
-    return ParseByValueType(transformation, single).Map<TransformationOutcome>(oc => oc);
+    Either<FlowError, TransformationOutcome> tmp = ParseByValueType(transformation, single);
+    return tmp.Map<TransformationOutcome>(oc => oc);
   }
 
   [MustDisposeResource]

@@ -48,14 +48,14 @@ public class CliOutputParserImplTests(IocContextFixture iocContext)
 
   private readonly ICliOutputParser _instance = iocContext.Instance;
 
-  public static TheoryData<string> StrictAggregations => new()
-  {
+  public static TheoryData<string> StrictAggregations =>
+  [
     "Min",
     "Max",
     "Average",
     "First",
     "Last",
-  };
+  ];
 
   [Fact]
   public void ShouldParseTransformationSuccessfully()

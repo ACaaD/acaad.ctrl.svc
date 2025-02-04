@@ -6,6 +6,7 @@ namespace Oma.WndwCtrl.Abstractions.Model;
 
 [Serializable]
 [MustDisposeResource]
+[PublicAPI]
 public record TransformationOutcome : IOutcome, IDisposable
 {
   public TransformationOutcome()
@@ -25,7 +26,7 @@ public record TransformationOutcome : IOutcome, IDisposable
   }
 
   [JsonIgnore]
-  public virtual object? OutcomeUntyped { get; } = null;
+  public virtual object? OutcomeUntyped { get; }
 
   public void Dispose()
   {

@@ -29,7 +29,7 @@ public record FlowError(bool IsExceptional, bool IsExpected) : Error
       return err switch
       {
         FlowError flowError => flowError.Message,
-        ManyErrors _ => "Multiple errors occurred. Refer to the nested properties for more details.",
+        ManyErrors => "Multiple errors occurred. Refer to the nested properties for more details.",
         var _ => null,
       };
     },
@@ -37,7 +37,7 @@ public record FlowError(bool IsExceptional, bool IsExpected) : Error
   );
 
   public override int Code { get; }
-  public override string Message { get; } = $"An unexpected error occurred processing a flow.";
+  public override string Message => "An unexpected error occurred processing a flow.";
   public override bool IsExceptional { get; } = IsExceptional;
   public override bool IsExpected { get; } = IsExpected;
 
@@ -59,6 +59,7 @@ public record FlowError(bool IsExceptional, bool IsExpected) : Error
 
   public static implicit operator FlowError(TechnicalError error) => new(error);
 
+  [PublicAPI]
   public record NoCommandExecutorFoundError : FlowError
   {
     private readonly string _commandType;
@@ -72,6 +73,7 @@ public record FlowError(bool IsExceptional, bool IsExpected) : Error
       $"No command executor found that handles transformation type {_commandType}.";
   }
 
+  [PublicAPI]
   public record NoTransformerFoundError : FlowError
   {
     private readonly string _transformationName;

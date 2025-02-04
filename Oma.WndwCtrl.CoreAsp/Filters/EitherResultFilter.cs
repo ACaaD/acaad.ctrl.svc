@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +7,7 @@ using Oma.WndwCtrl.Abstractions.Errors;
 
 namespace Oma.WndwCtrl.CoreAsp.Filters;
 
+[UsedImplicitly]
 public class EitherResultFilter : IAsyncResultFilter
 {
   public async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
@@ -24,19 +26,14 @@ public class EitherResultFilter : IAsyncResultFilter
     await next();
   }
 
-  private static IActionResult GetErrorResult(ResultExecutingContext context, object? error)
+  private static ObjectResult GetErrorResult(ResultExecutingContext context, object? error)
   {
-    if (error is null)
+    return error switch
     {
-      return GetGenericServerError(context);
-    }
-
-    if (error is Error langExtError)
-    {
-      return Problem(context, langExtError.ToProblemDetails());
-    }
-
-    return GetGenericServerError(context);
+      Error langExtError => Problem(context, langExtError.ToProblemDetails()),
+      null => GetGenericServerError(context),
+      var _ => GetGenericServerError(context),
+    };
   }
 
   private static ObjectResult GetGenericServerError(ResultExecutingContext context)
@@ -104,7 +101,7 @@ public static class FlowErrorExtensions
     inner.Do(
       innerErrors =>
       {
-        details.Extensions = new Dictionary<string, object?>()
+        details.Extensions = new Dictionary<string, object?>
         {
           { "innerErrors", innerErrors.ToList() },
         };

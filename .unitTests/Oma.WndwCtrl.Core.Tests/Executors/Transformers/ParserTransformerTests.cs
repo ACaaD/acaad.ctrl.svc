@@ -74,7 +74,8 @@ public sealed class ParserTransformerTests : IDisposable
   [Fact]
   public async Task ShouldSuccessfullyParseSingleString()
   {
-    string expected = "this is a string override";
+    const string expected = "this is a string override";
+
     _transformationInput = _transformationInput with
     {
       ValueType = ValueType.String,
@@ -90,7 +91,7 @@ public sealed class ParserTransformerTests : IDisposable
   [Fact]
   public async Task ShouldSuccessfullyParseSingleLong()
   {
-    long expected = (long)int.MaxValue + 1;
+    const long expected = (long)int.MaxValue + 1;
 
     _transformationInput = _transformationInput with
     {
@@ -107,7 +108,7 @@ public sealed class ParserTransformerTests : IDisposable
   [Fact]
   public async Task ShouldSuccessfullyParseSingleDouble()
   {
-    double expected = 12345.6789d;
+    const double expected = 12345.6789d;
 
     _transformationInput = _transformationInput with
     {

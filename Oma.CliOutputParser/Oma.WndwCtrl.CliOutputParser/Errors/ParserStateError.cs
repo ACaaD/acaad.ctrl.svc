@@ -4,7 +4,7 @@ namespace Oma.WndwCtrl.CliOutputParser.Errors;
 
 public abstract record ParserStateError : FlowError
 {
-  public ParserStateError(bool isExceptional) : base(isExceptional)
+  protected ParserStateError(bool isExceptional) : base(isExceptional)
   {
   }
 

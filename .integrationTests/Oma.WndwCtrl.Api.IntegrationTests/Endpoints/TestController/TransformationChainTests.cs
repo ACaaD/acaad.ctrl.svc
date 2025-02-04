@@ -1,15 +1,16 @@
-using System.Text.Json;
 using FluentAssertions;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Oma.WndwCtrl.Abstractions.Model;
 using Oma.WndwCtrl.Api.IntegrationTests.TestFramework;
-using Oma.WndwCtrl.CliOutputParser.Interfaces;
 
 namespace Oma.WndwCtrl.Api.IntegrationTests.Endpoints.TestController;
 
+[UsedImplicitly]
+[PublicAPI]
 internal class NestedProblemDetails : ProblemDetails
 {
-  public List<NestedProblemDetails> InnerErrors { get; set; } = new();
+  public List<NestedProblemDetails> InnerErrors { get; init; } = [];
 }
 
 public sealed partial class TransformationChainTests(
@@ -60,16 +61,6 @@ public sealed partial class TransformationChainTests(
   }
 
   [Fact]
-  public async Task ShouldUnwrapParserTransformationResult()
-  {
-    string payload = Payloads.PingResultOneTransformation;
-    using HttpRequestMessage httpRequestMessage = ConstructCommandHttpRequestMessage(payload, isJson: true);
-    using HttpResponseMessage httpResponse = await _httpClient.SendAsync(httpRequestMessage, _cancelToken);
-
-    const double expected = 7.5;
-  }
-
-  [Fact]
   public async Task ShouldReturnProblemDetailsOnEmptyValueAggregation()
   {
     string payload = Payloads.PingTimeoutResultOneTransformation;
@@ -113,18 +104,5 @@ public sealed partial class TransformationChainTests(
     using HttpResponseMessage httpResponse = await _httpClient.SendAsync(httpRequestMessage, _cancelToken);
 
     httpResponse.Should().HaveHeader("Content-Type").And.Match("application/json*");
-  }
-
-  private static void AssertParserResultOneNumber(
-    TransformationOutcome<ParserResult> response,
-    double expectedValue
-  )
-  {
-    response.Success.Should().BeTrue();
-    response.Outcome.Should().NotBeNull();
-    response.Outcome!.First().Should().BeAssignableTo<JsonElement>();
-    JsonElement jsonElement = (JsonElement)response.Outcome!.First();
-    double num = jsonElement.GetDouble();
-    num.Should().Be(expectedValue);
   }
 }
