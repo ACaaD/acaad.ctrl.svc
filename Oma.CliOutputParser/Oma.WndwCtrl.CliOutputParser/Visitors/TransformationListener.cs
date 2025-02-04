@@ -1,3 +1,4 @@
+using Oma.WndwCtrl.CliOutputParser.Errors;
 using Oma.WndwCtrl.CliOutputParser.Grammar;
 using Oma.WndwCtrl.CliOutputParser.Interfaces;
 using Oma.WndwCtrl.CliOutputParser.Model;
@@ -26,11 +27,19 @@ public partial class TransformationListener : CliOutputParserBaseListener
 
   public NestedEnumerable CurrentValues { get; private set; }
 
+  public ParserStateError? Error { get; private set; }
+
   public override void EnterStatement(Grammar.CliOutputParser.StatementContext context)
   {
     if (_log.Enabled)
     {
       _log.Log($"{Environment.NewLine}\t### COMMAND -> {context.GetChild(i: 0).GetText()}");
+    }
+
+    if (Error is not null)
+    {
+      // TODO: Check if this really short-circuits everything.
+      return;
     }
 
     base.EnterStatement(context);

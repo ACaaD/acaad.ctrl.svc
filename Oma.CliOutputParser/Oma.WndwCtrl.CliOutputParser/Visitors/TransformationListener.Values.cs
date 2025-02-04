@@ -1,4 +1,6 @@
 using JetBrains.Annotations;
+using Oma.WndwCtrl.CliOutputParser.Errors;
+using Oma.WndwCtrl.CliOutputParser.Model;
 
 namespace Oma.WndwCtrl.CliOutputParser.Visitors;
 
@@ -113,5 +115,36 @@ public partial class TransformationListener
         ? null
         : itemList[index];
     }
+  }
+
+  public override void ExitValuesCount(Grammar.CliOutputParser.ValuesCountContext context)
+  {
+    object? result = FoldItemsRecursive(CurrentValues, Fold);
+    StoreFoldResult(result);
+
+    base.ExitValuesCount(context);
+    return;
+
+    object Fold(IEnumerable<object> val)
+    {
+      object res = val.Count();
+      return res;
+    }
+  }
+
+  public override void EnterStrictValueAggregation(
+    Grammar.CliOutputParser.StrictValueAggregationContext context
+  )
+  {
+    List<object> collapsedValues = CurrentValues.ToList();
+
+    if (collapsedValues.Count == 0)
+    {
+      Error = new EmptyEnumerationAggregationError("No values to average.", isExceptional: true);
+      return;
+    }
+
+    CurrentValues = NestedEnumerable.FromEnumerableInternal(collapsedValues, CurrentValues.IsNested);
+    base.EnterStrictValueAggregation(context);
   }
 }

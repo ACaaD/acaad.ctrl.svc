@@ -22,6 +22,19 @@ public partial class TransformationChainTests
                                      Minimum = 7ms, Maximum = 8ms, Average = 7ms
 
                                  """;
+
+    internal const string PingTimeout = """
+
+                                        Pinging 1.1.1.1 with 32 bytes of data:
+                                        PING: transmit failed. General failure.
+                                        PING: transmit failed. General failure.
+                                        PING: transmit failed. General failure.
+                                        PING: transmit failed. General failure.
+
+                                        Ping statistics for 2a00:1450:4001:806::200e:
+                                            Packets: Sent = 4, Received = 0, Lost = 4 (100% loss),
+
+                                        """;
   }
 
   public static class Payloads
@@ -85,6 +98,14 @@ public partial class TransformationChainTests
 
     internal static string PingResultMultipleTransformations =>
       InjectMultilineArray(PingResultMultipleTransformationsTemplate, SampleCommandOutcomes.Ping);
+
+    /// <summary>
+    /// Simulates a ping cli result when there is, for example, no internet connection.
+    /// The transformation relies on the presence of at least one value to aggregate, but there is none.
+    /// Refer to GitHub Issue <see href="https://github.com/OlliMartin/wndw.ctl/issues/35">#35</see>
+    /// </summary>
+    internal static string PingTimeoutResultOneTransformation =>
+      InjectMultilineArray(PingResultOneTransformationTemplate, SampleCommandOutcomes.PingTimeout);
 
     private static string InjectMultilineArray(string template, string toInject)
     {

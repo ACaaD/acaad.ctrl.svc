@@ -25,6 +25,7 @@ MIN             : 'Min';
 SUM             : 'Sum';
 AT              : 'At';
 INDEX           : 'Index';
+COUNT           : 'Count';
 
 DOT             : '.';
 LPAREN          : '(';

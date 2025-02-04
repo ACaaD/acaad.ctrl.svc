@@ -3,6 +3,7 @@ using LanguageExt;
 using LanguageExt.Common;
 using Oma.WndwCtrl.CliOutputParser.Interfaces;
 using Oma.WndwCtrl.CliOutputParser.Visitors;
+using static LanguageExt.Prelude;
 
 namespace Oma.WndwCtrl.CliOutputParser;
 
@@ -39,12 +40,12 @@ public class CliOutputParserImpl(
     Either<Error, Grammar.CliOutputParser.TransformationContext>
       treeOrError = treeCache.GetOrCreateTree(transformation);
 
-    return treeOrError.Map(
+    return treeOrError.Bind(
       tree => ExecuteParser(transformationListenerFactory, tree)
     );
   }
 
-  private static ParserResult ExecuteParser(
+  private static Either<Error, ParserResult> ExecuteParser(
     Func<TransformationListener> transformationListenerFactory,
     Grammar.CliOutputParser.TransformationContext tree
   )
@@ -52,13 +53,27 @@ public class CliOutputParserImpl(
     TransformationListener listener = transformationListenerFactory();
 
     ParseTreeWalker walker = new();
-    walker.Walk(listener, tree);
+    Exception? thrownException;
+
+    try
+    {
+      walker.Walk(listener, tree);
+    }
+    catch (Exception ex)
+    {
+      thrownException = ex;
+    }
+
+    if (listener.Error is not null)
+    {
+      return listener.Error;
+    }
 
     List<object> enumeratedList = listener.CurrentValues.ToList();
 
     if (enumeratedList.Count == 1)
     {
-      return [enumeratedList.Single(),];
+      return Right<ParserResult>([enumeratedList.Single(),]);
     }
 
     ParserResult result = [];

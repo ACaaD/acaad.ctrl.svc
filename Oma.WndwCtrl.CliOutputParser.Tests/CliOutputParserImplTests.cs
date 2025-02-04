@@ -1,6 +1,7 @@
 using FluentAssertions;
 using LanguageExt;
 using LanguageExt.Common;
+using Oma.WndwCtrl.CliOutputParser.Errors;
 using Oma.WndwCtrl.CliOutputParser.Interfaces;
 using Oma.WndwCtrl.CliOutputParser.Tests.Fixtures;
 
@@ -46,6 +47,15 @@ public class CliOutputParserImplTests(IocContextFixture iocContext)
                                            """;
 
   private readonly ICliOutputParser _instance = iocContext.Instance;
+
+  public static TheoryData<string> StrictAggregations => new()
+  {
+    "Min",
+    "Max",
+    "Average",
+    "First",
+    "Last",
+  };
 
   [Fact]
   public void ShouldParseTransformationSuccessfully()
@@ -202,6 +212,7 @@ public class CliOutputParserImplTests(IocContextFixture iocContext)
   [InlineData("Sum", 45)]
   [InlineData("First", "9")]
   [InlineData("Last", "1")]
+  [InlineData("Count", 9)]
   public void ShouldApplyAggregateFunctions(string aggregate, object expectedValue)
   {
     const string text = "9 8 7 6 5 4 3 2 1";
@@ -237,11 +248,11 @@ public class CliOutputParserImplTests(IocContextFixture iocContext)
   [Fact]
   public void ShouldCacheTransformations()
   {
-    const string input = """
-                         This is
-                         multiline
-                         text
-                         """;
+    const string text = """
+                        This is
+                        multiline
+                        text
+                        """;
 
     const string transformationOne = """
                                      Anchor.From('This');
@@ -254,16 +265,86 @@ public class CliOutputParserImplTests(IocContextFixture iocContext)
                                      """;
 
     Either<Error, ParserResult> transformationResult1
-      = _instance.Parse(transformationOne, input);
+      = _instance.Parse(transformationOne, text);
 
     Either<Error, ParserResult> transformationResult2
-      = _instance.Parse(transformationTwo, input);
+      = _instance.Parse(transformationTwo, text);
 
     Either<Error, ParserResult> transformationResult3
-      = _instance.Parse(transformationOne, input);
+      = _instance.Parse(transformationOne, text);
 
     AssertSingleValue("This is", transformationResult1);
     AssertSingleValue("multiline", transformationResult2);
     AssertSingleValue("This is", transformationResult3);
+  }
+
+  [Theory]
+  [MemberData(nameof(StrictAggregations))]
+  public void ShouldReturnAggregationErrorOnEmptyValue(string aggregate)
+  {
+    const string text = """
+                        This has no number.
+                        This also has no number.
+                        """;
+
+    string transformation = $"""
+                             Regex.Match($'(\d)'); // -> []
+                             Values.Index(1); // [] -> []
+                             Values.{aggregate}();
+                             """;
+
+    Either<Error, ParserResult> transformationResult
+      = _instance.Parse(transformation, text);
+
+    transformationResult.Match(
+      Right: val => val.Should().BeNull(),
+      Left: val => val.Should().BeOfType<EmptyEnumerationAggregationError>()
+    );
+  }
+
+  [Theory]
+  [InlineData("Sum")]
+  [InlineData("Count")]
+  public void ShouldReturnZeroForForgivingAggregations(string aggregate)
+  {
+    const string text = """
+                        This has no number.
+                        This also has no number.
+                        """;
+
+    string transformation = $"""
+                             Regex.Match($'(\d)'); // -> []
+                             Values.Index(1); // [] -> []
+                             Values.{aggregate}();
+                             """;
+
+    Either<Error, ParserResult> transformationResult
+      = _instance.Parse(transformation, text);
+
+    AssertSingleValue(expectedValue: 0, transformationResult);
+  }
+
+  [Theory]
+  [MemberData(nameof(StrictAggregations))]
+  public void ShouldPopulatedThrownExceptionOnAggregationError(string aggregate)
+  {
+    const string text = """
+                        This has no number.
+                        This also has no number.
+                        """;
+
+    string transformation = $"""
+                             Regex.Match($'(\d)'); // -> []
+                             Values.Index(1); // [] -> []
+                             Values.{aggregate}();
+                             """;
+
+    Either<Error, ParserResult> transformationResult
+      = _instance.Parse(transformation, text);
+
+    transformationResult.Match(
+      Right: val => val.Should().BeNull(),
+      Left: val => val.Should().BeOfType<EmptyEnumerationAggregationError>()
+    );
   }
 }

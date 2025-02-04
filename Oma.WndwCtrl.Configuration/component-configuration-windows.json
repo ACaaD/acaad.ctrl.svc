@@ -25,7 +25,9 @@
               "Anchor.To('WAIT_HINT');",
               "Regex.Match($'STATE[\\s:\\d]*(\\w+)');",
               "Values.Index(1);"
-            ]
+            ],
+            "returnType": "double",
+            "cardinality": "single"
           }
         ]
       },
