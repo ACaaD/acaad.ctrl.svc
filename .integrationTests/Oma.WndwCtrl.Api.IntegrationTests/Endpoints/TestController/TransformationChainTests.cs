@@ -38,10 +38,10 @@ public sealed partial class TransformationChainTests(
     using HttpRequestMessage httpRequestMessage = ConstructCommandHttpRequestMessage(payload, isJson: true);
     using HttpResponseMessage httpResponse = await _httpClient.SendAsync(httpRequestMessage, _cancelToken);
 
-    const double expected = 7.5;
+    const decimal expected = 7.5m;
 
-    httpResponse.Should().Be200Ok().And.Satisfy<TransformationOutcome<ParserResult>>(
-      response => { AssertParserResultOneNumber(response, expected); }
+    httpResponse.Should().Be200Ok().And.Satisfy<TransformationOutcome<decimal>>(
+      response => { response.Outcome.Should().Be(expected); }
     );
   }
 
@@ -52,10 +52,10 @@ public sealed partial class TransformationChainTests(
     using HttpRequestMessage httpRequestMessage = ConstructCommandHttpRequestMessage(payload, isJson: true);
     using HttpResponseMessage httpResponse = await _httpClient.SendAsync(httpRequestMessage, _cancelToken);
 
-    const double expected = 7.5;
+    const decimal expected = 7.5m;
 
-    httpResponse.Should().Be200Ok().And.Satisfy<TransformationOutcome<ParserResult>>(
-      response => { AssertParserResultOneNumber(response, expected); }
+    httpResponse.Should().Be200Ok().And.Satisfy<TransformationOutcome<decimal>>(
+      response => { response.Outcome.Should().Be(expected); }
     );
   }
 

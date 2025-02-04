@@ -77,7 +77,8 @@
               "Regex.Match($'mdev = (\\d+(\\.\\d+)?)');",
               "Values.Index(1);",
               "Values.First();"
-            ]
+            ],
+            "valueType": "decimal"
           }
         ]
       },

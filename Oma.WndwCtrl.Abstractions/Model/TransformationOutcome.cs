@@ -24,6 +24,9 @@ public record TransformationOutcome : IOutcome, IDisposable
     OutcomeRaw = outcome.OutcomeRaw;
   }
 
+  [JsonIgnore]
+  public virtual object? OutcomeUntyped { get; } = null;
+
   public void Dispose()
   {
     Dispose(disposing: true);
@@ -31,7 +34,7 @@ public record TransformationOutcome : IOutcome, IDisposable
   }
 
   public bool Success { get; init; }
-  
+
   [JsonInclude]
   public string OutcomeRaw { get; internal set; } = string.Empty;
 
@@ -68,6 +71,8 @@ public record TransformationOutcome<TData> : TransformationOutcome
 
   [JsonInclude]
   public TData? Outcome { get; internal set; }
+
+  public override object? OutcomeUntyped => Outcome;
 
   public override FlowOutcome ToFlowOutcome() => Outcome is not null
     ? new FlowOutcome<TData>(Outcome, Success)

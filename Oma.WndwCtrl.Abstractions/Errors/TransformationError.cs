@@ -1,18 +1,18 @@
-using JetBrains.Annotations;
 using LanguageExt.Common;
 
 namespace Oma.WndwCtrl.Abstractions.Errors;
 
-public record TransformationError : FlowError
+public abstract record TransformationError : FlowError
 {
-  public TransformationError(Error other) : base(other)
+  protected TransformationError(Error error) : base(error)
   {
   }
 
-  [PublicAPI]
-  public TransformationError(string message, bool isExceptional, bool isExpected) : base(
+  protected TransformationError(bool isExceptional) : base(
     isExceptional
   )
   {
   }
+
+  public override string Message => "An error occurred executing an outcome transformation.";
 }

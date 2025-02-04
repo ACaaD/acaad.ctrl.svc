@@ -60,7 +60,8 @@ public partial class TransformationChainTests
                                                                        "Regex.Match($'time=(\\d+)ms');",
                                                                        "Regex.YieldGroup(1);",
                                                                        "Values.Average();"
-                                                                     ]
+                                                                     ],
+                                                                     "valueType": "decimal"
                                                                    }
                                                                  ]
                                                                }
@@ -75,19 +76,22 @@ public partial class TransformationChainTests
                                                                            "type": "parser",
                                                                            "statements": [
                                                                              "Regex.Match($'time=(\\d+)ms');"
-                                                                           ]
+                                                                           ],
+                                                                           "cardinality": "multiple"
                                                                          },
                                                                          {
                                                                            "type": "parser",
                                                                            "statements": [
                                                                              "Regex.YieldGroup(1);"
-                                                                           ]
+                                                                           ],
+                                                                           "cardinality": "multiple"
                                                                          },
                                                                          {
                                                                            "type": "parser",
                                                                            "statements": [
                                                                              "Values.Average();"
-                                                                           ]
+                                                                           ],
+                                                                           "valueType": "decimal"
                                                                          }
                                                                        ]
                                                                      }

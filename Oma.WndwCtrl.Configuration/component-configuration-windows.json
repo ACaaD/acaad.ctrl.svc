@@ -26,7 +26,6 @@
               "Regex.Match($'STATE[\\s:\\d]*(\\w+)');",
               "Values.Index(1);"
             ],
-            "returnType": "double",
             "cardinality": "single"
           }
         ]
@@ -53,7 +52,8 @@
               "// Match mem-usage",
               "Regex.Match($'Mem Usage:\\s+([\\d\\.]*)');",
               "Values.Index(1);"
-            ]
+            ],
+            "cardinality": "multiple"
           }
         ]
       },
@@ -80,7 +80,8 @@
               "Regex.Match($'time=(\\d+)ms');",
               "Values.Index(1);",
               "Values.Average();"
-            ]
+            ],
+            "valueType": "decimal"
           }
         ]
       },

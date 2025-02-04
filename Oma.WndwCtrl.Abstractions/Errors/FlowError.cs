@@ -7,7 +7,7 @@ namespace Oma.WndwCtrl.Abstractions.Errors;
 [method: PublicAPI]
 public record FlowError(bool IsExceptional, bool IsExpected) : Error
 {
-  protected FlowError(Error other) : this(other.IsExceptional, other.IsExpected)
+  public FlowError(Error other) : this(other.IsExceptional, other.IsExpected)
   {
     Code = other.Code;
     Inner = other;
