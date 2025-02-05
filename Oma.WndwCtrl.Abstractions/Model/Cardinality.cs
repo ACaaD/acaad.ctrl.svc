@@ -5,6 +5,6 @@ namespace Oma.WndwCtrl.Abstractions.Model;
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum Cardinality
 {
-  Single,
-  Multiple,
+  Single = 0,
+  Multiple = 1,
 }

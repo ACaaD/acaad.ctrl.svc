@@ -18,10 +18,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Actions\"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <None Include="CtrlApiService.config.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>

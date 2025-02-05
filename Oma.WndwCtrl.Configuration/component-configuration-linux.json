@@ -65,6 +65,7 @@
     },
     "ping-google": {
       "type": "sensor",
+      "unitOfMeasure": "ms",
       "queryCommand": {
         "type": "cli",
         "fileName": "ping",

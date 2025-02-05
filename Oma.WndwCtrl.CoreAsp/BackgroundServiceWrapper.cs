@@ -60,14 +60,18 @@ public class BackgroundServiceWrapper<TAssemblyDescriptor>(IConfiguration config
     hostBuilder.ConfigureHostConfiguration(builder => builder.AddConfiguration(configuration));
 
     hostBuilder.ConfigureLogging(
-      (_, logging) =>
+      (_, lb) =>
       {
-        logging.ClearProviders();
-        logging.SetMinimumLevel(LogLevel.Trace);
+        lb.ClearProviders();
+        lb.SetMinimumLevel(LogLevel.Trace);
+
+#if DEBUG
+        lb.AddConsole();
+#endif
 
         if (UseOtlp)
         {
-          logging.AddOpenTelemetry(
+          lb.AddOpenTelemetry(
             otelOptions =>
             {
               ResourceBuilder resourceBuilder =
@@ -89,7 +93,7 @@ public class BackgroundServiceWrapper<TAssemblyDescriptor>(IConfiguration config
           );
         }
 
-        logging.AddConfiguration(configuration.GetSection("Logging"));
+        lb.AddConfiguration(configuration.GetSection("Logging"));
       }
     );
 

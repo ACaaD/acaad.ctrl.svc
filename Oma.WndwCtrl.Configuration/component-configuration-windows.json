@@ -68,6 +68,7 @@
     "ping-google": {
       "type": "sensor",
       "active": true,
+      "unitOfMeasure": "ms",
       "queryCommand": {
         "type": "cli",
         "fileName": "ping",
@@ -132,6 +133,7 @@
     "test-switch": {
       "type": "switch",
       "active": true,
+      "onIff": "RUNNING",
       "queryCommand": {
         "type": "cli",
         "fileName": "C:\\Program Files\\Git\\usr\\bin\\bash.exe",

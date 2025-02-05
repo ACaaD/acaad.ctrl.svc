@@ -1,6 +1,8 @@
 using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 using LanguageExt;
+using Oma.WndwCtrl.Abstractions.Model;
+using ValueType = Oma.WndwCtrl.Abstractions.Model.ValueType;
 
 namespace Oma.WndwCtrl.Abstractions;
 
@@ -17,8 +19,12 @@ public interface ICommand
   [JsonIgnore]
   string Category { get; }
 
-  IEnumerable<ITransformation> Transformations { get; }
+  IList<ITransformation> Transformations { get; }
 
   [JsonIgnore]
   Option<IComponent> Component { get; set; }
+
+  ValueType InferredType => Transformations.LastOrDefault()?.ValueType ?? default;
+
+  Cardinality InferredCardinality => Transformations.LastOrDefault()?.Cardinality ?? default;
 }

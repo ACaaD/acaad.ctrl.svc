@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
@@ -9,6 +10,7 @@ using Oma.WndwCtrl.Api.Hubs;
 using Oma.WndwCtrl.Api.Hubs.MessageConsumer;
 using Oma.WndwCtrl.Api.OpenApi;
 using Oma.WndwCtrl.Configuration.Model;
+using Oma.WndwCtrl.Core.Model.Settings;
 using Oma.WndwCtrl.CoreAsp;
 using Oma.WndwCtrl.Messaging.Bus;
 using Oma.WndwCtrl.Messaging.Extensions;
@@ -44,8 +46,11 @@ public class CtrlApiService(
         options =>
         {
           options.AddDocumentTransformer(
-            (document, _, _) =>
+            (document, context, _) =>
             {
+              GeneralSettings generalSettings = context.ApplicationServices
+                .GetRequiredService<IOptions<GeneralSettings>>().Value;
+
               document.Info = new OpenApiInfo
               {
                 Title = "Component Control API",
@@ -54,6 +59,12 @@ public class CtrlApiService(
                 Extensions = new Dictionary<string, IOpenApiExtension>
                 {
                   ["acaad"] = new OpenApiString("commithash"),
+                  ["acaad.metadata"] = new OpenApiObject
+                  {
+                    ["name"] = new OpenApiString(generalSettings.Name),
+                    ["os"] = new OpenApiString(generalSettings.OS),
+                    ["otlpEnabled"] = new OpenApiBoolean(generalSettings.UseOtlp),
+                  },
                 },
               };
 

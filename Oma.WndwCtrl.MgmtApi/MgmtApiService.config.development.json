@@ -1,7 +1,9 @@
 {
   "Logging": {
     "LogLevel": {
-      "Default": "Trace"
+      "Default": "Information",
+      "Microsoft.AspNetCore.Hosting.Diagnostics": "Warning",
+      "Microsoft.AspNetCore.Routing.EndpointMiddleware": "Warning"
     }
   },
   "Core": {

@@ -141,6 +141,10 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(
       {
         lb.ClearProviders();
 
+#if DEBUG
+        lb.AddConsole();
+#endif
+
         if (UseOtlp)
         {
           lb.AddOpenTelemetry(
