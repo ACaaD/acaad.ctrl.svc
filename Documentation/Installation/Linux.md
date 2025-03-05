@@ -90,3 +90,4 @@ __TODO...__
 
 - [Running .NET Core Applications as a Linux Service](https://code-maze.com/aspnetcore-running-applications-as-linux-service/)
   by [Muhammed Saleem](https://code-maze.com/author/muhammed-saleem/)
+- [Mount NAS SharedFolder to Linux with CIFS](https://medium.com/@langhxs/mount-nas-sharedfolder-to-linux-with-cifs-6149e2d32dba) by [Kexin Lu](https://medium.com/@langhxs)
