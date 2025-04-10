@@ -6,5 +6,10 @@ public class TestStep
 
   public TimeSpan Duration { get; init; }
 
-  public decimal TargetGravitationalForce { get; init; }
+  public float TargetGravitationalForce { get; init; }
+
+  public float Amplitude { get; set; } = 0.05f;
+
+  public override string ToString() =>
+    $"Freq={Frequency}Hz;Dur={Duration};Target={TargetGravitationalForce}G;CurrA={Amplitude}";
 }

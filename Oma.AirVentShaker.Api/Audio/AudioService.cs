@@ -71,6 +71,20 @@ public sealed class AudioService : IAudioService, IDisposable
     }
   }
 
+  public async Task UpdateAmplitudeAsync(float newVal, CancellationToken cancelToken)
+  {
+    try
+    {
+      await _mutex.WaitAsync(cancelToken);
+
+      _oscillator.Amplitude = newVal;
+    }
+    finally
+    {
+      _mutex.Release();
+    }
+  }
+
   public void Dispose()
   {
     _delayCancellationTokenSource?.Dispose();

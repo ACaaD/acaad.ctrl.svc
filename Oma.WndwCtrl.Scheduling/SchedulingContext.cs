@@ -25,7 +25,7 @@ public class SchedulingContext(ILogger<SchedulingContext> logger) : ISchedulingC
     _currentTickOffset += clampedOffsetChange;
     _currentOffset = TimeSpan.FromTicks(_currentTickOffset);
 
-    logger.LogInformation(
+    logger.LogDebug(
       "Updated scheduling offset to {Offset} based on an average of {Avg} (unfiltered={AvgUnfiltered}) over {Cnt} values.",
       _currentOffset,
       TimeSpan.FromTicks(aggregatedValues),

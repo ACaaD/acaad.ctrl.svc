@@ -22,7 +22,15 @@ public class TimeSeriesPersistorMessageConsumer(ILogger<TimeSeriesPersistorMessa
 
   public Task OnMessageAsync(GForceValueBatchEvent message, CancellationToken cancelToken = default)
   {
-    logger.LogInformation("Received {count} events.", message.DataPoints.Count);
+    IEnumerable<string> stepNames = message.DataPoints
+      .DistinctBy(dp => dp.TestStep?.ToString() ?? "none")
+      .Select(dp => dp.TestStep?.ToString() ?? "none");
+
+    logger.LogDebug(
+      "Received {count} events. Test Steps: [{stepNames}]",
+      message.DataPoints.Count,
+      string.Join(", ", stepNames)
+    );
 
     return Task.CompletedTask;
   }

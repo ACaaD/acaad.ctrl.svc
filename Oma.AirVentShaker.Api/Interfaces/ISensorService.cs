@@ -9,6 +9,8 @@ public record CurrentGForces
   public TestStep? TestStep { get; init; }
 
   public DateTime AsOf { get; } = DateTime.UtcNow;
+
+  public float NetForce { get; } = Random.Shared.NextSingle() * 100 / 500;
 }
 
 public interface ISensorService
