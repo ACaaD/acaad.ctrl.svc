@@ -6,5 +6,5 @@ public interface IAudioService
 {
   Task PlayAsync(IWaveDescriptor waveDescriptor, TimeSpan duration, CancellationToken cancelToken);
 
-  Task StopAllAsync(CancellationToken cancelToken);
+  Task StopAsync(CancellationToken cancelToken);
 }

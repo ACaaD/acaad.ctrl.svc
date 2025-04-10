@@ -21,6 +21,7 @@
         <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.10.0"/>
         <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.10.1"/>
         <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.10.0"/>
+        <PackageVersion Include="SoundFlow" Version="1.0.3"/>
     </ItemGroup>
     <ItemGroup Label="Host">
         <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1"/>

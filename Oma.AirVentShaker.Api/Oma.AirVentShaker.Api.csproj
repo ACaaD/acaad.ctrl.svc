@@ -16,4 +16,8 @@
         <Folder Include="Sensors\"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <PackageReference Include="SoundFlow"/>
+    </ItemGroup>
+
 </Project>
