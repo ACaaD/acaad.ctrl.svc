@@ -4,7 +4,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Oma.AirVentShaker.Api.Audio;
 using Oma.AirVentShaker.Api.Interfaces;
+using Oma.AirVentShaker.Api.Messaging.Consumers;
 using Oma.AirVentShaker.Api.Model;
+using Oma.AirVentShaker.Api.Model.Events;
+using Oma.AirVentShaker.Api.Sensors;
+using Oma.AirVentShaker.Api.TestRunners;
+using Oma.AirVentShaker.Api.Workers;
 using Oma.WndwCtrl.Configuration.Model;
 using Oma.WndwCtrl.Core.Extensions;
 using Oma.WndwCtrl.CoreAsp;
@@ -31,9 +36,14 @@ public class AirVentShakerApiService(
   {
     base
       .ConfigureServices(services)
+      .AddSingleton<GlobalState>()
       .AddSingleton(_messageBusAccessor)
       .UseMessageBus(_messageBusAccessor)
-      .AddSingleton<IAudioService, AudioService>();
+      .AddMessageConsumer<TimeSeriesPersistorMessageConsumer, GForceValueBatchEvent>()
+      .AddHostedService<SensorWorker>()
+      .AddSingleton<ITestRunner, DummyTestRunner>()
+      .AddSingleton<IAudioService, AudioService>()
+      .AddSingleton<ISensorService, DummySensorService>();
 
     services.AddSignalR();
 

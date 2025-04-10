@@ -10,6 +10,7 @@ namespace Oma.AirVentShaker.Api.Audio;
 public sealed class AudioService : IAudioService, IDisposable
 {
   private readonly AudioEngine _audioEngine;
+  private readonly SemaphoreSlim _mutex = new(initialCount: 1);
   private readonly Oscillator _oscillator;
 
   private CancellationTokenSource? _delayCancellationTokenSource;
@@ -30,26 +31,44 @@ public sealed class AudioService : IAudioService, IDisposable
     CancellationToken cancelToken
   )
   {
-    if (_delayCancellationTokenSource is not null)
+    try
     {
-      await _delayCancellationTokenSource.CancelAsync();
+      await _mutex.WaitAsync(cancelToken);
+
+      if (_delayCancellationTokenSource is not null)
+      {
+        await _delayCancellationTokenSource.CancelAsync();
+      }
+
+      _delayCancellationTokenSource = new CancellationTokenSource();
+
+      AdjustOscillator(waveDescriptor);
+      ScheduleStop(duration, _delayCancellationTokenSource.Token);
+
+      cancelToken.Register(() => _oscillator.Enabled = false);
     }
-
-    _delayCancellationTokenSource = new CancellationTokenSource();
-
-    AdjustOscillator(waveDescriptor);
-    ScheduleStop(duration, _delayCancellationTokenSource.Token);
-
-    cancelToken.Register(() => _oscillator.Enabled = false);
+    finally
+    {
+      _mutex.Release();
+    }
   }
 
   public async Task StopAsync(CancellationToken cancelToken)
   {
-    _oscillator.Enabled = false;
+    try
+    {
+      await _mutex.WaitAsync(cancelToken);
 
-    await (_delayCancellationTokenSource?.CancelAsync() ?? Task.CompletedTask);
-    _delayCancellationTokenSource?.Dispose();
-    _delayCancellationTokenSource = null;
+      _oscillator.Enabled = false;
+
+      await (_delayCancellationTokenSource?.CancelAsync() ?? Task.CompletedTask);
+      _delayCancellationTokenSource?.Dispose();
+      _delayCancellationTokenSource = null;
+    }
+    finally
+    {
+      _mutex.Release();
+    }
   }
 
   public void Dispose()

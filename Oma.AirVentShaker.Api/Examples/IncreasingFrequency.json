@@ -1,3 +1,19 @@
 {
-
+  "steps": [
+    {
+      "frequency": 50,
+      "duration": "00:00:01",
+      "targetGravitationalForce": 0.5
+    },
+    {
+      "frequency": 100,
+      "duration": "00:00:01",
+      "targetGravitationalForce": 0.5
+    },
+    {
+      "frequency": 200,
+      "duration": "00:00:01",
+      "targetGravitationalForce": 0.5
+    }
+  ]
 }
