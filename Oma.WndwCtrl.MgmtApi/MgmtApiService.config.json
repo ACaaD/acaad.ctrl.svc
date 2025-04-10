@@ -30,7 +30,7 @@
     "Kestrel": {
       "Endpoints": {
         "Http": {
-          "Url": "http://192.168.178.22:8443"
+          "Url": "http://192.168.203.80:8443"
         }
       }
     }
@@ -39,7 +39,7 @@
     "Kestrel": {
       "Endpoints": {
         "Http": {
-          "Url": "http://192.168.178.22:5000"
+          "Url": "http://192.168.203.80:5000"
         }
       }
     }
@@ -49,7 +49,16 @@
     "Kestrel": {
       "Endpoints": {
         "Http": {
-          "Url": "http://192.168.178.22:19090"
+          "Url": "http://192.168.203.80:19090"
+        }
+      }
+    }
+  },
+  "AirVentShakerApiService": {
+    "Kestrel": {
+      "Endpoints": {
+        "Http": {
+          "Url": "http://192.168.203.80:1337"
         }
       }
     }

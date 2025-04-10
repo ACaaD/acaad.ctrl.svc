@@ -89,6 +89,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenTelemetry Collector", "
 		Monitoring\OpenTelemetry Collector\config.yaml = Monitoring\OpenTelemetry Collector\config.yaml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oma.AirVentShaker.Api", "Oma.AirVentShaker.Api\Oma.AirVentShaker.Api.csproj", "{06E0F056-4673-4058-AE8D-5DBDB3C4CB99}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -175,6 +177,10 @@ Global
 		{BECCCB65-C4D8-4AD1-B156-A745370BE36A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BECCCB65-C4D8-4AD1-B156-A745370BE36A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BECCCB65-C4D8-4AD1-B156-A745370BE36A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06E0F056-4673-4058-AE8D-5DBDB3C4CB99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06E0F056-4673-4058-AE8D-5DBDB3C4CB99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06E0F056-4673-4058-AE8D-5DBDB3C4CB99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06E0F056-4673-4058-AE8D-5DBDB3C4CB99}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{E7217C2E-5C78-4106-977D-3091CFA63F43} = {307F90ED-24AD-4725-960B-0A7AAFFE8C6D}

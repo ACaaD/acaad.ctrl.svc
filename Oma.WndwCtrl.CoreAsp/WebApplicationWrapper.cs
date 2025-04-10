@@ -33,6 +33,8 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(
 
   private static readonly string _serviceName = typeof(TAssemblyDescriptor).Name;
 
+  protected static DefaultJsonTypeInfoResolver? _typeInfoResolver;
+
   private readonly string AcaadName =
     rootConfiguration?.GetValue<string>("ACaaD:Name") ?? Guid.NewGuid().ToString();
 
@@ -41,6 +43,8 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(
   private IConfiguration? _configuration;
 
   private IWebHostEnvironment? _environment;
+
+  protected virtual Action<JsonTypeInfo> AddAdditionalModifiers { get; } = info => { };
 
   [PublicAPI]
   protected static IServiceProvider ServiceProvider => _serviceProvider
@@ -122,7 +126,7 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(
       .AddJsonOptions(
         opts =>
         {
-          ModifyJsonSerializerOptions(opts.JsonSerializerOptions);
+          ModifyJsonSerializerOptions(opts.JsonSerializerOptions, AddAdditionalModifiers);
           ConfigureJsonOptions(opts);
         }
       );
@@ -217,9 +221,12 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(
     : Task.CompletedTask;
 
   public static void ModifyJsonSerializerOptions(
-    JsonSerializerOptions jsonSerializerOptions
+    JsonSerializerOptions jsonSerializerOptions,
+    Action<JsonTypeInfo>? additionalModifierAction = null
   )
   {
+    additionalModifierAction ??= _ => { };
+
     jsonSerializerOptions.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
       .WithAddedModifier(
         JsonExtensions.GetPolymorphismModifierFor<ICommand>(
@@ -235,7 +242,7 @@ public class WebApplicationWrapper<TAssemblyDescriptor>(
         JsonExtensions.GetPolymorphismModifierFor<ITrigger>(
           t => t.Name.Replace("Trigger", string.Empty)
         )
-      );
+      ).WithAddedModifier(additionalModifierAction);
   }
 
   [PublicAPI]

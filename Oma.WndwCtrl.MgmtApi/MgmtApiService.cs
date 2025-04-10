@@ -1,3 +1,4 @@
+using Oma.AirVentShaker.Api;
 using Oma.WndwCtrl.Api.Extensions;
 using Oma.WndwCtrl.CommandProcessor;
 using Oma.WndwCtrl.CoreAsp;
@@ -21,6 +22,7 @@ public class MgmtApiService(MessageBusAccessor? messageBusAccessor, IConfigurati
       .AddComponentApi(Configuration)
       .AddHostedService<ServiceWorker>()
       .AddApiService<MetricsApiService>()
+      .AddApiService<AirVentShakerApiService>()
       .AddBackgroundService<MessageBusService>()
       .AddBackgroundService<EventLoggingService>()
       .AddBackgroundService<SchedulingService>()
