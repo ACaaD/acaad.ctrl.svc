@@ -17,7 +17,7 @@ public sealed class AudioService : IAudioService, IDisposable
 
   public AudioService()
   {
-    _audioEngine = new MiniAudioEngine(sampleRate: 48000, Capability.Playback);
+    _audioEngine = new MiniAudioEngine(sampleRate: 44100, Capability.Playback);
 
     _oscillator = new Oscillator()
       { Frequency = 50, Type = Oscillator.WaveformType.Sine, Amplitude = 0.2f, Enabled = false, };

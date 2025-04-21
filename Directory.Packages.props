@@ -8,6 +8,8 @@
     <ItemGroup Label="General">
         <PackageVersion Include="CliWrap" Version="3.7.1"/>
         <PackageVersion Include="CommandLineParser" Version="2.9.1"/>
+        <PackageVersion Include="InfluxDB.Client" Version="4.18.0"/>
+        <PackageVersion Include="Iot.Device.Bindings" Version="3.2.0"/>
         <PackageVersion Include="LanguageExt.Core" Version="5.0.0-beta-45"/>
         <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.1"/>
         <PackageVersion Include="Microsoft.Extensions.Diagnostics" Version="9.0.1"/>
@@ -15,13 +17,14 @@
         <PackageVersion Include="Microsoft.Extensions.Hosting.Systemd" Version="9.0.1"/>
         <PackageVersion Include="Microsoft.Extensions.Hosting.WindowsServices" Version="9.0.0"/>
         <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.1"/>
+        <PackageVersion Include="nanoFramework.Hardware.Esp32" Version="1.6.34"/>
         <PackageVersion Include="OpenTelemetry.Exporter.Console" Version="1.11.1"/>
         <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.11.1"/>
         <PackageVersion Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.10.0-beta.1"/>
         <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.10.0"/>
         <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.10.1"/>
         <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.10.0"/>
-        <PackageVersion Include="SoundFlow" Version="1.0.3"/>
+        <PackageVersion Include="System.Device.Gpio" Version="3.2.0"/>
     </ItemGroup>
     <ItemGroup Label="Host">
         <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1"/>

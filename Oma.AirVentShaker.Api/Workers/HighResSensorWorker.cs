@@ -9,7 +9,7 @@ using Oma.WndwCtrl.Abstractions.Messaging.Interfaces;
 
 namespace Oma.AirVentShaker.Api.Workers;
 
-public class SensorWorker(
+public class HighResSensorWorker(
   ILogger<SensorWorker> logger,
   IOptions<SensorSettings> sensorOptions,
   ISensorService sensorService,
@@ -19,56 +19,50 @@ public class SensorWorker(
   private readonly CancellationTokenSource _cts = new();
 
   private ConcurrentBag<CurrentGForces> _active = new();
+  private bool _isRunning;
+  private CurrentGForces? _last;
   private ConcurrentBag<CurrentGForces> _other = new();
-  private PeriodicTimer? _timer;
 
-  public Task StartAsync(CancellationToken cancellationToken)
+  public async Task StartAsync(CancellationToken cancellationToken)
   {
-    SensorSettings settings = sensorOptions.Value;
+    _isRunning = true;
 
-    _timer = new PeriodicTimer(settings.QueryInterval);
-    _ = ReadSensorAsync();
-
-    return Task.CompletedTask;
+    _ = ProcessAsync();
   }
 
   public async Task StopAsync(CancellationToken cancellationToken)
   {
+    _isRunning = false;
+
     await _cts.CancelAsync();
     _cts.Dispose();
   }
 
-  private async Task ReadSensorAsync()
-  {
-    try
-    {
-      while (await (_timer?.WaitForNextTickAsync(_cts.Token) ?? ValueTask.FromResult(result: false)))
-        await ProcessTimerTickAsync();
-    }
-    catch (OperationCanceledException)
-    {
-      logger.LogInformation("Scheduling service canceled.");
-    }
-  }
-
-  private async Task ProcessTimerTickAsync()
+  private async Task ProcessAsync()
   {
     int batchSize = sensorOptions.Value.BatchSize;
 
-    try
-    {
-      CurrentGForces currentReading = await sensorService.ReadAsync(_cts.Token);
-      _active.Add(currentReading);
+    await Task.Delay(TimeSpan.FromSeconds(seconds: 7));
+    logger.LogInformation("Starting to read sensor values.");
 
-      if (_active.Count >= batchSize)
+    while (_isRunning)
+      try
       {
-        await QueueBatchAsync();
+        CurrentGForces currentReading = await sensorService.ReadAsync(_cts.Token);
+
+        _active.Add(currentReading);
+
+        if (_active.Count >= batchSize)
+        {
+          await QueueBatchAsync();
+        }
+
+        await Task.Delay(TimeSpan.FromMicroseconds(microseconds: 100));
       }
-    }
-    catch (Exception ex)
-    {
-      logger.LogError(ex, "An unexpected error occurred while processing jobs.");
-    }
+      catch (Exception ex)
+      {
+        logger.LogError(ex, "An unexpected error occurred.");
+      }
   }
 
   private async Task QueueBatchAsync()

@@ -84,7 +84,8 @@ public class AmplitudeAdjustingMessageConsumer : IMessageConsumer<GForceValueBat
     step.Amplitude += clamped;
 
     _logger.LogInformation(
-      "Updated amplitude to {Amplitude} (diff={Diff}) based on an average of {Avg} over {Cnt} values.",
+      "Measured G-Forces: {avgG}. Updating amplitude to {Amplitude} (diff={Diff}) based on an average of {Avg} over {Cnt} values.",
+      measurements.Average(),
       step.Amplitude,
       clamped,
       devAverage,

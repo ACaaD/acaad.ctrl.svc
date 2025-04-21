@@ -43,10 +43,20 @@ public class AirVentShakerApiService(
       .UseMessageBus(_messageBusAccessor)
       .AddMessageConsumer<TimeSeriesPersistorMessageConsumer, GForceValueBatchEvent>()
       .AddMessageConsumer<AmplitudeAdjustingMessageConsumer, GForceValueBatchEvent>()
-      .AddHostedService<SensorWorker>()
+      // .AddHostedService<SensorWorker>()
+      .AddHostedService<HighResSensorWorker>()
       .AddSingleton<ITestRunner, DummyTestRunner>()
-      .AddSingleton<IAudioService, AudioService>()
-      .AddSingleton<ISensorService, DummySensorService>();
+      .AddSingleton<IAudioService, AudioService>();
+
+
+    if (Configuration.GetValue<string>("ACaaD:OS") == "windows")
+    {
+      services.AddSingleton<ISensorService, DummySensorService>();
+    }
+    else
+    {
+      services.AddSingleton<ISensorService, Adxl345SensorService>();
+    }
 
     services.AddSignalR();
 

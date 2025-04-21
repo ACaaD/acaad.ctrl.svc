@@ -1,0 +1,10 @@
+{
+  "Sensor": {
+    "Io": {
+      "Accelerometer": {
+        "BusId": 0,
+        "Line": 0
+      }
+    }
+  }
+}

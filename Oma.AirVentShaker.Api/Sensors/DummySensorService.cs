@@ -3,11 +3,13 @@ using Oma.AirVentShaker.Api.Model;
 
 namespace Oma.AirVentShaker.Api.Sensors;
 
-public class DummySensorService(GlobalState globalState) : ISensorService
+public class DummySensorService(GlobalState GlobalState) : ISensorService
 {
-  public async Task<CurrentGForces> ReadAsync(CancellationToken cancelToken) => new()
-  {
-    TestDefinition = globalState.ActiveDefinition,
-    TestStep = globalState.ActiveStep,
-  };
+  public Task<CurrentGForces> ReadAsync(CancellationToken cancelToken) => Task.FromResult(
+    new CurrentGForces(NetForce: 0)
+    {
+      TestStep = GlobalState.ActiveStep,
+      TestDefinition = GlobalState.ActiveDefinition,
+    }
+  );
 }

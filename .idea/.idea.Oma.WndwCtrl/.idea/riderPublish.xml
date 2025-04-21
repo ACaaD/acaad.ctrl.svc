@@ -6,6 +6,7 @@
         <option value="T:/Build/MgmtApi/Debug" />
         <option value="T:/Build/MgmtApi/Release" />
         <option value="T:/Build/MgmtApi/Linux" />
+        <option value="T:/Build/MgmtApi/Linux.ARM" />
       </list>
     </option>
   </component>

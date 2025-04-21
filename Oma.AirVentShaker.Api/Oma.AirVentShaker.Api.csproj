@@ -7,12 +7,22 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\external\SoundFlow\Src\SoundFlow.csproj"/>
         <ProjectReference Include="..\Oma.WndwCtrl.Configuration\Oma.WndwCtrl.Configuration.csproj"/>
         <ProjectReference Include="..\Oma.WndwCtrl.Messaging\Oma.WndwCtrl.Messaging.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="SoundFlow"/>
+        <PackageReference Include="InfluxDB.Client"/>
+        <PackageReference Include="Iot.Device.Bindings"/>
+        <PackageReference Include="nanoFramework.Hardware.Esp32"/>
+        <PackageReference Include="System.Device.Gpio"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="AirVentShakerApiService.config.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>

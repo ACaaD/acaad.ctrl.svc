@@ -30,7 +30,7 @@
     "Kestrel": {
       "Endpoints": {
         "Http": {
-          "Url": "http://192.168.203.80:8443"
+          "Url": "http://oma-desktop.acaad.dev:8443"
         }
       }
     }
@@ -39,7 +39,7 @@
     "Kestrel": {
       "Endpoints": {
         "Http": {
-          "Url": "http://192.168.203.80:5000"
+          "Url": "http://oma-desktop.acaad.dev:5000"
         }
       }
     }
@@ -49,7 +49,7 @@
     "Kestrel": {
       "Endpoints": {
         "Http": {
-          "Url": "http://192.168.203.80:19090"
+          "Url": "http://oma-desktop.acaad.dev:19090"
         }
       }
     }
@@ -58,7 +58,7 @@
     "Kestrel": {
       "Endpoints": {
         "Http": {
-          "Url": "http://192.168.203.80:1337"
+          "Url": "http://oma-desktop.acaad.dev:1337"
         }
       }
     }
